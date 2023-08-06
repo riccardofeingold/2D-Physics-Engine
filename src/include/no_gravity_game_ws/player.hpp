@@ -4,7 +4,7 @@
 class Player
 {
     public:
-    Player(float x, float y, float size);
+    Player(float x, float y, float size, float restitution = 1.f);
     ~Player();
 
     // methods
@@ -13,7 +13,11 @@ class Player
     void shoot();
     
     // public variables
-    sf::CircleShape shape_;
+    float size;
+    float restitution;
+    sf::CircleShape body;
+    sf::Vector2f velocity;
+    
     private:
     bool on_ground_;
 };
