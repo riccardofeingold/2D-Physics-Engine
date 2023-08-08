@@ -10,14 +10,14 @@ Player::Player(float x, float y, float size, float restitution)
     this->velocity = sf::Vector2f(0.f, 0.f);
     this->body = sf::CircleShape(size);
     this->body.setFillColor(sf::Color::White);
-    this->body.setPosition(x + size, y - size);
+    this->body.setPosition(x - size, y - size);
 }
 
 Player::~Player() = default;
 
 void Player::move()
 {
-
+    // if (sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X) > 0)
 }
 
 void Player::shoot()

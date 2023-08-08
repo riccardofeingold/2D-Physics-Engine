@@ -8,7 +8,7 @@ FetchContent_Declare(SFML
 FetchContent_MakeAvailable(SFML)
 
 
-add_executable(NoGravityGameWS src/main.cpp src/src/player.cpp)
+add_executable(NoGravityGameWS src/main.cpp src/src/player.cpp src/src/physics.cpp)
 target_include_directories(NoGravityGameWS PUBLIC include/no_gravity_game_ws)
 target_link_libraries(NoGravityGameWS PRIVATE sfml-graphics)
 target_compile_features(NoGravityGameWS PRIVATE cxx_std_17)
