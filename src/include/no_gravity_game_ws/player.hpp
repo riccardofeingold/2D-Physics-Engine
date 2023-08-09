@@ -8,16 +8,21 @@ class Player
     ~Player();
 
     // methods
-    void move();
-    void jump();
+    void move(const sf::Vector2f& position);
     void shoot();
     
-    // public variables
+    // setters
+    void setVelocity(const sf::Vector2f& velocity);
+
+    // getters
+    const sf::Vector2f& getVelocity() const;
+    
+    // public variable
+    bool on_ground;
     float size;
     float restitution;
     sf::CircleShape body;
-    sf::Vector2f velocity;
-    
+
     private:
-    bool on_ground_;
+    sf::Vector2f velocity_;
 };

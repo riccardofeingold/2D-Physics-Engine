@@ -1,5 +1,14 @@
 #pragma once
+#include <iostream>
 #include <SFML/Graphics.hpp>
+
+struct DragForce
+{
+    float drag_coefficient = 0.f;
+    float cross_sectional_area = 0.f;
+    float density = 0.f;
+    float force = 0.f;
+};
 
 class PhysicsObject
 {
@@ -12,6 +21,7 @@ class PhysicsObject
     void apply_torque(const float& torque);
     void apply_impulse(const sf::Vector2f& impulse);
     void update(sf::Time delta_time);
+    void addAirResitance();
 
     // getters
     const sf::Vector2f& get_position() const;
@@ -24,6 +34,11 @@ class PhysicsObject
     const float& get_moment_of_inertia() const;
 
     private:
+    // private methods
+    void calculateDragForce();
+
+    // private variables
+    DragForce air_drag_;
     float gravity_;
     float mass_;
     float moment_of_inertia_;

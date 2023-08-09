@@ -45,6 +45,11 @@ void PhysicsObject::apply_torque(const float& torque)
     angular_acceleration_ += torque / moment_of_inertia_;
 }
 
+void PhysicsObject::calculateDragForce()
+{
+    this->air_drag_.force = -0.5;
+}
+
 void PhysicsObject::update(sf::Time delta_time)
 {
     // apply gravity
@@ -54,4 +59,9 @@ void PhysicsObject::update(sf::Time delta_time)
     velocity_ += acceleration_ * delta_time.asSeconds();
     position_ += velocity_ * delta_time.asSeconds();
     acceleration_ = sf::Vector2f(0.f, 0.f);
+}
+
+void PhysicsObject::addAirResitance()
+{
+    
 }
