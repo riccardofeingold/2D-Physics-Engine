@@ -7,7 +7,28 @@ struct DragForce
     float drag_coefficient = 0.f;
     float cross_sectional_area = 0.f;
     float density = 0.f;
-    float force = 0.f;
+
+    // methods
+    float constant_multiplier()
+    {
+        return 0.5 * drag_coefficient * cross_sectional_area * density;
+    }
+
+    sf::Vector2f force(const sf::Vector2f& velocity)
+    {
+        sf::Vector2f force;
+        if (velocity.x >= 0)
+            force.x = -constant_multiplier() * velocity.x * velocity.x;
+        else if (velocity.x < 0)
+            force.x = constant_multiplier() * velocity.x * velocity.x;
+        
+        if (velocity.y >= 0)
+            force.y = -constant_multiplier() * velocity.y * velocity.y;
+        else if (velocity.y < 0)
+            force.y = constant_multiplier() * velocity.y * velocity.y;
+
+        return force;
+    }
 };
 
 class PhysicsObject
@@ -21,7 +42,7 @@ class PhysicsObject
     void apply_torque(const float& torque);
     void apply_impulse(const sf::Vector2f& impulse);
     void update(sf::Time delta_time);
-    void addAirResitance();
+    void applyAirDrag(float Cd, float A, float density);
 
     // getters
     const sf::Vector2f& get_position() const;
@@ -35,7 +56,6 @@ class PhysicsObject
 
     private:
     // private methods
-    void calculateDragForce();
 
     // private variables
     DragForce air_drag_;

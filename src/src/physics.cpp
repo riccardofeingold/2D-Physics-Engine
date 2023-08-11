@@ -45,15 +45,15 @@ void PhysicsObject::apply_torque(const float& torque)
     angular_acceleration_ += torque / moment_of_inertia_;
 }
 
-void PhysicsObject::calculateDragForce()
-{
-    this->air_drag_.force = -0.5;
-}
-
 void PhysicsObject::update(sf::Time delta_time)
 {
     // apply gravity
     acceleration_.y += gravity_;
+    
+    // apply air drag
+    sf::Vector2f air_drag = air_drag_.force(velocity_);
+    acceleration_.x += air_drag.x / mass_;
+    acceleration_.y += air_drag.y / mass_;
 
     // calculate velocity and position
     velocity_ += acceleration_ * delta_time.asSeconds();
@@ -61,7 +61,9 @@ void PhysicsObject::update(sf::Time delta_time)
     acceleration_ = sf::Vector2f(0.f, 0.f);
 }
 
-void PhysicsObject::addAirResitance()
+void PhysicsObject::applyAirDrag(float Cd, float A, float density)
 {
-    
+    air_drag_.drag_coefficient = Cd;
+    air_drag_.cross_sectional_area = A;
+    air_drag_.density = density;
 }

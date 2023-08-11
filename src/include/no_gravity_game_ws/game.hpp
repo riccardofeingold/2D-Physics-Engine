@@ -8,9 +8,13 @@
 #define SCREEN_HEIGHT 480
 #define SPEED 200
 #define SPEED_JOYSTICK 0.02 // maximum value of the joystick is 100
-#define MAX_THRUST_FORCE 0.1
-#define GRAVITY 0
+#define MAX_THRUST_FORCE 2
+#define GRAVITY 10
 #define FRAME_RATE 60
+
+// air drag values
+#define DRAG_COEFFICIENT 1.05 // https://en.wikipedia.org/wiki/Drag_coefficient
+#define AIR_DENSITY 1.293
 
 class Game
 {

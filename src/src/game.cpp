@@ -5,6 +5,7 @@ Game::Game() :
     player_(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 1.f), 
     playerPhysics_(GRAVITY, 1, 1) 
 {
+    this->playerPhysics_.applyAirDrag(DRAG_COEFFICIENT, 1, AIR_DENSITY);
 }
 
 Game::~Game() = default;
@@ -15,9 +16,6 @@ void Game::handleInput()
     {
         int throttle = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
         int roll = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z);
-
-        // player_.setVelocity(sf::Vector2f(player_.getVelocity().x, player_.getVelocity().y + SPEED_JOYSTICK * throttle));
-        // player_.setVelocity(sf::Vector2f(player_.getVelocity().x + SPEED_JOYSTICK * roll, player_.getVelocity().y));
 
         this->playerPhysics_.apply_force(sf::Vector2f(0.f, MAX_THRUST_FORCE * throttle));
         this->playerPhysics_.apply_force(sf::Vector2f(MAX_THRUST_FORCE * roll, 0.f));
