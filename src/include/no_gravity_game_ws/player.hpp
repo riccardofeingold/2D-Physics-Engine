@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "physics.hpp"
 
-class Player
+class Player : public PhysicsObject
 {
     public:
     Player(float x, float y, float size, float restitution = 1.f);

@@ -34,6 +34,7 @@ struct DragForce
 class PhysicsObject
 {
     public:
+    PhysicsObject();
     PhysicsObject(float gravity, float mass, float moment_of_inertia);
     ~PhysicsObject();
 
@@ -45,14 +46,22 @@ class PhysicsObject
     void applyAirDrag(float Cd, float A, float density);
 
     // getters
-    const sf::Vector2f& get_position() const;
-    const sf::Vector2f& get_velocity() const;
-    const sf::Vector2f& get_acceleration() const;
-    const float& get_orientation() const;
-    const float& get_angular_velocity() const;
-    const float& get_angular_acceleration() const;
-    const float& get_mass() const;
-    const float& get_moment_of_inertia() const;
+    virtual const sf::Vector2f& get_position() const;
+    virtual const sf::Vector2f& get_velocity() const;
+    virtual const sf::Vector2f& get_acceleration() const;
+    virtual const float& get_orientation() const;
+    virtual const float& get_angular_velocity() const;
+    virtual const float& get_angular_acceleration() const;
+    virtual const float& get_mass() const;
+    virtual const float& get_moment_of_inertia() const;
+
+    protected:
+    sf::Vector2f position_;
+    sf::Vector2f velocity_;
+    sf::Vector2f acceleration_;
+    float orientation_;
+    float angular_velocity_;
+    float angular_acceleration_;
 
     private:
     // private methods
@@ -62,10 +71,4 @@ class PhysicsObject
     float gravity_;
     float mass_;
     float moment_of_inertia_;
-    sf::Vector2f position_;
-    sf::Vector2f velocity_;
-    sf::Vector2f acceleration_;
-    float orientation_;
-    float angular_velocity_;
-    float angular_acceleration_;
 };

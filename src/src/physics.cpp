@@ -1,5 +1,15 @@
 #include "../include/no_gravity_game_ws/physics.hpp"
 
+PhysicsObject::PhysicsObject()
+    : gravity_(9.81),
+      mass_(1),
+      moment_of_inertia_(1),
+      position_(sf::Vector2f(0.f, 0.f)),
+      velocity_(sf::Vector2f(0.f, 0.f)),
+      acceleration_(sf::Vector2f(0.f, 0.f))
+{
+}
+
 PhysicsObject::PhysicsObject(float gravity, float mass, float moment_of_inertia) 
     : gravity_(gravity), 
       mass_(mass),

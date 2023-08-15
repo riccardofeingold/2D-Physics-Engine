@@ -3,12 +3,18 @@
 Game::Game() : 
     window_("2D Drone Simulator", sf::Vector2u(SCREEN_WIDTH, SCREEN_HEIGHT), FRAME_RATE), 
     player_(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 1.f), 
-    playerPhysics_(GRAVITY, 1, 1) 
+    playerPhysics_(GRAVITY, 1, 1)
 {
     this->playerPhysics_.applyAirDrag(DRAG_COEFFICIENT, 1, AIR_DENSITY);
+    this->start();
 }
 
 Game::~Game() = default;
+
+void Game::start()
+{
+    world_.addObject(&this->playerPhysics_);
+}
 
 void Game::handleInput()
 {
