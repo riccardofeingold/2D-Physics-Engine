@@ -39,6 +39,23 @@ const float& PhysicsObject::get_angular_velocity() const { return angular_veloci
 
 const float& PhysicsObject::get_angular_acceleration() const { return angular_acceleration_; }
 
+// setters
+void PhysicsObject::setAcceleration(sf::Vector2f& acceleration) { this->acceleration_ = acceleration; }
+
+void PhysicsObject::setVelocity(sf::Vector2f& velocity) { this->velocity_ = velocity; }
+
+void PhysicsObject::setPosition(sf::Vector2f& position) { this->position_ = position; }
+
+void PhysicsObject::setOrientation(float angle) { this->orientation_ = angle; }
+
+void PhysicsObject::setAngularVelocity(float angular_velocity) { this->angular_velocity_ = angular_velocity; }
+
+void PhysicsObject::setAngularAcceleration(float angular_acceleration) { this->angular_acceleration_ = angular_acceleration; }
+
+void PhysicsObject::setMass(float mass) { this->mass_ = mass; }
+
+void PhysicsObject::setMomentOfInertia(float MoI) { this->moment_of_inertia_ = MoI; }
+
 // Physics
 void PhysicsObject::apply_force(const sf::Vector2f& force)
 {

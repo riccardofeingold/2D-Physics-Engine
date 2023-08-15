@@ -7,6 +7,7 @@ class World
 {
     public:
     World();
+    World(float gravity);
     ~World();
 
     void addObject(PhysicsObject* obj);
@@ -15,6 +16,6 @@ class World
     void update(const sf::Time& dt);
     
     private:
+    float gravity_;
     std::vector<PhysicsObject*> objects_;
-
 };

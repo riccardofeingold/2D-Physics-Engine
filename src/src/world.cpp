@@ -4,6 +4,11 @@ World::World()
 {
 }
 
+World::World(float gravity)
+    : gravity_(gravity)
+{
+}
+
 World::~World() = default;
 
 void World::addObject(PhysicsObject* obj)
@@ -23,5 +28,7 @@ void World::removeObject(PhysicsObject* obj)
 
 void World::update(const sf::Time& dt)
 {
-    
+    for (PhysicsObject* obj : objects_)
+    {
+    }
 }

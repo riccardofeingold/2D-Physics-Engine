@@ -55,6 +55,16 @@ class PhysicsObject
     virtual const float& get_mass() const;
     virtual const float& get_moment_of_inertia() const;
 
+    // setters
+    virtual void setAcceleration(sf::Vector2f& acceleration);
+    virtual void setVelocity(sf::Vector2f& velocity);
+    virtual void setPosition(sf::Vector2f& position);
+    virtual void setOrientation(float angle);
+    virtual void setAngularVelocity(float angular_velocity);
+    virtual void setAngularAcceleration(float angular_acceleration);
+    virtual void setMass(float mass);
+    virtual void setMomentOfInertia(float MoI);
+
     protected:
     sf::Vector2f position_;
     sf::Vector2f velocity_;
