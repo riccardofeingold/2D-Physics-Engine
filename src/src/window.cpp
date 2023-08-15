@@ -73,7 +73,7 @@ void Window::endDraw()
     this->window_.display();
 }
 
-void Window::draw(sf::Drawable& drawable)
+void Window::draw(const sf::Drawable& drawable)
 {
     this->window_.draw(drawable);
 }

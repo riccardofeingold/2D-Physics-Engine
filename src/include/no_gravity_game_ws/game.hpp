@@ -39,5 +39,5 @@ class Game
     Window window_;
     World world_;
     Player player_;
-    PhysicsObject playerPhysics_;
+    Player test_;
 };

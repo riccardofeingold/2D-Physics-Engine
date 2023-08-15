@@ -9,7 +9,8 @@ class Player : public PhysicsObject
     ~Player();
 
     // methods
-    void move(const sf::Vector2f& position);
+    void move();
+    void move(const sf::Vector2f& position); // used with keys
     void shoot();
     
     // setters
@@ -22,7 +23,6 @@ class Player : public PhysicsObject
     bool on_ground;
     float size;
     float restitution;
-    sf::CircleShape body;
 
     private:
     sf::Vector2f velocity_;

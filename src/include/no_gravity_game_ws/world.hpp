@@ -12,10 +12,11 @@ class World
 
     void addObject(PhysicsObject* obj);
     void removeObject(PhysicsObject* obj);
+    PhysicsObject& getObject(const int id);
+    int getNumberOfObjects() const;
     void setup();
     void update(const sf::Time& dt);
     
     private:
-    float gravity_;
     std::vector<PhysicsObject*> objects_;
 };

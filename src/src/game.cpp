@@ -2,10 +2,11 @@
 
 Game::Game() : 
     window_("2D Drone Simulator", sf::Vector2u(SCREEN_WIDTH, SCREEN_HEIGHT), FRAME_RATE), 
-    player_(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 1.f), 
-    playerPhysics_(GRAVITY, 1, 1)
+    player_(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 20, 1.f),
+    test_(0, 0, 10, 1)
 {
-    this->playerPhysics_.applyAirDrag(DRAG_COEFFICIENT, 1, AIR_DENSITY);
+    this->player_.applyAirDrag(DRAG_COEFFICIENT, 1, AIR_DENSITY);
+    this->test_.applyAirDrag(DRAG_COEFFICIENT, 1, AIR_DENSITY);
     this->start();
 }
 
@@ -13,7 +14,12 @@ Game::~Game() = default;
 
 void Game::start()
 {
-    world_.addObject(&this->playerPhysics_);
+    // set properties of player
+    this->player_.setMass(1);
+    this->player_.setMomentOfInertia(1);
+    world_.addObject(&this->player_);
+
+    world_.addObject(&this->test_);
 }
 
 void Game::handleInput()
@@ -23,8 +29,8 @@ void Game::handleInput()
         int throttle = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
         int roll = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z);
 
-        this->playerPhysics_.apply_force(sf::Vector2f(0.f, MAX_THRUST_FORCE * throttle));
-        this->playerPhysics_.apply_force(sf::Vector2f(MAX_THRUST_FORCE * roll, 0.f));
+        this->player_.apply_force(sf::Vector2f(0.f, MAX_THRUST_FORCE * throttle));
+        this->player_.apply_force(sf::Vector2f(MAX_THRUST_FORCE * roll, 0.f));
     } else
     {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
@@ -42,14 +48,16 @@ void Game::update()
 {
     this->dt_ = this->clock_.restart();
     this->window_.update();
-    this->playerPhysics_.update(this->dt_);
-    this->player_.move(this->playerPhysics_.get_position());
+    this->world_.update(this->dt_);
 }
 
 void Game::render()
 {
     this->window_.beginDraw();
-    this->window_.draw(this->player_.body);
+    for (int i = 0; i < this->world_.getNumberOfObjects(); ++i)
+    {
+        this->window_.draw(this->world_.getObject(i).getBody());
+    }
     this->window_.endDraw();
 }
 

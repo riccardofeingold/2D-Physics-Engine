@@ -45,6 +45,9 @@ class PhysicsObject
     void update(sf::Time delta_time);
     void applyAirDrag(float Cd, float A, float density);
 
+    // pure virtual methods
+    virtual void move() = 0;
+
     // getters
     virtual const sf::Vector2f& get_position() const;
     virtual const sf::Vector2f& get_velocity() const;
@@ -54,7 +57,8 @@ class PhysicsObject
     virtual const float& get_angular_acceleration() const;
     virtual const float& get_mass() const;
     virtual const float& get_moment_of_inertia() const;
-
+    virtual const int& getId() const;
+    virtual const sf::Drawable& getBody();
     // setters
     virtual void setAcceleration(sf::Vector2f& acceleration);
     virtual void setVelocity(sf::Vector2f& velocity);
@@ -64,6 +68,7 @@ class PhysicsObject
     virtual void setAngularAcceleration(float angular_acceleration);
     virtual void setMass(float mass);
     virtual void setMomentOfInertia(float MoI);
+    virtual void setId(int id);
 
     protected:
     sf::Vector2f position_;
@@ -73,10 +78,13 @@ class PhysicsObject
     float angular_velocity_;
     float angular_acceleration_;
 
+    sf::CircleShape body_;
+
     private:
     // private methods
 
     // private variables
+    int id_;
     DragForce air_drag_;
     float gravity_;
     float mass_;

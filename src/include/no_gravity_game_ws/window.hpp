@@ -18,7 +18,7 @@ class Window
     void endDraw(); // Display
 
     void toggleFullscreen();
-    void draw(sf::Drawable& drawable);
+    void draw(const sf::Drawable& drawable);
 
     // getters and setters
     bool isDone() const;

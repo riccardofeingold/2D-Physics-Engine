@@ -39,6 +39,9 @@ const float& PhysicsObject::get_angular_velocity() const { return angular_veloci
 
 const float& PhysicsObject::get_angular_acceleration() const { return angular_acceleration_; }
 
+const int& PhysicsObject::getId() const { return this->id_; }
+
+const sf::Drawable& PhysicsObject::getBody() { return this->body_; }
 // setters
 void PhysicsObject::setAcceleration(sf::Vector2f& acceleration) { this->acceleration_ = acceleration; }
 
@@ -55,6 +58,8 @@ void PhysicsObject::setAngularAcceleration(float angular_acceleration) { this->a
 void PhysicsObject::setMass(float mass) { this->mass_ = mass; }
 
 void PhysicsObject::setMomentOfInertia(float MoI) { this->moment_of_inertia_ = MoI; }
+
+void PhysicsObject::setId(int id) { this->id_ = id; }
 
 // Physics
 void PhysicsObject::apply_force(const sf::Vector2f& force)

@@ -8,9 +8,9 @@ Player::Player(float x, float y, float size, float restitution)
 
     // player initialization
     this->velocity_ = sf::Vector2f(0.f, 0.f);
-    this->body = sf::CircleShape(size);
-    this->body.setFillColor(sf::Color::White);
-    this->body.setPosition(x - size, y - size);
+    this->body_ = sf::CircleShape(size);
+    this->body_.setFillColor(sf::Color::White);
+    this->body_.setPosition(x - size, y - size);
 }
 
 Player::~Player() = default;
@@ -21,9 +21,14 @@ void Player::setVelocity(const sf::Vector2f& velocity) { this->velocity_ = veloc
 // getters
 const sf::Vector2f& Player::getVelocity() const { return this->velocity_; }
 
+void Player::move()
+{
+    this->body_.move(this->position_);
+}
+
 void Player::move(const sf::Vector2f& position)
 {
-    this->body.move(position);
+    this->body_.move(position);
 }
 
 void Player::shoot()
