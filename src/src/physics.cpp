@@ -23,31 +23,33 @@ PhysicsObject::PhysicsObject(float gravity, float mass, float moment_of_inertia)
 PhysicsObject::~PhysicsObject() = default;
 
 // getters 
-const float& PhysicsObject::get_mass() const { return mass_; }
+const float& PhysicsObject::getMass() const { return mass_; }
 
-const float& PhysicsObject::get_moment_of_inertia() const { return moment_of_inertia_; }
+const float& PhysicsObject::getMomentOfInertia() const { return moment_of_inertia_; }
 
-const sf::Vector2f& PhysicsObject::get_position() const { return position_; }
+const sf::Vector2f& PhysicsObject::getPosition() const { return position_; }
 
-const sf::Vector2f& PhysicsObject::get_velocity() const { return velocity_; }
+const sf::Vector2f& PhysicsObject::getVelocity() const { return velocity_; }
 
-const sf::Vector2f& PhysicsObject::get_acceleration() const { return acceleration_; }
+const sf::Vector2f& PhysicsObject::getAcceleration() const { return acceleration_; }
 
-const float& PhysicsObject::get_orientation() const { return orientation_; }
+const float& PhysicsObject::getOrientation() const { return orientation_; }
 
-const float& PhysicsObject::get_angular_velocity() const { return angular_velocity_; }
+const float& PhysicsObject::getAngularVelocity() const { return angular_velocity_; }
 
-const float& PhysicsObject::get_angular_acceleration() const { return angular_acceleration_; }
+const float& PhysicsObject::getAngularAcceleration() const { return angular_acceleration_; }
 
 const int& PhysicsObject::getId() const { return this->id_; }
 
-const sf::Drawable& PhysicsObject::getBody() { return this->body_; }
+const sf::Vector2f& PhysicsObject::getSize() const { return this->size_; }
+
+sf::RectangleShape& PhysicsObject::getBody() { return this->body_; }
 // setters
-void PhysicsObject::setAcceleration(sf::Vector2f& acceleration) { this->acceleration_ = acceleration; }
+void PhysicsObject::setAcceleration(const sf::Vector2f& acceleration) { this->acceleration_ = acceleration; }
 
-void PhysicsObject::setVelocity(sf::Vector2f& velocity) { this->velocity_ = velocity; }
+void PhysicsObject::setVelocity(const sf::Vector2f& velocity) { this->velocity_ = velocity; }
 
-void PhysicsObject::setPosition(sf::Vector2f& position) { this->position_ = position; }
+void PhysicsObject::setPosition(const sf::Vector2f& position) { this->position_ = position; }
 
 void PhysicsObject::setOrientation(float angle) { this->orientation_ = angle; }
 
@@ -62,17 +64,23 @@ void PhysicsObject::setMomentOfInertia(float MoI) { this->moment_of_inertia_ = M
 void PhysicsObject::setId(int id) { this->id_ = id; }
 
 // Physics
-void PhysicsObject::apply_force(const sf::Vector2f& force)
+// @brief applies a force at the center of mass
+void PhysicsObject::applyForce(const sf::Vector2f& force)
 {
     acceleration_ += force / mass_;
 }
 
-void PhysicsObject::apply_impulse(const sf::Vector2f& impulse)
+void PhysicsObject::applyForce(const sf::Vector2f& force, const sf::Vector2f& relative_position)
+{
+
+}
+
+void PhysicsObject::applyImpulse(const sf::Vector2f& impulse)
 {
     velocity_ += impulse / mass_;
 }
 
-void PhysicsObject::apply_torque(const float& torque)
+void PhysicsObject::applyTorque(const float& torque)
 {
     angular_acceleration_ += torque / moment_of_inertia_;
 }

@@ -39,5 +39,4 @@ class Game
     Window window_;
     World world_;
     Player player_;
-    Player test_;
 };

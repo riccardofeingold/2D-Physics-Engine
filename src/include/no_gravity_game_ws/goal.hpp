@@ -1,24 +1,17 @@
 #pragma once
-
+#include "physics.hpp"
 #include <SFML/Graphics.hpp>
 #include <cstdlib>
 
-class Goal
+class Goal : public PhysicsObject
 {
     public:
-    Goal(float height, float width, float screen_height, float screen_width);
+    Goal();
     ~Goal();
 
     // setters
     void setRandomPosition();
 
-    // public variables
-    sf::RectangleShape body_;
-
     private:
     bool player_reached_it_;
-    float width_;
-    float height_;
-    float screen_width_;
-    float screen_height_;
 };
