@@ -33,6 +33,7 @@ struct DragForce
 
 struct Material
 {
+    sf::Color color = sf::Color(0, 0, 0, 255);
     float restitution = 0.f;
     float density = 0.f;
     float friction = 0.f;
@@ -92,7 +93,7 @@ class PhysicsObject
 
     sf::RectangleShape body_;
     sf::Vector2f size_;
-    float restitution_;
+    Material material_;
 
     private:
     // private methods
