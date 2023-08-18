@@ -27,8 +27,9 @@ void Game::handleInput()
         int roll = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z);
 
         this->player_.applyForce(sf::Vector2f(0.f, MAX_THRUST_FORCE * throttle));
-        this->player_.applyForce(sf::Vector2f(MAX_THRUST_FORCE * roll, 0.f));
-
+        // this->player_.applyForce(sf::Vector2f(MAX_THRUST_FORCE * roll, 0.f));
+        this->player_.applyTorque(2 * roll);
+        
         // restart
         if (sf::Joystick::isButtonPressed(0, 0))
         {

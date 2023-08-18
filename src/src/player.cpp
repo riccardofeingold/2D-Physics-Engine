@@ -5,6 +5,7 @@ Player::Player(float x, float y, sf::Vector2f size, float restitution)
     this->size_ = size;
     this->material_.restitution = restitution;
     this->initial_position_ = sf::Vector2f(x - size.x/2, y - size.y/2);
+    
     // player initialization
     this->velocity_ = sf::Vector2f(0.f, 0.f);
     this->body_ = sf::RectangleShape(size);
@@ -16,12 +17,20 @@ Player::~Player() = default;
 
 void Player::move()
 {
+    this->body_.setOrigin(this->size_.x/2, this->size_.y/2);
     this->body_.move(this->position_);
+    this->body_.rotate(this->orientation_);
 }
 
 void Player::move(const sf::Vector2f& position)
 {
     this->body_.move(position);
+}
+
+void Player::applyForce(const sf::Vector2f& force)
+{
+    this->acceleration_.x = -std::sin(this->body_.getRotation()) * force.y;
+    this->acceleration_.y = std::cos(this->body_.getRotation()) * force.y;
 }
 
 void Player::reset()

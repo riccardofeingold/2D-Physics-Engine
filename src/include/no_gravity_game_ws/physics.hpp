@@ -47,8 +47,7 @@ class PhysicsObject
     ~PhysicsObject();
 
     // Methods
-    void applyForce(const sf::Vector2f& force);
-    void applyForce(const sf::Vector2f& force, const sf::Vector2f& relative_position);
+    virtual void applyForce(const sf::Vector2f& force);
     void applyTorque(const float& torque);
     void applyImpulse(const sf::Vector2f& impulse);
     void update(sf::Time delta_time);

@@ -35,30 +35,30 @@ void World::wallCollision()
     for (PhysicsObject* obj : this->objects_)
     {
         // right wall
-        if (obj->getBody().getPosition().x + obj->getSize().x > this->window_->getWindowSize().x)
+        if (obj->getBody().getPosition().x + obj->getSize().x/2 > this->window_->getWindowSize().x)
         {
-            obj->getBody().setPosition(sf::Vector2f(this->window_->getWindowSize().x - obj->getSize().x, obj->getBody().getPosition().y));
+            obj->getBody().setPosition(sf::Vector2f(this->window_->getWindowSize().x - obj->getSize().x/2, obj->getBody().getPosition().y));
             obj->setPosition(sf::Vector2f(0, obj->getPosition().y));
             obj->setVelocity(sf::Vector2f(0.f, obj->getVelocity().y));
         }
         // left wall
-        if (obj->getBody().getPosition().x < 0)
+        if (obj->getBody().getPosition().x + obj->getSize().x/2 < 0)
         {
-            obj->getBody().setPosition(sf::Vector2f(0, obj->getBody().getPosition().y));
+            obj->getBody().setPosition(sf::Vector2f(obj->getSize().x/2, obj->getBody().getPosition().y));
             obj->setPosition(sf::Vector2f(0, obj->getPosition().y));
             obj->setVelocity(sf::Vector2f(0.f, obj->getVelocity().y));
         }
         // bottom wall
-        if (obj->getBody().getPosition().y + obj->getSize().y > this->window_->getWindowSize().y)
+        if (obj->getBody().getPosition().y + obj->getSize().y/2 > this->window_->getWindowSize().y)
         {
-            obj->getBody().setPosition(sf::Vector2f(obj->getBody().getPosition().x, this->window_->getWindowSize().y - obj->getSize().y));
+            obj->getBody().setPosition(sf::Vector2f(obj->getBody().getPosition().x, this->window_->getWindowSize().y - obj->getSize().y/2));
             obj->setPosition(sf::Vector2f(obj->getPosition().x, 0));
             obj->setVelocity(sf::Vector2f(obj->getVelocity().x, 0.f));
         }
         // top wall
-        if (obj->getBody().getPosition().y < 0)
+        if (obj->getBody().getPosition().y - obj->getSize().y/2 < 0)
         {
-            obj->getBody().setPosition(sf::Vector2f(obj->getBody().getPosition().x, 0));
+            obj->getBody().setPosition(sf::Vector2f(obj->getBody().getPosition().x, obj->getSize().y/2));
             obj->setPosition(sf::Vector2f(obj->getPosition().x, 0));
             obj->setVelocity(sf::Vector2f(obj->getVelocity().x, 0.f));
         }

@@ -70,11 +70,6 @@ void PhysicsObject::applyForce(const sf::Vector2f& force)
     acceleration_ += force / mass_;
 }
 
-void PhysicsObject::applyForce(const sf::Vector2f& force, const sf::Vector2f& relative_position)
-{
-
-}
-
 void PhysicsObject::applyImpulse(const sf::Vector2f& impulse)
 {
     velocity_ += impulse / mass_;
@@ -99,6 +94,11 @@ void PhysicsObject::update(sf::Time delta_time)
     velocity_ += acceleration_ * delta_time.asSeconds();
     position_ += velocity_ * delta_time.asSeconds();
     acceleration_ = sf::Vector2f(0.f, 0.f);
+
+    // calculate rotation
+    angular_velocity_ += angular_acceleration_ * delta_time.asSeconds();
+    orientation_ += angular_velocity_ * delta_time.asSeconds();
+    angular_acceleration_ = 0.f;
 }
 
 void PhysicsObject::applyAirDrag(float Cd, float A, float density)
