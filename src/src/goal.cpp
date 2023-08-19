@@ -5,7 +5,7 @@ Goal::Goal(sf::Vector2f size, float restitution = 0.f)
     this->size_ = size;
     this->material_.restitution = restitution;
     this->body_ = sf::RectangleShape(sf::Vector2f(20, 20));
-    this->body_.setFillColor(sf::Color::Green);
+    this->body_.setFillColor(Colors().GOAL);
     this->setRandomPosition();
 }
 

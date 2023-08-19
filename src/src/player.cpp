@@ -10,7 +10,7 @@ Player::Player(float x, float y, sf::Vector2f size, float restitution)
     this->moment_of_inertia_ = MomentOfInertia(this->size_.x, this->size_.y, 1.f, this->getMass(), "z");
     this->velocity_ = sf::Vector2f(0.f, 0.f);
     this->body_ = sf::RectangleShape(size);
-    this->body_.setFillColor(sf::Color::White);
+    this->body_.setFillColor(Colors().PLAYER);
     this->body_.setPosition(this->initial_position_);
 }
 

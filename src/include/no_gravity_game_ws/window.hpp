@@ -1,4 +1,5 @@
 #pragma once
+#include "colors.hpp"
 #include <string>
 #include <SFML/Graphics.hpp>
 

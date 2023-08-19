@@ -65,7 +65,7 @@ void Window::toggleFullscreen()
 
 void Window::beginDraw()
 {
-    this->window_.clear();
+    this->window_.clear(Colors().BACKGROUND);
 }
 
 void Window::endDraw()

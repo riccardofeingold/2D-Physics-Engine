@@ -34,10 +34,10 @@ void World::checkCollisionBetween(const std::string& name1, const std::string& n
     // axis aligned boundary box
     if 
     (
-        obj1.getBody().getPosition().x < obj2.getBody().getPosition().x + obj2.getSize().x &&
-        obj1.getBody().getPosition().x + obj1.getSize().x > obj2.getBody().getPosition().x &&
-        obj1.getBody().getPosition().y < obj2.getBody().getPosition().y + obj2.getSize().y &&
-        obj1.getBody().getPosition().y + obj1.getSize().y > obj2.getBody().getPosition().y
+        obj1.getBody().getPosition().x < obj2.getBody().getPosition().x + obj2.getSize().x/2 &&
+        obj1.getBody().getPosition().x + obj1.getSize().x/2 > obj2.getBody().getPosition().x &&
+        obj1.getBody().getPosition().y < obj2.getBody().getPosition().y + obj2.getSize().y/2 &&
+        obj1.getBody().getPosition().y + obj1.getSize().y/2 > obj2.getBody().getPosition().y
     )
     {
         if (name1 == "goal")

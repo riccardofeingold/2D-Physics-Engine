@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "physics.hpp"
+#include "colors.hpp"
 
 class Player : public PhysicsObject
 {
