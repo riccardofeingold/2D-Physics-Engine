@@ -7,6 +7,7 @@ Player::Player(float x, float y, sf::Vector2f size, float restitution)
     this->initial_position_ = sf::Vector2f(x - size.x/2, y - size.y/2);
     
     // player initialization
+    this->moment_of_inertia_ = MomentOfInertia(this->size_.x, this->size_.y, 1.f, this->getMass(), "z");
     this->velocity_ = sf::Vector2f(0.f, 0.f);
     this->body_ = sf::RectangleShape(size);
     this->body_.setFillColor(sf::Color::White);
@@ -25,12 +26,6 @@ void Player::move()
 void Player::move(const sf::Vector2f& position)
 {
     this->body_.move(position);
-}
-
-void Player::applyForce(const sf::Vector2f& force)
-{
-    this->acceleration_.x = -std::sin(this->body_.getRotation()) * force.y;
-    this->acceleration_.y = std::cos(this->body_.getRotation()) * force.y;
 }
 
 void Player::reset()

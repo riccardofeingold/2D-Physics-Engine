@@ -1,9 +1,11 @@
 #pragma once
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "momentOfInertia.hpp"
 
-struct DragForce
+class DragForce
 {
+    public:
     float drag_coefficient = 0.f;
     float cross_sectional_area = 0.f;
     float density = 0.f;
@@ -29,6 +31,15 @@ struct DragForce
 
         return force;
     }
+
+    float torque(const float angular_velocity)
+    {
+        if (angular_velocity >= 0)
+            return -constantMultiplier() * angular_velocity * angular_velocity;
+        if (angular_velocity < 0)
+            return constantMultiplier() * angular_velocity * angular_velocity;
+        return 0;
+    }
 };
 
 struct Material
@@ -43,7 +54,7 @@ class PhysicsObject
 {
     public:
     PhysicsObject();
-    PhysicsObject(float gravity, float mass, float moment_of_inertia);
+    PhysicsObject(float gravity, float mass);
     ~PhysicsObject();
 
     // Methods
@@ -65,7 +76,6 @@ class PhysicsObject
     virtual const float& getAngularVelocity() const;
     virtual const float& getAngularAcceleration() const;
     virtual const float& getMass() const;
-    virtual const float& getMomentOfInertia() const;
     virtual const int& getId() const;
     virtual sf::RectangleShape& getBody();
     virtual const sf::Vector2f& getSize() const;
@@ -78,7 +88,6 @@ class PhysicsObject
     virtual void setAngularVelocity(float angular_velocity);
     virtual void setAngularAcceleration(float angular_acceleration);
     virtual void setMass(float mass);
-    virtual void setMomentOfInertia(float MoI);
     virtual void setId(int id);
 
     protected:
@@ -93,6 +102,7 @@ class PhysicsObject
     sf::RectangleShape body_;
     sf::Vector2f size_;
     Material material_;
+    MomentOfInertia moment_of_inertia_;
 
     private:
     // private methods
@@ -102,5 +112,4 @@ class PhysicsObject
     DragForce air_drag_;
     float gravity_;
     float mass_;
-    float moment_of_inertia_;
 };

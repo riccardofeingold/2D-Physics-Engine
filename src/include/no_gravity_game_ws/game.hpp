@@ -10,6 +10,7 @@
 #define SPEED 200
 #define SPEED_JOYSTICK 0.02 // maximum value of the joystick is 100
 #define MAX_THRUST_FORCE 0.5
+#define MAX_ROTATIONAL_TORQUE 1
 #define GRAVITY 10
 #define FRAME_RATE 60
 

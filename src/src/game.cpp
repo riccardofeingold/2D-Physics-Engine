@@ -15,7 +15,6 @@ void Game::start()
 {
     // set properties of player
     this->player_.setMass(1);
-    this->player_.setMomentOfInertia(1);
     this->world_.addObject(&this->player_);
 }
 
@@ -27,9 +26,8 @@ void Game::handleInput()
         int roll = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z);
 
         this->player_.applyForce(sf::Vector2f(0.f, MAX_THRUST_FORCE * throttle));
-        // this->player_.applyForce(sf::Vector2f(MAX_THRUST_FORCE * roll, 0.f));
-        this->player_.applyTorque(2 * roll);
-        
+        this->player_.applyForce(sf::Vector2f(MAX_THRUST_FORCE * roll, 0.f));
+
         // restart
         if (sf::Joystick::isButtonPressed(0, 0))
         {

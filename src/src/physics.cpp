@@ -3,17 +3,15 @@
 PhysicsObject::PhysicsObject()
     : gravity_(9.81),
       mass_(1),
-      moment_of_inertia_(1),
       position_(sf::Vector2f(0.f, 0.f)),
       velocity_(sf::Vector2f(0.f, 0.f)),
       acceleration_(sf::Vector2f(0.f, 0.f))
 {
 }
 
-PhysicsObject::PhysicsObject(float gravity, float mass, float moment_of_inertia) 
+PhysicsObject::PhysicsObject(float gravity, float mass) 
     : gravity_(gravity), 
       mass_(mass),
-      moment_of_inertia_(moment_of_inertia),
       position_(sf::Vector2f(0.f, 0.f)), 
       velocity_(sf::Vector2f(0.f, 0.f)), 
       acceleration_(sf::Vector2f(0.f, 0.f))
@@ -24,8 +22,6 @@ PhysicsObject::~PhysicsObject() = default;
 
 // getters 
 const float& PhysicsObject::getMass() const { return mass_; }
-
-const float& PhysicsObject::getMomentOfInertia() const { return moment_of_inertia_; }
 
 const sf::Vector2f& PhysicsObject::getPosition() const { return position_; }
 
@@ -59,8 +55,6 @@ void PhysicsObject::setAngularAcceleration(float angular_acceleration) { this->a
 
 void PhysicsObject::setMass(float mass) { this->mass_ = mass; }
 
-void PhysicsObject::setMomentOfInertia(float MoI) { this->moment_of_inertia_ = MoI; }
-
 void PhysicsObject::setId(int id) { this->id_ = id; }
 
 // Physics
@@ -77,7 +71,7 @@ void PhysicsObject::applyImpulse(const sf::Vector2f& impulse)
 
 void PhysicsObject::applyTorque(const float& torque)
 {
-    angular_acceleration_ += torque / moment_of_inertia_;
+    angular_acceleration_ += torque / moment_of_inertia_.getMomentOfInertia();
 }
 
 void PhysicsObject::update(sf::Time delta_time)
@@ -85,10 +79,14 @@ void PhysicsObject::update(sf::Time delta_time)
     // apply gravity
     acceleration_.y += gravity_;
     
-    // apply air drag
+    // apply air drag translational
     sf::Vector2f air_drag = air_drag_.force(velocity_);
     acceleration_.x += air_drag.x / mass_;
-    acceleration_.y += air_drag.y / mass_;
+    acceleration_.y += air_drag.y / mass_;    
+
+    // apply air drag rotational
+    float air_drag_angular = air_drag_.torque(angular_velocity_);
+    angular_acceleration_ += air_drag_angular / moment_of_inertia_.getMomentOfInertia();
 
     // calculate velocity and position
     velocity_ += acceleration_ * delta_time.asSeconds();

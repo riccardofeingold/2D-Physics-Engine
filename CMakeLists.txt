@@ -15,6 +15,7 @@ add_executable(NoGravityGameWS
                src/src/game.cpp 
                src/src/window.cpp
                src/src/world.cpp
+               src/src/momentOfInertia.cpp
 )
 target_include_directories(NoGravityGameWS PUBLIC include/no_gravity_game_ws)
 target_link_libraries(NoGravityGameWS PRIVATE sfml-graphics)
