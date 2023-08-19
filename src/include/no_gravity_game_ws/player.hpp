@@ -11,6 +11,6 @@ class Player : public PhysicsObject
     // methods
     void move() override;
     void reset() override;
+    void setRandomPosition() override;
     void move(const sf::Vector2f& position); // used with keys
-    void shoot();
 };

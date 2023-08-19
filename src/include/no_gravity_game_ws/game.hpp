@@ -3,6 +3,7 @@
 #include "player.hpp"
 #include "physics.hpp"
 #include "world.hpp"
+#include "goal.hpp"
 #include <SFML/Graphics.hpp>
 
 #define SCREEN_WIDTH 640
@@ -40,4 +41,5 @@ class Game
     Window window_;
     World world_;
     Player player_;
+    Goal goal_;
 };

@@ -40,6 +40,7 @@ const int& PhysicsObject::getId() const { return this->id_; }
 const sf::Vector2f& PhysicsObject::getSize() const { return this->size_; }
 
 sf::RectangleShape& PhysicsObject::getBody() { return this->body_; }
+
 // setters
 void PhysicsObject::setAcceleration(const sf::Vector2f& acceleration) { this->acceleration_ = acceleration; }
 
@@ -56,6 +57,8 @@ void PhysicsObject::setAngularAcceleration(float angular_acceleration) { this->a
 void PhysicsObject::setMass(float mass) { this->mass_ = mass; }
 
 void PhysicsObject::setId(int id) { this->id_ = id; }
+
+void PhysicsObject::setWindow(Window& window) { this->window_ = &window; }
 
 // Physics
 // @brief applies a force at the center of mass

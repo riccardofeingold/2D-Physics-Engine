@@ -28,6 +28,12 @@ void Player::move(const sf::Vector2f& position)
     this->body_.move(position);
 }
 
+void Player::setRandomPosition()
+{
+    sf::Vector2f random_position = sf::Vector2f((float)std::rand()/RAND_MAX*this->window_->getWindowSize().x, (float)std::rand()/RAND_MAX*this->window_->getWindowSize().y);
+    this->body_.setPosition(random_position);
+}
+
 void Player::reset()
 {
     this->acceleration_ = sf::Vector2f(0, 0);
@@ -37,9 +43,4 @@ void Player::reset()
     this->angular_velocity_ = 0;
     this->angular_acceleration_ = 0;
     this->body_.setPosition(this->initial_position_);
-}
-
-void Player::shoot()
-{
-
 }

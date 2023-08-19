@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "momentOfInertia.hpp"
+#include "window.hpp"
 
 class DragForce
 {
@@ -66,6 +67,7 @@ class PhysicsObject
 
     // pure virtual methods
     virtual void move() = 0;
+    virtual void setRandomPosition() = 0;
     virtual void reset() = 0;
 
     // getters
@@ -89,6 +91,7 @@ class PhysicsObject
     virtual void setAngularAcceleration(float angular_acceleration);
     virtual void setMass(float mass);
     virtual void setId(int id);
+    virtual void setWindow(Window& window);
 
     protected:
     sf::Vector2f initial_position_;
@@ -103,6 +106,7 @@ class PhysicsObject
     sf::Vector2f size_;
     Material material_;
     MomentOfInertia moment_of_inertia_;
+    Window* window_;
 
     private:
     // private methods

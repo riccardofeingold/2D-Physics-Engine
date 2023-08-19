@@ -2,9 +2,12 @@
 
 Game::Game() : 
     window_("2D Drone Simulator", sf::Vector2u(SCREEN_WIDTH, SCREEN_HEIGHT), FRAME_RATE), 
-    player_(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, sf::Vector2f(20, 20), 1.f)
+    player_(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, sf::Vector2f(20, 20), 1.f),
+    goal_(sf::Vector2f(10, 10), 0)
 {
     this->world_.window_ = &window_;
+    this->goal_.setWindow(window_);
+    this->player_.setWindow(window_);
     this->player_.applyAirDrag(DRAG_COEFFICIENT, 1, AIR_DENSITY);
     this->start();
 }
@@ -15,7 +18,8 @@ void Game::start()
 {
     // set properties of player
     this->player_.setMass(1);
-    this->world_.addObject(&this->player_);
+    this->world_.addObject("player", &this->player_);
+    this->world_.addObject("goal", &this->goal_);
 }
 
 void Game::handleInput()
@@ -56,9 +60,9 @@ void Game::update()
 void Game::render()
 {
     this->window_.beginDraw();
-    for (int i = 0; i < this->world_.getNumberOfObjects(); ++i)
+    for (std::string name : this->world_.list_of_object_names_)
     {
-        this->window_.draw(this->world_.getObject(i).getBody());
+        this->window_.draw(this->world_.getObject(name).getBody());
     }
     this->window_.endDraw();
 }

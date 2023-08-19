@@ -6,12 +6,12 @@
 class Goal : public PhysicsObject
 {
     public:
-    Goal();
+    Goal(sf::Vector2f size, float restitution);
     ~Goal();
 
-    // setters
-    void setRandomPosition();
+    void reset() override;
+    void move() override;
 
-    private:
-    bool player_reached_it_;
+    // setters
+    void setRandomPosition() override;
 };
