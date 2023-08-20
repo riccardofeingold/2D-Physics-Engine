@@ -41,6 +41,8 @@ const sf::Vector2f& PhysicsObject::getSize() const { return this->size_; }
 
 sf::RectangleShape& PhysicsObject::getBody() { return this->body_; }
 
+int PhysicsObject::getScore() const { return this->score_; }
+
 // setters
 void PhysicsObject::setAcceleration(const sf::Vector2f& acceleration) { this->acceleration_ = acceleration; }
 
@@ -60,6 +62,18 @@ void PhysicsObject::setId(int id) { this->id_ = id; }
 
 void PhysicsObject::setWindow(Window& window) { this->window_ = &window; }
 
+void PhysicsObject::setRandomPosition()
+{
+    sf::Vector2f random_position = sf::Vector2f((float)std::rand()/RAND_MAX*this->window_->getWindowSize().x, (float)std::rand()/RAND_MAX*this->window_->getWindowSize().y);
+    this->body_.setPosition(random_position);
+}
+
+void PhysicsObject::setScoreToZero() { this->score_ = 0; }
+
+void PhysicsObject::increaseScoreBy(int num)
+{
+    this->score_ += num;
+}
 // Physics
 // @brief applies a force at the center of mass
 void PhysicsObject::applyForce(const sf::Vector2f& force)

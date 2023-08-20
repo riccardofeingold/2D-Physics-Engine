@@ -41,9 +41,21 @@ void World::checkCollisionBetween(const std::string& name1, const std::string& n
     )
     {
         if (name1 == "goal")
+        {
             obj1.setRandomPosition();
+            obj2.increaseScoreBy(1);
+        }
         else if (name2 == "goal")
+        {
             obj2.setRandomPosition();
+            obj1.increaseScoreBy(1);
+        }
+
+        if (name1 == "enemy" || name2 == "enemy")
+        {
+            this->reset();
+            this->game_over = true;
+        }
     }
 }
 
@@ -87,6 +99,8 @@ void World::update(const sf::Time& dt)
     // check for walls
     wallCollision();
     checkCollisionBetween("goal", "player");
+    checkCollisionBetween("player", "enemy");
+
     for (auto obj : this->objects_)
     {
         obj.second->update(dt);

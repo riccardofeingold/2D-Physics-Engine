@@ -1,4 +1,6 @@
 #pragma once
+
+#include <cstdlib>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "momentOfInertia.hpp"
@@ -62,12 +64,11 @@ class PhysicsObject
     virtual void applyForce(const sf::Vector2f& force);
     void applyTorque(const float& torque);
     void applyImpulse(const sf::Vector2f& impulse);
-    void update(sf::Time delta_time);
+    virtual void update(sf::Time delta_time);
     void applyAirDrag(float Cd, float A, float density);
 
     // pure virtual methods
     virtual void move() = 0;
-    virtual void setRandomPosition() = 0;
     virtual void reset() = 0;
 
     // getters
@@ -81,8 +82,10 @@ class PhysicsObject
     virtual const int& getId() const;
     virtual sf::RectangleShape& getBody();
     virtual const sf::Vector2f& getSize() const;
+    int getScore() const;
 
     // setters
+    virtual void setRandomPosition();
     virtual void setAcceleration(const sf::Vector2f& acceleration);
     virtual void setVelocity(const sf::Vector2f& velocity);
     virtual void setPosition(const sf::Vector2f& position);
@@ -92,6 +95,9 @@ class PhysicsObject
     virtual void setMass(float mass);
     virtual void setId(int id);
     virtual void setWindow(Window& window);
+    void setScoreToZero();
+
+    void increaseScoreBy(int num);
 
     protected:
     sf::Vector2f initial_position_;
@@ -116,4 +122,5 @@ class PhysicsObject
     DragForce air_drag_;
     float gravity_;
     float mass_;
+    int score_ = 0;
 };

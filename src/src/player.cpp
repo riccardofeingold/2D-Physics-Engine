@@ -20,7 +20,6 @@ void Player::move()
 {
     this->body_.setOrigin(this->size_.x/2, this->size_.y/2);
     this->body_.move(this->position_);
-    this->body_.rotate(this->orientation_);
 }
 
 void Player::move(const sf::Vector2f& position)

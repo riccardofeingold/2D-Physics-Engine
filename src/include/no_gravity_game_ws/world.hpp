@@ -31,7 +31,8 @@ class World
     // public variables
     Window* window_;
     std::vector<std::string> list_of_object_names_;
-    
+    bool game_over = false;
+
     private:
     std::map<std::string, PhysicsObject*> objects_;
 };
