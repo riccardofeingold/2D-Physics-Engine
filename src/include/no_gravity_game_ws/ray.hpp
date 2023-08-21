@@ -3,7 +3,6 @@
 
 #include "world.hpp"
 #include <cmath>
-#include <SFML/Graphics.hpp>
 
 // forward declarations
 class World;
@@ -19,14 +18,19 @@ class Ray
 
     void castRay(World& w);
     void draw();
+    float calculateMagnitude(sf::Vector2f& end_point);
 
-    // public variable
-    sf::RectangleShape line_;
+    // getters
+    const sf::RectangleShape& getLineShape() const;
+    const float getDistance() const;
+    const float getAngle() const;
 
     private:
+    sf::RectangleShape line_;
     sf::Vector2f direction_;
     const sf::Vector2f* start_;
     const float angle_; // degrees
+    float distance_;
     sf::Vector2f point_of_contact_;
 };
 

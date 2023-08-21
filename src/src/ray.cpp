@@ -16,16 +16,25 @@ Ray::Ray(const sf::Vector2f* start, float angle)
 
 Ray::~Ray() = default;
 
+// getters
+const sf::RectangleShape& Ray::getLineShape() const { return this->line_; }
+const float Ray::getDistance() const { return this->distance_; }
+const float Ray::getAngle() const { return this->angle_; }
+
+float Ray::calculateMagnitude(sf::Vector2f& end_point)
+{
+    sf::Vector2f line_vector = *this->start_ - end_point;
+    return std::sqrt(line_vector.x * line_vector.x + line_vector.y * line_vector.y);
+}
+
 void Ray::draw()
 {
-    // std::cout << this->point_of_contact_.x << " " << this->point_of_contact_.y << std::endl;
-    sf::Vector2f line_vector = *this->start_ - this->point_of_contact_;
-    float magnitude = std::sqrt(line_vector.x * line_vector.x + line_vector.y * line_vector.y);
+    this->distance_ = this->calculateMagnitude(this->point_of_contact_);
     line_.setOrigin(sf::Vector2f(0, line_.getSize().y/2));
     line_.setPosition(*start_);
 
-    if (magnitude <= MAX_DISTANCE)
-        line_.setSize(sf::Vector2f(magnitude, THICKNESS));
+    if (this->distance_ <= MAX_DISTANCE)
+        line_.setSize(sf::Vector2f(this->distance_, THICKNESS));
     else
         line_.setSize(sf::Vector2f(MAX_DISTANCE, THICKNESS));
         
@@ -41,6 +50,8 @@ void Ray::castRay(World& w)
     {
         if (obj.first != "player")
         {
+            std::vector<sf::Vector2f> points;
+
             const sf::Vector2f& tl = obj.second->getCornerPosition("tl");
             const sf::Vector2f& bl = obj.second->getCornerPosition("bl");
             const sf::Vector2f& tr = obj.second->getCornerPosition("tr");
@@ -61,70 +72,88 @@ void Ray::castRay(World& w)
                 {
                     this->point_of_contact_.x = tl.x + t * (bl.x - tl.x);
                     this->point_of_contact_.y = tl.y + t * (bl.y - tl.y);
-                    // std::cout << "x: " << this->point_of_contact_.x << " y: " << this->point_of_contact_.y << std::endl;
-                    break;
+
+                    points.push_back(this->point_of_contact_);
                 }
             }
 
             // top side
-            // float den = (tl.x - bl.x) * (player.y - (player.y + direction_.y))
-            //       - (tl.y - bl.y) * (player.x - (player.x + direction_.x));
+            den = (tl.x - tr.x) * (player.y - (player.y + direction_.y))
+                  - (tl.y - tr.y) * (player.x - (player.x + direction_.x));
         
-            // if (den != 0)
-            // {
-            //     float t_num = (tl.x - player.x) * (player.y - (player.y + direction_.y)) - (tl.y - player.y) * (player.x - (player.x + direction_.x));
-            //     float u_num = (tl.x - player.x) * (tl.y - bl.y) - (tl.y - player.y) * (tl.x - bl.x);
+            if (den != 0)
+            {
+                float t_num = (tl.x - player.x) * (player.y - (player.y + direction_.y)) - (tl.y - player.y) * (player.x - (player.x + direction_.x));
+                float u_num = (tl.x - player.x) * (tl.y - tr.y) - (tl.y - player.y) * (tl.x - tr.x);
                 
-            //     float t = t_num / den;
-            //     float u = u_num / den;
-            //     if (t <= 1 && t >= 0 && u >= 0)
-            //     {
-            //         this->point_of_contact_.x = tl.x + t * (bl.x - tl.x);
-            //         this->point_of_contact_.y = tl.y + t * (bl.y - tl.y);
-            //         found_contact_point = true;
-            //     }
-            // }
+                float t = t_num / den;
+                float u = u_num / den;
+                if (t <= 1 && t >= 0 && u >= 0)
+                {
+                    this->point_of_contact_.x = tl.x + t * (tr.x - tl.x);
+                    this->point_of_contact_.y = tl.y + t * (tr.y - tl.y);
+
+                    points.push_back(this->point_of_contact_);
+                }
+            }
 
             // right side
-            // float den = (tl.x - bl.x) * (player.y - (player.y + direction_.y))
-            //       - (tl.y - bl.y) * (player.x - (player.x + direction_.x));
+            den = (tr.x - br.x) * (player.y - (player.y + direction_.y))
+                  - (tr.y - br.y) * (player.x - (player.x + direction_.x));
         
-            // if (den != 0)
-            // {
-            //     float t_num = (tl.x - player.x) * (player.y - (player.y + direction_.y)) - (tl.y - player.y) * (player.x - (player.x + direction_.x));
-            //     float u_num = (tl.x - player.x) * (tl.y - bl.y) - (tl.y - player.y) * (tl.x - bl.x);
+            if (den != 0)
+            {
+                float t_num = (tr.x - player.x) * (player.y - (player.y + direction_.y)) - (tr.y - player.y) * (player.x - (player.x + direction_.x));
+                float u_num = (tr.x - player.x) * (tr.y - br.y) - (tr.y - player.y) * (tr.x - br.x);
                 
-            //     float t = t_num / den;
-            //     float u = u_num / den;
-            //     if (t <= 1 && t >= 0 && u >= 0)
-            //     {
-            //         this->point_of_contact_.x = tl.x + t * (bl.x - tl.x);
-            //         this->point_of_contact_.y = tl.y + t * (bl.y - tl.y);
-            //         found_contact_point = true;
-            //     }
-            // }
+                float t = t_num / den;
+                float u = u_num / den;
+                if (t <= 1 && t >= 0 && u >= 0)
+                {
+                    this->point_of_contact_.x = tr.x + t * (br.x - tr.x);
+                    this->point_of_contact_.y = tr.y + t * (br.y - tr.y);
+
+                    points.push_back(this->point_of_contact_);
+                }
+            }
 
             // bottom side
-            // float den = (tl.x - bl.x) * (player.y - (player.y + direction_.y))
-            //       - (tl.y - bl.y) * (player.x - (player.x + direction_.x));
+            den = (br.x - bl.x) * (player.y - (player.y + direction_.y))
+                  - (br.y - bl.y) * (player.x - (player.x + direction_.x));
         
-            // if (den != 0)
-            // {
-            //     float t_num = (tl.x - player.x) * (player.y - (player.y + direction_.y)) - (tl.y - player.y) * (player.x - (player.x + direction_.x));
-            //     float u_num = (tl.x - player.x) * (tl.y - bl.y) - (tl.y - player.y) * (tl.x - bl.x);
+            if (den != 0)
+            {
+                float t_num = (br.x - player.x) * (player.y - (player.y + direction_.y)) - (br.y - player.y) * (player.x - (player.x + direction_.x));
+                float u_num = (br.x - player.x) * (br.y - bl.y) - (br.y - player.y) * (br.x - bl.x);
                 
-            //     float t = t_num / den;
-            //     float u = u_num / den;
-            //     if (t <= 1 && t >= 0 && u >= 0)
-            //     {
-            //         this->point_of_contact_.x = tl.x + t * (bl.x - tl.x);
-            //         this->point_of_contact_.y = tl.y + t * (bl.y - tl.y);
-            //         found_contact_point = true;
-            //     }
-            // }
+                float t = t_num / den;
+                float u = u_num / den;
+                if (t <= 1 && t >= 0 && u >= 0)
+                {
+                    this->point_of_contact_.x = br.x + t * (bl.x - br.x);
+                    this->point_of_contact_.y = br.y + t * (bl.y - br.y);
+
+                    points.push_back(this->point_of_contact_);                    
+                }
+            }
 
             // if nothing has been found set contact point to start
-            this->point_of_contact_ = *this->start_ + sf::Vector2f(200, 200);
+            if (points.size() == 0)
+                this->point_of_contact_ = *this->start_ + sf::Vector2f(200, 200);
+            else
+            {
+                float min_d = INFINITY;
+                for (auto p : points)
+                {
+                    float d = this->calculateMagnitude(p);
+                    if (min_d > d)
+                    {
+                        min_d = d;
+                        this->point_of_contact_ = p;
+                    }
+                }
+                break;
+            }
         }
     }
 }

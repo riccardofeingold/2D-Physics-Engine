@@ -75,14 +75,14 @@ void Game::render()
     {
         r.castRay(this->world_);
         r.draw();
-        this->window_.draw(r.line_);
+        this->window_.draw(r.getLineShape());
     }
 
     for (std::string name : this->world_.list_of_object_names_)
     {
         this->window_.draw(this->world_.getObject(name).getBody());
     }
-    
+
     if (this->world_.game_over)
     {
         std::cout << "GAME OVER! 😂" << " Your score: " << this->player_.getScore() << std::endl;

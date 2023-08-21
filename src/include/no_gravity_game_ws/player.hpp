@@ -5,6 +5,8 @@
 #include "physics.hpp"
 #include "colors.hpp"
 
+#define ANGLE_DIFF 1
+
 class Player : public PhysicsObject
 {
     public:

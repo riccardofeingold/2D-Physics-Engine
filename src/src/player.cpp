@@ -14,7 +14,7 @@ Player::Player(float x, float y, sf::Vector2f size, float restitution)
     this->body_.setPosition(this->initial_position_);
 
     // setup sensors
-    for (int i = 0; i < 360; i += 10)
+    for (int i = 0; i < 360; i += ANGLE_DIFF)
     {
         Ray ray = Ray(&this->body_.getPosition(), i);
         rays.push_back(ray);
