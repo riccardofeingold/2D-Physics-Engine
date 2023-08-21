@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENEMY_HPP
+#define ENEMY_HPP
 
 #include "colors.hpp"
 #include "physics.hpp"
@@ -22,3 +23,5 @@ class Enemy : public PhysicsObject
     const sf::Vector2f* target_position_;
     float SPEED;
 };
+
+#endif

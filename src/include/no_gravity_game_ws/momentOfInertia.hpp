@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MOMENT_OF_INERTIA_HPP
+#define MOMENT_OF_INERTIA_HPP
+
 #include <SFML/Graphics.hpp>
 #include <string>
 
@@ -15,3 +17,5 @@ class MomentOfInertia
     private:
     float moment_of_inertia_;
 };
+
+#endif

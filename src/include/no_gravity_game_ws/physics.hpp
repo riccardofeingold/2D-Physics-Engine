@@ -1,10 +1,14 @@
-#pragma once
+#ifndef PHYSICS_HPP
+#define PHYSICS_HPP
 
 #include <cstdlib>
 #include <iostream>
-#include <SFML/Graphics.hpp>
 #include "momentOfInertia.hpp"
 #include "window.hpp"
+#include "ray.hpp"
+
+// forward declaration
+class Ray;
 
 class DragForce
 {
@@ -72,6 +76,7 @@ class PhysicsObject
     virtual void reset() = 0;
 
     // getters
+    virtual sf::Vector2f getCornerPosition(std::string corner_name);
     virtual const sf::Vector2f& getPosition() const;
     virtual const sf::Vector2f& getVelocity() const;
     virtual const sf::Vector2f& getAcceleration() const;
@@ -99,6 +104,9 @@ class PhysicsObject
 
     void increaseScoreBy(int num);
 
+    // public variables
+    std::vector<Ray> rays;
+
     protected:
     sf::Vector2f initial_position_;
     sf::Vector2f position_;
@@ -124,3 +132,5 @@ class PhysicsObject
     float mass_;
     int score_ = 0;
 };
+
+#endif

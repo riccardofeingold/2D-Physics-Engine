@@ -12,6 +12,13 @@ Player::Player(float x, float y, sf::Vector2f size, float restitution)
     this->body_ = sf::RectangleShape(size);
     this->body_.setFillColor(Colors().PLAYER);
     this->body_.setPosition(this->initial_position_);
+
+    // setup sensors
+    for (int i = 0; i < 360; i += 10)
+    {
+        Ray ray = Ray(&this->body_.getPosition(), i);
+        rays.push_back(ray);
+    }
 }
 
 Player::~Player() = default;

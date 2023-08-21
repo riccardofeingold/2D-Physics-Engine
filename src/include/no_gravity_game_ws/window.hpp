@@ -1,7 +1,8 @@
-#pragma once
+#ifndef WINDOW_HPP
+#define WINDOW_HPP
+
 #include "colors.hpp"
 #include <string>
-#include <SFML/Graphics.hpp>
 
 class Window
 {
@@ -40,3 +41,5 @@ class Window
     bool is_done_;
     bool is_fullscreen_;
 };
+
+#endif

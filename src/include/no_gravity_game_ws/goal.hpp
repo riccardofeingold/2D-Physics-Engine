@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GOAL_HPP
+#define GOAL_HPP
+
 #include "physics.hpp"
 #include "colors.hpp"
 #include <SFML/Graphics.hpp>
@@ -16,3 +18,5 @@ class Goal : public PhysicsObject
     // setters
     void setRandomPosition() override;
 };
+
+#endif

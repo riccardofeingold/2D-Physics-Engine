@@ -43,6 +43,21 @@ sf::RectangleShape& PhysicsObject::getBody() { return this->body_; }
 
 int PhysicsObject::getScore() const { return this->score_; }
 
+// @brief possible arguments: tl = top left, bl = bottom left, tr = top right, br = bottom right
+sf::Vector2f PhysicsObject::getCornerPosition(std::string corner_name)
+{
+    if ("tl" == corner_name)
+        return sf::Vector2f(this->getBody().getPosition().x - this->getSize().x/2, this->getBody().getPosition().y - this->getSize().y/2);
+    else if ("bl" == corner_name)
+        return sf::Vector2f(this->getBody().getPosition().x - this->getSize().x/2, this->getBody().getPosition().y + this->getSize().y/2);
+    else if ("tr" == corner_name)
+        return sf::Vector2f(this->getBody().getPosition().x + this->getSize().x/2, this->getBody().getPosition().y - this->getSize().y/2);
+    else if ("br" == corner_name)
+        return sf::Vector2f(this->getBody().getPosition().x + this->getSize().x/2, this->getBody().getPosition().y + this->getSize().y/2);
+    else
+        return sf::Vector2f(0, 0);
+}
+
 // setters
 void PhysicsObject::setAcceleration(const sf::Vector2f& acceleration) { this->acceleration_ = acceleration; }
 

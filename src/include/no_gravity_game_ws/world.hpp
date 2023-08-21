@@ -1,9 +1,15 @@
-#pragma once
-#include <SFML/Graphics.hpp>
+#ifndef WORLD_HPP
+#define WORLD_HPP
+
 #include "physics.hpp"
 #include "window.hpp"
+#include "ray.hpp"
 #include <iostream>
 #include <map>
+
+// forward declaration 
+class Ray;
+class PhysicsObject;
 
 class World
 {
@@ -33,6 +39,11 @@ class World
     std::vector<std::string> list_of_object_names_;
     bool game_over = false;
 
+    // friend classes
+    friend class Ray;
+    
     private:
     std::map<std::string, PhysicsObject*> objects_;
 };
+
+#endif

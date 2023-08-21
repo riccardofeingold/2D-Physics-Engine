@@ -1,4 +1,6 @@
-#pragma once
+#ifndef GAME_HPP
+#define GAME_HPP
+
 #include "window.hpp"
 #include "player.hpp"
 #include "physics.hpp"
@@ -45,3 +47,5 @@ class Game
     Goal goal_;
     Enemy enemy_;
 };
+
+#endif

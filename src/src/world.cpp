@@ -71,7 +71,7 @@ void World::wallCollision()
             obj.second->setVelocity(sf::Vector2f(0.f, obj.second->getVelocity().y));
         }
         // left wall
-        if (obj.second->getBody().getPosition().x + obj.second->getSize().x/2 < 0)
+        if (obj.second->getBody().getPosition().x - obj.second->getSize().x/2 < 0)
         {
             obj.second->getBody().setPosition(sf::Vector2f(obj.second->getSize().x/2, obj.second->getBody().getPosition().y));
             obj.second->setPosition(sf::Vector2f(0, obj.second->getPosition().y));
