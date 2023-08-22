@@ -43,15 +43,22 @@ sf::RectangleShape& PhysicsObject::getBody() { return this->body_; }
 
 int PhysicsObject::getScore() const { return this->score_; }
 
-// @brief returns a list of all normals needed for SAT
+// @brief returns a list of all normals needed for SAT; already normalized
 std::vector<sf::Vector2f> PhysicsObject::getNormals()
 {
     std::vector<sf::Vector2f> normals;
+    float mag = 0;
     
-    sf::Vector2f normal = sf::Vector2f(this->getCornerPosition("tr").y - this->getCornerPosition("rl").y, this->getCornerPosition("tl").x - this->getCornerPosition("tr").x);
+    sf::Vector2f normal = sf::Vector2f(this->getCornerPosition("tr").y - this->getCornerPosition("tl").y, this->getCornerPosition("tl").x - this->getCornerPosition("tr").x);
+    mag = std::sqrt(normal.x * normal.x + normal.y * normal.y);
+    normal.x /= mag;
+    normal.y /= mag;
     normals.push_back(normal);
 
-    normal = sf::Vector2f(this->getCornerPosition("bl").y - this->getCornerPosition("tl").y, this->getCornerPosition("tl").x - this->getCornerPosition("bl").y);
+    normal = sf::Vector2f(this->getCornerPosition("bl").y - this->getCornerPosition("tl").y, this->getCornerPosition("tl").x - this->getCornerPosition("bl").x);
+    mag = std::sqrt(normal.x * normal.x + normal.y * normal.y);
+    normal.x /= mag;
+    normal.y /= mag;
     normals.push_back(normal);
 
     return normals;

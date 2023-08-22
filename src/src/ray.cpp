@@ -42,6 +42,7 @@ void Ray::draw()
 
 void Ray::castRay(World& w)
 {
+    // TODO: minimal distance not working properly
     const sf::Vector2f& player = w.getObject("player").getBody().getPosition();
     // wikipedia article about line intersection: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
     for (auto obj : w.objects_)
