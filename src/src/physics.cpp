@@ -43,17 +43,66 @@ sf::RectangleShape& PhysicsObject::getBody() { return this->body_; }
 
 int PhysicsObject::getScore() const { return this->score_; }
 
+// @brief returns a list of all normals needed for SAT
+std::vector<sf::Vector2f> PhysicsObject::getNormals()
+{
+    std::vector<sf::Vector2f> normals;
+    
+    sf::Vector2f normal = sf::Vector2f(this->getCornerPosition("tr").y - this->getCornerPosition("rl").y, this->getCornerPosition("tl").x - this->getCornerPosition("tr").x);
+    normals.push_back(normal);
+
+    normal = sf::Vector2f(this->getCornerPosition("bl").y - this->getCornerPosition("tl").y, this->getCornerPosition("tl").x - this->getCornerPosition("bl").y);
+    normals.push_back(normal);
+
+    return normals;
+}
+
 // @brief possible arguments: tl = top left, bl = bottom left, tr = top right, br = bottom right
 sf::Vector2f PhysicsObject::getCornerPosition(std::string corner_name)
 {
+    float cos_theta = std::cos((float)this->getBody().getRotation()*M_PI/180);
+    float sin_theta = std::sin((float)this->getBody().getRotation()*M_PI/180);
+
     if ("tl" == corner_name)
-        return sf::Vector2f(this->getBody().getPosition().x - this->getSize().x/2, this->getBody().getPosition().y - this->getSize().y/2);
+    {
+        float local_x = cos_theta * (-this->getSize().x/2) - sin_theta * (-this->getSize().y/2);
+        float local_y = sin_theta * (-this->getSize().x/2) + cos_theta * (-this->getSize().y/2);
+
+        float x = this->getBody().getPosition().x + local_x;
+        float y = this->getBody().getPosition().y + local_y;
+
+        return sf::Vector2f(x, y);
+    }
     else if ("bl" == corner_name)
-        return sf::Vector2f(this->getBody().getPosition().x - this->getSize().x/2, this->getBody().getPosition().y + this->getSize().y/2);
+    {
+        float local_x = cos_theta * (-this->getSize().x/2) - sin_theta * (this->getSize().y/2);
+        float local_y = sin_theta * (-this->getSize().x/2) + cos_theta * (this->getSize().y/2);
+        
+        float x = this->getBody().getPosition().x + local_x;
+        float y = this->getBody().getPosition().y + local_y;
+
+        return sf::Vector2f(x, y);
+    }
     else if ("tr" == corner_name)
-        return sf::Vector2f(this->getBody().getPosition().x + this->getSize().x/2, this->getBody().getPosition().y - this->getSize().y/2);
+    {
+        float local_x = cos_theta * (this->getSize().x/2) - sin_theta * (-this->getSize().y/2);
+        float local_y = sin_theta * (this->getSize().x/2) + cos_theta * (-this->getSize().y/2);
+
+        float x = this->getBody().getPosition().x + local_x;
+        float y = this->getBody().getPosition().y + local_y;
+
+        return sf::Vector2f(x, y);
+    }
     else if ("br" == corner_name)
-        return sf::Vector2f(this->getBody().getPosition().x + this->getSize().x/2, this->getBody().getPosition().y + this->getSize().y/2);
+    {
+        float local_x = cos_theta * (this->getSize().x/2) - sin_theta * (this->getSize().y/2);
+        float local_y = sin_theta * (this->getSize().x/2) + cos_theta * (this->getSize().y/2);
+
+        float x = this->getBody().getPosition().x + local_x;
+        float y = this->getBody().getPosition().y + local_y;
+
+        return sf::Vector2f(x, y);
+    }
     else
         return sf::Vector2f(0, 0);
 }

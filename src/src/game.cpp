@@ -15,9 +15,11 @@ Game::~Game() = default;
 
 void Game::start()
 {
+    // goals
     this->goal_.setWindow(window_);
     this->goal_.setRandomPosition();
 
+    // enemy
     this->enemy_.setSpeed(5);
     this->enemy_.setWindow(window_);
     this->enemy_.setRandomPosition();
@@ -27,9 +29,27 @@ void Game::start()
     this->player_.setWindow(window_);
     this->player_.applyAirDrag(DRAG_COEFFICIENT, 1, AIR_DENSITY);
     this->player_.setMass(1);
+
+    // add objects to the world
     this->world_.addObject("player", &this->player_);
     this->world_.addObject("goal", &this->goal_);
     this->world_.addObject("enemy", &this->enemy_);
+
+    // walls
+    for (int i = 0; i < NUM_WALLS; ++i)
+    {
+        Wall wall = Wall(sf::Vector2f((float)std::rand()/RAND_MAX*SCREEN_WIDTH, (float)std::rand()/RAND_MAX*SCREEN_HEIGHT), sf::Vector2f(100, WALL_THICKNESS), (float)std::rand()/RAND_MAX*360);
+        this->walls_.push_back(wall);
+    }
+
+    int counter = 0;
+    for (auto it = this->walls_.begin(); it != this->walls_.end(); ++it)
+    {
+        std::string name = "wall";
+        name += std::to_string(counter);
+        this->world_.addObject(name, &*it);
+        ++counter;
+    }
 }
 
 void Game::handleInput()

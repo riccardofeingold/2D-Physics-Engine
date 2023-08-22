@@ -77,6 +77,7 @@ class PhysicsObject
 
     // getters
     virtual sf::Vector2f getCornerPosition(std::string corner_name);
+    virtual std::vector<sf::Vector2f> getNormals();
     virtual const sf::Vector2f& getPosition() const;
     virtual const sf::Vector2f& getVelocity() const;
     virtual const sf::Vector2f& getAcceleration() const;
@@ -106,6 +107,7 @@ class PhysicsObject
 
     // public variables
     std::vector<Ray> rays;
+    bool is_moving_ = false;
 
     protected:
     sf::Vector2f initial_position_;
@@ -121,6 +123,7 @@ class PhysicsObject
     Material material_;
     MomentOfInertia moment_of_inertia_;
     Window* window_;
+
 
     private:
     // private methods

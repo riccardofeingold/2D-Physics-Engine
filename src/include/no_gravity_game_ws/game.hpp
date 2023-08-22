@@ -7,6 +7,7 @@
 #include "world.hpp"
 #include "goal.hpp"
 #include "enemy.hpp"
+#include "wall.hpp"
 #include <SFML/Graphics.hpp>
 
 #define SCREEN_WIDTH 640
@@ -17,6 +18,8 @@
 #define MAX_ROTATIONAL_TORQUE 1
 #define GRAVITY 10
 #define FRAME_RATE 60
+#define NUM_WALLS 2
+#define WALL_THICKNESS 10
 
 // air drag values
 #define DRAG_COEFFICIENT 1.05 // https://en.wikipedia.org/wiki/Drag_coefficient
@@ -46,6 +49,7 @@ class Game
     Player player_;
     Goal goal_;
     Enemy enemy_;
+    std::vector<Wall> walls_;
 };
 
 #endif

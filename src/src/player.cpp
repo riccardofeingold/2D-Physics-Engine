@@ -3,6 +3,7 @@
 Player::Player(float x, float y, sf::Vector2f size, float restitution)
 {
     this->size_ = size;
+    this->is_moving_ = true;
     this->material_.restitution = restitution;
     this->initial_position_ = sf::Vector2f(x - size.x/2, y - size.y/2);
     

@@ -6,7 +6,6 @@ Ray::Ray(const sf::Vector2f* start, float angle)
 {
     float rad = angle_ * M_PI / 180;
     this->direction_ = sf::Vector2f(std::cos(rad), std::sin(rad));
-    std::cout << direction_.x << " " << direction_.y << std::endl;
     this->line_ = sf::RectangleShape(sf::Vector2f(0, THICKNESS));
     line_.setOrigin(sf::Vector2f(0, line_.getSize().y/2));
     line_.setPosition(*start_);
@@ -44,7 +43,6 @@ void Ray::draw()
 void Ray::castRay(World& w)
 {
     const sf::Vector2f& player = w.getObject("player").getBody().getPosition();
-
     // wikipedia article about line intersection: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
     for (auto obj : w.objects_)
     {

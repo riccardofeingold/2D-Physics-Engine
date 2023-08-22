@@ -31,6 +31,7 @@ void World::checkCollisionBetween(const std::string& name1, const std::string& n
     PhysicsObject& obj1 = (*(*this->objects_.find(name1)).second);
     PhysicsObject& obj2 = (*(*this->objects_.find(name2)).second);
 
+    // TODO: improve it using SAT collision method
     // axis aligned boundary box
     if 
     (
@@ -63,33 +64,36 @@ void World::wallCollision()
 {
     for (auto obj : this->objects_)
     {
-        // right wall
-        if (obj.second->getBody().getPosition().x + obj.second->getSize().x/2 > this->window_->getWindowSize().x)
+        if (obj.second->is_moving_)
         {
-            obj.second->getBody().setPosition(sf::Vector2f(this->window_->getWindowSize().x - obj.second->getSize().x/2, obj.second->getBody().getPosition().y));
-            obj.second->setPosition(sf::Vector2f(0, obj.second->getPosition().y));
-            obj.second->setVelocity(sf::Vector2f(0.f, obj.second->getVelocity().y));
-        }
-        // left wall
-        if (obj.second->getBody().getPosition().x - obj.second->getSize().x/2 < 0)
-        {
-            obj.second->getBody().setPosition(sf::Vector2f(obj.second->getSize().x/2, obj.second->getBody().getPosition().y));
-            obj.second->setPosition(sf::Vector2f(0, obj.second->getPosition().y));
-            obj.second->setVelocity(sf::Vector2f(0.f, obj.second->getVelocity().y));
-        }
-        // bottom wall
-        if (obj.second->getBody().getPosition().y + obj.second->getSize().y/2 > this->window_->getWindowSize().y)
-        {
-            obj.second->getBody().setPosition(sf::Vector2f(obj.second->getBody().getPosition().x, this->window_->getWindowSize().y - obj.second->getSize().y/2));
-            obj.second->setPosition(sf::Vector2f(obj.second->getPosition().x, 0));
-            obj.second->setVelocity(sf::Vector2f(obj.second->getVelocity().x, 0.f));
-        }
-        // top wall
-        if (obj.second->getBody().getPosition().y - obj.second->getSize().y/2 < 0)
-        {
-            obj.second->getBody().setPosition(sf::Vector2f(obj.second->getBody().getPosition().x, obj.second->getSize().y/2));
-            obj.second->setPosition(sf::Vector2f(obj.second->getPosition().x, 0));
-            obj.second->setVelocity(sf::Vector2f(obj.second->getVelocity().x, 0.f));
+            // right wall
+            if (obj.second->getBody().getPosition().x + obj.second->getSize().x/2 > this->window_->getWindowSize().x)
+            {
+                obj.second->getBody().setPosition(sf::Vector2f(this->window_->getWindowSize().x - obj.second->getSize().x/2, obj.second->getBody().getPosition().y));
+                obj.second->setPosition(sf::Vector2f(0, obj.second->getPosition().y));
+                obj.second->setVelocity(sf::Vector2f(0.f, obj.second->getVelocity().y));
+            }
+            // left wall
+            if (obj.second->getBody().getPosition().x - obj.second->getSize().x/2 < 0)
+            {
+                obj.second->getBody().setPosition(sf::Vector2f(obj.second->getSize().x/2, obj.second->getBody().getPosition().y));
+                obj.second->setPosition(sf::Vector2f(0, obj.second->getPosition().y));
+                obj.second->setVelocity(sf::Vector2f(0.f, obj.second->getVelocity().y));
+            }
+            // bottom wall
+            if (obj.second->getBody().getPosition().y + obj.second->getSize().y/2 > this->window_->getWindowSize().y)
+            {
+                obj.second->getBody().setPosition(sf::Vector2f(obj.second->getBody().getPosition().x, this->window_->getWindowSize().y - obj.second->getSize().y/2));
+                obj.second->setPosition(sf::Vector2f(obj.second->getPosition().x, 0));
+                obj.second->setVelocity(sf::Vector2f(obj.second->getVelocity().x, 0.f));
+            }
+            // top wall
+            if (obj.second->getBody().getPosition().y - obj.second->getSize().y/2 < 0)
+            {
+                obj.second->getBody().setPosition(sf::Vector2f(obj.second->getBody().getPosition().x, obj.second->getSize().y/2));
+                obj.second->setPosition(sf::Vector2f(obj.second->getPosition().x, 0));
+                obj.second->setVelocity(sf::Vector2f(obj.second->getVelocity().x, 0.f));
+            }
         }
     }
 }

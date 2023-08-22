@@ -3,6 +3,7 @@
 Enemy::Enemy(sf::Vector2f size, float restitution = 0.f)
 {
     this->size_ = size;
+    this->is_moving_ = true;
     this->material_.restitution = restitution;
     this->body_ = sf::RectangleShape(size_);
     this->body_.setFillColor(Colors().ENEMY);
