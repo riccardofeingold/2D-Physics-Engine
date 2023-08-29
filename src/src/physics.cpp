@@ -21,6 +21,7 @@ PhysicsObject::PhysicsObject(float gravity, float mass)
 PhysicsObject::~PhysicsObject() = default;
 
 // getters 
+const Material PhysicsObject::getMaterial() const { return this->material_; }
 const float& PhysicsObject::getMass() const { return mass_; }
 
 const sf::Vector2f& PhysicsObject::getPosition() const { return position_; }

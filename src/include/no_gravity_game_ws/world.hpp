@@ -28,7 +28,7 @@ class World
 
     // collisions
     void wallCollision();
-    void checkCollisionBetween(const std::string& name1, const std::string& name2);
+    bool checkCollisionBetween(const std::string& name1, const std::string& name2, sf::Time dt);
 
     // getters
     PhysicsObject& getObject(const std::string& name);

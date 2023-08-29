@@ -26,12 +26,15 @@ void World::removeObject(const std::string& name)
     this->objects_.erase(iter);
 }
 
-void World::checkCollisionBetween(const std::string& name1, const std::string& name2)
+bool World::checkCollisionBetween(const std::string& name1, const std::string& name2, sf::Time dt)
 {
     PhysicsObject& obj1 = (*(*this->objects_.find(name1)).second);
     PhysicsObject& obj2 = (*(*this->objects_.find(name2)).second);
 
-    // TODO: improve it using SAT collision method
+    float smallest_penetration_distance = INFINITY;
+    std::map<float, sf::Vector2f> pdistances_and_normal;
+    sf::Vector2f normal_of_collision = sf::Vector2f(0.f, 0.f);
+
     std::vector<sf::Vector2f> corners_obj1;
     corners_obj1.push_back(obj1.getCornerPosition("tl"));
     corners_obj1.push_back(obj1.getCornerPosition("tr"));
@@ -75,13 +78,36 @@ void World::checkCollisionBetween(const std::string& name1, const std::string& n
         float obj2_max = *std::max_element(projections.begin(), projections.end());
         float obj2_min = *std::min_element(projections.begin(), projections.end());
 
-        if ((obj1_max > obj2_min && obj1_max < obj2_max) || (obj1_min > obj2_min && obj1_min < obj2_max))
-            std::cout << "OVERLAP" << std::endl;
-        else 
-            return;
+        bool overlap = (obj1_max >= obj2_min && obj1_max <= obj2_max) || (obj1_min >= obj2_min && obj1_min <= obj2_max); 
+        if (overlap)
+        {
+            if (obj1_max >= obj2_min && obj1_max <= obj2_max)
+                pdistances_and_normal.emplace(obj1_max - obj2_min, n);
+            else if (obj1_min >= obj2_min && obj1_min <= obj2_max)
+                pdistances_and_normal.emplace(obj2_max - obj1_min, n);
+        }
+        else
+        {
+            return false;
+        }
     }
-    
-    std::cout << "COLLISION!!!! Detected with SAT!" << std::endl;
+
+    // find minimal penetration distance
+    for (auto pair : pdistances_and_normal)
+    {
+        if (pair.first < smallest_penetration_distance)
+        {
+            smallest_penetration_distance = pair.first;
+            normal_of_collision = pair.second;
+        }
+    }
+
+    std::cout << "COLLISION between " << name1 << " and " << name2 << std::endl;
+    if (name1 == "tester")
+    {
+        obj1.getBody().setFillColor(sf::Color::Green);
+    }
+
     if (name1 == "goal")
     {
         obj1.setRandomPosition();
@@ -93,38 +119,16 @@ void World::checkCollisionBetween(const std::string& name1, const std::string& n
         obj1.increaseScoreBy(1);
     }
 
-    if (name1 == "enemy" || name2 == "enemy")
+    if (name1 == "enemy" || name2 == "enemy" || name2.find("wall") != std::string::npos)
     {
-        this->reset();
-        this->game_over = true;
+        if (name1 != "tester")
+        {
+            this->reset();
+            this->game_over = true;
+        }
     }
 
-    // axis aligned boundary box
-    // if 
-    // (
-    //     obj1.getBody().getPosition().x < obj2.getBody().getPosition().x + obj2.getSize().x/2 &&
-    //     obj1.getBody().getPosition().x + obj1.getSize().x/2 > obj2.getBody().getPosition().x &&
-    //     obj1.getBody().getPosition().y < obj2.getBody().getPosition().y + obj2.getSize().y/2 &&
-    //     obj1.getBody().getPosition().y + obj1.getSize().y/2 > obj2.getBody().getPosition().y
-    // )
-    // {
-    //     if (name1 == "goal")
-    //     {
-    //         obj1.setRandomPosition();
-    //         obj2.increaseScoreBy(1);
-    //     }
-    //     else if (name2 == "goal")
-    //     {
-    //         obj2.setRandomPosition();
-    //         obj1.increaseScoreBy(1);
-    //     }
-
-    //     if (name1 == "enemy" || name2 == "enemy")
-    //     {
-    //         this->reset();
-    //         this->game_over = true;
-    //     }
-    // }
+    return true;
 }
 
 void World::wallCollision()
@@ -169,8 +173,20 @@ void World::update(const sf::Time& dt)
 {
     // check for walls
     wallCollision();
-    checkCollisionBetween("goal", "player");
-    checkCollisionBetween("player", "enemy");
+    checkCollisionBetween("goal", "player", dt);
+    // checkCollisionBetween("player", "enemy", dt);
+
+    bool tester_collided = false;
+    this->getObject("tester").getBody().setFillColor(sf::Color::Blue);
+    for (auto name : this->list_of_object_names_)
+    {
+        if (name.find("wall") != std::string::npos)
+        {
+            checkCollisionBetween("player", name, dt);
+            if (!tester_collided)
+                tester_collided = checkCollisionBetween("tester", name, dt);
+        }
+    }
 
     for (auto obj : this->objects_)
     {

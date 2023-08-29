@@ -76,6 +76,7 @@ class PhysicsObject
     virtual void reset() = 0;
 
     // getters
+    virtual const Material getMaterial() const;
     virtual sf::Vector2f getCornerPosition(std::string corner_name);
     virtual std::vector<sf::Vector2f> getNormals();
     virtual const sf::Vector2f& getPosition() const;

@@ -42,8 +42,8 @@ void Ray::draw()
 
 void Ray::castRay(World& w)
 {
-    // TODO: minimal distance not working properly
     const sf::Vector2f& player = w.getObject("player").getBody().getPosition();
+    std::vector<sf::Vector2f> global_points;
     // wikipedia article about line intersection: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
     for (auto obj : w.objects_)
     {
@@ -151,8 +151,19 @@ void Ray::castRay(World& w)
                         this->point_of_contact_ = p;
                     }
                 }
-                break;
+                global_points.push_back(this->point_of_contact_);
             }
+        }
+    }
+
+    float min_d = INFINITY;
+    for (auto p : global_points)
+    {
+        float d = this->calculateMagnitude(p);
+        if (min_d > d)
+        {
+            min_d = d;
+            this->point_of_contact_ = p;
         }
     }
 }

@@ -18,8 +18,8 @@
 #define MAX_ROTATIONAL_TORQUE 1
 #define GRAVITY 10
 #define FRAME_RATE 60
-#define NUM_WALLS 2
-#define WALL_THICKNESS 10
+#define NUM_WALLS 10
+#define MAX_WALL_SIZE 100
 
 // air drag values
 #define DRAG_COEFFICIENT 1.05 // https://en.wikipedia.org/wiki/Drag_coefficient
@@ -49,6 +49,7 @@ class Game
     Player player_;
     Goal goal_;
     Enemy enemy_;
+    Enemy tester_;
     std::vector<Wall> walls_;
 };
 
