@@ -41,11 +41,6 @@ bool Physics2D::Vector2f::operator==(Physics2D::Vector2f& a)
     return this->x == a.x && this->y == a.y;
 }
 
-float Physics2D::Vector2f::dot(Physics2D::Vector2f& a)
-{
-    return this->x * a.x + this->y * a.y;
-}
-
 std::size_t Physics2D::Vector2f::getHashCode()
 {
     return std::hash<Physics2D::Vector2f>{}(Vector2f(this->x, this->y));

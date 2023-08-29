@@ -20,6 +20,8 @@ add_executable(NoGravityGameWS
                src/src/enemy.cpp
                src/src/ray.cpp
                src/src/wall.cpp
+               src/src/vector2d.cpp
+               src/src/vector2dconverter.cpp
 )
 target_include_directories(NoGravityGameWS PUBLIC include/no_gravity_game_ws)
 target_link_libraries(NoGravityGameWS PRIVATE sfml-graphics)

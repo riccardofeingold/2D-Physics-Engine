@@ -23,7 +23,6 @@ namespace Physics2D
         Vector2f operator*(float scalar);
         Vector2f operator/(float scalar);
         bool operator==(Vector2f& a);
-        float dot(Vector2f& a);
         std::size_t getHashCode();
         std::string toString();
     };
