@@ -9,6 +9,7 @@ namespace Physics2D
     struct Vector2f
     { 
         // constructor
+        Vector2f();
         Vector2f(float x, float y);
 
         // variables
@@ -17,12 +18,14 @@ namespace Physics2D
         static Vector2f Zero();
 
         // operations
-        Vector2f operator+(Vector2f& a);
-        Vector2f operator-(Vector2f& a);
+        Vector2f operator+(const Vector2f& a);
+        Vector2f operator-(const Vector2f& a);
         Vector2f operator-();
-        Vector2f operator*(float scalar);
-        Vector2f operator/(float scalar);
-        bool operator==(Vector2f& a);
+        Vector2f operator*(const float scalar);
+        Vector2f operator/(const float scalar);
+        Vector2f operator+=(const Vector2f& a);
+        Vector2f operator-=(const Vector2f& a);
+        bool operator==(const Vector2f& a);
         std::size_t getHashCode();
         std::string toString();
     };

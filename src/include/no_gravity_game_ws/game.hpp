@@ -8,6 +8,9 @@
 #include "goal.hpp"
 #include "enemy.hpp"
 #include "wall.hpp"
+#include "rigidbody.hpp"
+#include "vector2dconverter.hpp"
+#include "collision2d.hpp"
 #include <SFML/Graphics.hpp>
 
 #define SCREEN_WIDTH 640
@@ -18,12 +21,14 @@
 #define MAX_ROTATIONAL_TORQUE 1
 #define GRAVITY 10
 #define FRAME_RATE 60
-#define NUM_WALLS 10
+#define NUM_WALLS 0
 #define MAX_WALL_SIZE 100
 
 // air drag values
 #define DRAG_COEFFICIENT 1.05 // https://en.wikipedia.org/wiki/Drag_coefficient
 #define AIR_DENSITY 1.293
+
+using namespace Physics2D;
 
 class Game
 {
@@ -40,7 +45,12 @@ class Game
     void update();
     void render();
     Window* getWindow();
-    
+
+    // public variables
+    sf::View view; 
+    // Testing
+    std::vector<Rigidbody*> rigidbodies;
+
     private:
     sf::Clock clock_;
     sf::Time dt_;
@@ -51,6 +61,7 @@ class Game
     Enemy enemy_;
     Enemy tester_;
     std::vector<Wall> walls_;
+
 };
 
 #endif

@@ -92,3 +92,8 @@ sf::Vector2u Window::getWindowSize() const
 {
     return this->window_size_;
 }
+
+sf::RenderWindow& Window::getWindow()
+{
+    return this->window_;
+}

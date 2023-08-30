@@ -26,6 +26,7 @@ class Window
     bool isDone() const;
     bool isFullscreen() const;
     sf::Vector2u getWindowSize() const;
+    sf::RenderWindow& getWindow();
 
     private:
     // methods

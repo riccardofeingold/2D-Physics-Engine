@@ -9,7 +9,12 @@ namespace Physics2D
     {
         public:
         Math2D();
-        
+
+        // other math stuff
+        /// @brief clipping a value between min and max
+        static float clip(float value, float min, float max);
+
+        // Vector math        
         /// @brief calculate the length of a vector
         static float norm(Vector2f& a);
         /// @brief calculate the distance between two vectors

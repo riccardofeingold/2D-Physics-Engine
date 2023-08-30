@@ -1,52 +1,72 @@
 #include "../include/no_gravity_game_ws/vector2d.hpp"
 
-Physics2D::Vector2f::Vector2f(float x, float y)
+using namespace Physics2D;
+
+Vector2f::Vector2f()
+{
+    this->x = 0.f;
+    this->y = 0.f;
+}
+
+Vector2f::Vector2f(float x, float y)
 {
     this->x = x;
     this->y = y;
 }
 
-Physics2D::Vector2f Physics2D::Vector2f::Zero()
+Vector2f Vector2f::Zero()
 {
-    return Physics2D::Vector2f(0.f, 0.f);
+    return Vector2f(0.f, 0.f);
 }
 
-Physics2D::Vector2f Physics2D::Vector2f::operator+(Physics2D::Vector2f& a)
+Vector2f Vector2f::operator+(const Vector2f& a)
 {
-    return Physics2D::Vector2f(this->x + a.x, this->y + a.y);
+    return Vector2f(this->x + a.x, this->y + a.y);
 }
 
-Physics2D::Vector2f Physics2D::Vector2f::operator-(Physics2D::Vector2f& a)
+Vector2f Vector2f::operator+=(const Vector2f& a)
 {
-    return Physics2D::Vector2f(this->x - a.x, this->y - a.y);
+    this->x += a.x;
+    this->y += a.y;
+    return *this;
 }
 
-Physics2D::Vector2f Physics2D::Vector2f::operator-()
+Vector2f Vector2f::operator-=(const Vector2f& a)
 {
-    return Physics2D::Vector2f(-this->x, -this->y);
+    return *this - a;
 }
 
-Physics2D::Vector2f Physics2D::Vector2f::operator*(float scalar)
+Vector2f Vector2f::operator-(const Vector2f& a)
 {
-    return Physics2D::Vector2f(this->x * scalar, this->y * scalar);
+    return Vector2f(this->x - a.x, this->y - a.y);
 }
 
-Physics2D::Vector2f Physics2D::Vector2f::operator/(float scalar)
+Vector2f Vector2f::operator-()
 {
-    return Physics2D::Vector2f(this->x / scalar, this->y / scalar);
+    return Vector2f(-this->x, -this->y);
 }
 
-bool Physics2D::Vector2f::operator==(Physics2D::Vector2f& a)
+Vector2f Vector2f::operator*(const float scalar)
+{
+    return Vector2f(this->x * scalar, this->y * scalar);
+}
+
+Vector2f Vector2f::operator/(const float scalar)
+{
+    return Vector2f(this->x / scalar, this->y / scalar);
+}
+
+bool Vector2f::operator==(const Vector2f& a)
 {
     return this->x == a.x && this->y == a.y;
 }
 
-std::size_t Physics2D::Vector2f::getHashCode()
+std::size_t Vector2f::getHashCode()
 {
-    return std::hash<Physics2D::Vector2f>{}(Vector2f(this->x, this->y));
+    return std::hash<Vector2f>{}(Vector2f(this->x, this->y));
 }
 
-std::string Physics2D::Vector2f::toString()
+std::string Vector2f::toString()
 {
     return "X: " + std::to_string(this->x) + " Y: " + std::to_string(this->y);
 }

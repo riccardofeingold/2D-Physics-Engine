@@ -11,8 +11,8 @@ namespace Physics2D
         public:
         Vector2Converter() = default;
 
-        static inline sf::Vector2f toSFVector2f(Vector2f& a);
-        static inline Vector2f toPhysics2DVector2f(sf::Vector2f& a);
+        static sf::Vector2f toSFVector2f(Vector2f& a);
+        static Vector2f toPhysics2DVector2f(sf::Vector2f& a);
     };
 } // namespace Physics2D
 

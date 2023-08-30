@@ -7,6 +7,29 @@ Math2D::Math2D()
 
 }
 
+float Math2D::clip(float value, float min, float max)
+{
+    if (min == max)
+        return min;
+    
+    if (min > max)
+    {
+        try
+        {}
+        catch(const std::exception& e)
+        {
+            throw "min is greater than max!";
+        }
+    }
+        
+    if (value > max)
+        return max;
+    else if (value < min)
+        return min;
+    else
+        return value;
+}
+
 float Math2D::norm(Vector2f& a)
 {
     return std::sqrt(a.x * a.x + a.y * a.y);

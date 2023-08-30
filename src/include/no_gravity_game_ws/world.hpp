@@ -39,6 +39,12 @@ class World
     std::vector<std::string> list_of_object_names_;
     bool game_over = false;
 
+    // constant values
+    static constexpr float min_body_size = 0.01f * 0.01f;
+    static constexpr float max_body_size = 100.f * 100.f;
+    static constexpr float min_density = 0.25f;
+    static constexpr float max_density = 22.f;
+
     // friend classes
     friend class Ray;
     

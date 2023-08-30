@@ -1,4 +1,5 @@
 #include "../include/no_gravity_game_ws/game.hpp"
+#define debugging true
 
 Game::Game() : 
     window_("2D Drone Simulator", sf::Vector2u(SCREEN_WIDTH, SCREEN_HEIGHT), FRAME_RATE), 
@@ -12,10 +13,56 @@ Game::Game() :
     this->start();
 }
 
-Game::~Game() = default;
+Game::~Game()
+{
+    for (auto r : rigidbodies)
+    {
+        if (r != nullptr)
+            delete r;
+    }
+}
 
 void Game::start()
 {
+    // Camera settings
+    this->view.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    this->view.zoom(0.1f);
+    this->view.setCenter(this->view.getSize().x/2, this->view.getSize().y/2);
+    const float padding = this->view.getSize().x * 0.05f;
+    this->world_.window_->getWindow().setView(view);
+
+    /********TESTING*********/
+    for (int i = 0; i < 10; ++i)
+    {
+        int shape_random = (float)std::rand()/RAND_MAX > 0.5 ? 1 : 0;
+        // TODO: random shape to 0 = Circle
+        shape_random = 0;
+        Rigidbody* body = nullptr;
+
+        sf::View current_view = this->world_.window_->getWindow().getView();
+
+        Vector2f position((float)std::rand()/RAND_MAX * (current_view.getSize().x - padding), (float)std::rand()/RAND_MAX * (current_view.getSize().y - padding));
+
+        std::string e;
+        if (shape_random == ShapeType::Circle)
+        {
+            if (!Rigidbody::createCircleBody(1.f, position, 2.f, false, 1.f, body, e))
+                std::cout << e << std::endl;
+            else
+                rigidbodies.push_back(body);
+        } else if (shape_random == ShapeType::Box)
+        {
+            if (!Rigidbody::createBoxBody(1.f, 1.f, position, 2.f, false, 1.f, body, e))
+                std::cout << e << std::endl;
+            else
+                rigidbodies.push_back(body);
+        } else
+        {
+            std::cout << "unknown type" << std::endl;
+        }
+    }
+    /********TESTING*********/
+#if !debugging
     // goals
     this->goal_.setWindow(window_);
     this->goal_.setRandomPosition();
@@ -66,10 +113,31 @@ void Game::start()
             this->world_.getObject("name").getBody().move(sf::Vector2f((float)std::rand()/RAND_MAX*20, (float)std::rand()/RAND_MAX*20));
         }
     }
+#endif
 }
 
 void Game::handleInput()
 {
+    // keyboard steering
+    Vector2f dv(0.f, 0.f);
+    float speed = 8.f;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        --dv.y;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        ++dv.y;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        --dv.x;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        ++dv.x;
+
+    if (dv.x != 0 || dv.y != 0)
+    {
+        Vector2f direction = Math2D::normalize(dv);
+        Vector2f delta_pos = direction * speed * this->dt_.asSeconds();
+        this->rigidbodies[0]->move(delta_pos);
+    }
+    #if !debugging
     if (sf::Joystick::isConnected(0))
     {
         int throttle = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
@@ -96,19 +164,64 @@ void Game::handleInput()
     }
     
     this->tester_.getBody().setPosition(sf::Mouse::getPosition().x * SCREEN_WIDTH / 5118.f, (sf::Mouse::getPosition().y - 2880.f) * SCREEN_HEIGHT / (5758.f - 2880.f));
+    #endif
 }
 
 void Game::update()
 {
     this->dt_ = this->clock_.restart();
     this->window_.update();
+
+    // checking for circle collision
+    for (int i = 0; i < this->rigidbodies.size() - 1; ++i)
+    {
+        Rigidbody* body_a = this->rigidbodies[i];
+
+        for (int j = i + 1; j < this->rigidbodies.size(); ++j)
+        {
+            Rigidbody* body_b = this->rigidbodies[j];
+
+            Vector2f normal;
+            float depth;
+            if (Collision2D::circleCollisionDetection(body_a->position_, body_a->radius_, body_b->position_, body_b->radius_, normal, depth))
+            {
+                body_a->move(-normal * depth / 2.f);
+                body_b->move(normal * depth / 2.f);
+            }
+        }
+    }
+
+
+    #if !debugging
     this->world_.update(this->dt_);
+    #endif
 }
 
 void Game::render()
 {
     this->window_.beginDraw();
-
+    /********TESTING**********/
+    for (auto b : rigidbodies)
+    {
+        sf::Vector2f pos = Vector2Converter::toSFVector2f(b->position_);
+        if (b->shape_type_ == ShapeType::Circle)
+        {
+            sf::CircleShape circle(b->radius_);
+            circle.setFillColor(b->color_);
+            circle.setOrigin(circle.getRadius(), circle.getRadius());
+            circle.setPosition(pos);
+            this->window_.draw(circle);
+        } else if (b->shape_type_ == ShapeType::Box)
+        {
+            sf::RectangleShape box(sf::Vector2f(b->width_, b->height_));
+            box.setFillColor(b->color_);
+            box.setOrigin(box.getSize().x/2, box.getSize().y/2);
+            box.setPosition(pos);
+            this->window_.draw(box);
+        }
+    }
+    /********TESTING**********/
+    #if !debugging
     for (auto r : this->world_.getObject("player").rays)
     {
         r.castRay(this->world_);
@@ -126,6 +239,8 @@ void Game::render()
         std::cout << "GAME OVER! 😂" << " Your score: " << this->player_.getScore() << std::endl;
         this->player_.setScoreToZero();
     }
+    #endif
+
     this->window_.endDraw();
     
     if (this->world_.game_over)

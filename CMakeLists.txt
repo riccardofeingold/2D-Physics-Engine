@@ -22,6 +22,9 @@ add_executable(NoGravityGameWS
                src/src/wall.cpp
                src/src/vector2d.cpp
                src/src/vector2dconverter.cpp
+               src/src/rigidbody.cpp
+               src/src/math2d.cpp
+               src/src/collision2d.cpp
 )
 target_include_directories(NoGravityGameWS PUBLIC include/no_gravity_game_ws)
 target_link_libraries(NoGravityGameWS PRIVATE sfml-graphics)
