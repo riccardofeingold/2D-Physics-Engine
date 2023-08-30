@@ -2,12 +2,12 @@
 
 using namespace Physics2D;
 
-sf::Vector2f Vector2Converter::toSFVector2f(Vector2f& a)
+sf::Vector2f Vector2Converter::toSFVector2f(const Vector2f& a)
 {
     return sf::Vector2f(a.x, a.y);
 }
 
-Vector2f Vector2Converter::toPhysics2DVector2f(sf::Vector2f& a)
+Vector2f Vector2Converter::toPhysics2DVector2f(const sf::Vector2f& a)
 {
     return Vector2f(a.x, a.y);
 }

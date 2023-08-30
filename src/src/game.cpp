@@ -208,7 +208,7 @@ void Game::render()
 {
     this->window_.beginDraw();
     /********TESTING**********/
-    for (auto b : rigidbodies)
+    for (auto b : this->rigidbodies)
     {
         sf::Vector2f pos = Vector2Converter::toSFVector2f(b->position_);
         if (b->shape_type_ == ShapeType::Circle)
@@ -224,18 +224,16 @@ void Game::render()
         {
             Vector2Converter::toSFVector2fList(b->getTransformedVertices(), this->vertex_buffer_);
 
-            // sf::ConvexShape box(4);
-            // for (int i = 0; i < this->vertex_buffer_.size(); ++i)
-            // {
-            //     box.setPoint(i, this->vertex_buffer_[i]);
-            // }
+            sf::ConvexShape box(6);
+            for (int i = 0; i < box.getPointCount(); ++i)
+            {
+                box.setPoint(i, this->vertex_buffer_[b->triangle_indices[i]]);
+            }
 
-            sf::RectangleShape box(sf::Vector2f(b->width_, b->height_));
             box.setFillColor(b->color_);
             box.setOutlineColor(sf::Color::White);
             box.setOutlineThickness(0.1f);
-            // box.setOrigin(box.getGlobalBounds().width/2, box.getGlobalBounds().height/2);
-            box.setOrigin(box.getSize().x/2, box.getSize().y/2);
+            box.setOrigin(pos);
             box.setPosition(pos);
             box.setRotation(Math2D::convertToDegree(b->rotation_));
             this->window_.draw(box);

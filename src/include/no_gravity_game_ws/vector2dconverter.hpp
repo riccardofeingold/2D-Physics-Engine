@@ -11,8 +11,8 @@ namespace Physics2D
         public:
         Vector2Converter() = default;
 
-        static sf::Vector2f toSFVector2f(Vector2f& a);
-        static Vector2f toPhysics2DVector2f(sf::Vector2f& a);
+        static sf::Vector2f toSFVector2f(const Vector2f& a);
+        static Vector2f toPhysics2DVector2f(const sf::Vector2f& a);
         static void toSFVector2fList(const std::vector<Vector2f>& a, std::vector<sf::Vector2f>& b);
         static void toPhysics2DVector2fList(const std::vector<sf::Vector2f>& a, std::vector<Vector2f>& b);
     };
