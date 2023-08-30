@@ -30,6 +30,16 @@ float Math2D::clip(float value, float min, float max)
         return value;
 }
 
+float Math2D::convertToDegree(float radian)
+{
+    return radian * 180.f / M_PI;
+}
+
+float Math2D::convertToRadian(float degree)
+{
+    return degree * M_PI / 180.f;
+}
+
 float Math2D::norm(Vector2f& a)
 {
     return std::sqrt(a.x * a.x + a.y * a.y);

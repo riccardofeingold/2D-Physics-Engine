@@ -5,6 +5,7 @@
 
 namespace Physics2D
 {
+    class Vector2f;
     class Math2D
     {
         public:
@@ -13,8 +14,18 @@ namespace Physics2D
         // other math stuff
         /// @brief clipping a value between min and max
         static float clip(float value, float min, float max);
-
-        // Vector math        
+        
+        /// @brief convert to degree from radian
+        /// @param value 
+        /// @return degrees
+        static float convertToDegree(float radian);
+        
+        /// @brief convert to radian from degree
+        /// @param degree 
+        /// @return radians
+        static float convertToRadian(float degree);
+        
+        // Vector math
         /// @brief calculate the length of a vector
         static float norm(Vector2f& a);
         /// @brief calculate the distance between two vectors

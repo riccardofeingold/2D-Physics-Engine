@@ -36,7 +36,7 @@ void Game::start()
     {
         int shape_random = (float)std::rand()/RAND_MAX > 0.5 ? 1 : 0;
         // TODO: random shape to 0 = Circle
-        shape_random = 0;
+        shape_random = ShapeType::Box;
         Rigidbody* body = nullptr;
 
         sf::View current_view = this->world_.window_->getWindow().getView();
@@ -52,7 +52,7 @@ void Game::start()
                 rigidbodies.push_back(body);
         } else if (shape_random == ShapeType::Box)
         {
-            if (!Rigidbody::createBoxBody(1.f, 1.f, position, 2.f, false, 1.f, body, e))
+            if (!Rigidbody::createBoxBody(2.f, 2.f, position, 2.f, false, 1.f, body, e))
                 std::cout << e << std::endl;
             else
                 rigidbodies.push_back(body);
@@ -172,6 +172,13 @@ void Game::update()
     this->dt_ = this->clock_.restart();
     this->window_.update();
 
+    // box rotation
+    for (auto b : this->rigidbodies)
+    {
+        b->rotate(M_PI / 2 * this->dt_.asSeconds());
+    }
+
+#if false
     // checking for circle collision
     for (int i = 0; i < this->rigidbodies.size() - 1; ++i)
     {
@@ -190,7 +197,7 @@ void Game::update()
             }
         }
     }
-
+#endif
 
     #if !debugging
     this->world_.update(this->dt_);
@@ -208,15 +215,29 @@ void Game::render()
         {
             sf::CircleShape circle(b->radius_);
             circle.setFillColor(b->color_);
+            circle.setOutlineColor(sf::Color::White);
+            circle.setOutlineThickness(0.1f);
             circle.setOrigin(circle.getRadius(), circle.getRadius());
             circle.setPosition(pos);
             this->window_.draw(circle);
         } else if (b->shape_type_ == ShapeType::Box)
         {
+            Vector2Converter::toSFVector2fList(b->getTransformedVertices(), this->vertex_buffer_);
+
+            // sf::ConvexShape box(4);
+            // for (int i = 0; i < this->vertex_buffer_.size(); ++i)
+            // {
+            //     box.setPoint(i, this->vertex_buffer_[i]);
+            // }
+
             sf::RectangleShape box(sf::Vector2f(b->width_, b->height_));
             box.setFillColor(b->color_);
+            box.setOutlineColor(sf::Color::White);
+            box.setOutlineThickness(0.1f);
+            // box.setOrigin(box.getGlobalBounds().width/2, box.getGlobalBounds().height/2);
             box.setOrigin(box.getSize().x/2, box.getSize().y/2);
             box.setPosition(pos);
+            box.setRotation(Math2D::convertToDegree(b->rotation_));
             this->window_.draw(box);
         }
     }

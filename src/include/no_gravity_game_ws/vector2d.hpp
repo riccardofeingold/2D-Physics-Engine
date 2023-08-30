@@ -3,9 +3,11 @@
 
 #include <functional>
 #include <string>
+#include "transform2d.hpp"
 
 namespace Physics2D
 {
+    class Transform2D;
     struct Vector2f
     { 
         // constructor
@@ -28,6 +30,7 @@ namespace Physics2D
         bool operator==(const Vector2f& a);
         std::size_t getHashCode();
         std::string toString();
+        static Vector2f transform(Vector2f& a, Transform2D& transform);
     };
 }
 

@@ -30,6 +30,19 @@ Rigidbody::Rigidbody(const Vector2f& position, float density, float mass, float 
     this->height_ = height;
 
     this->shape_type_ = shape_type;
+
+    if (this->shape_type_ == ShapeType::Box)
+    {
+        this->vertices_ = Rigidbody::createBoxVertices(this->width_, this->height_);
+        this->triangle_indices = Rigidbody::createBoxTriangleIndices();
+        this->transformed_vertices_ = std::vector<Vector2f>(this->vertices_.size());
+    } else
+    {
+        // this->vertices_.empty();
+        // this->transformed_vertices_.empty();
+    }
+
+    this->transform_update_required_ = true;
 }
 
 bool Rigidbody::createCircleBody(float radius, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message)
@@ -115,11 +128,19 @@ bool Rigidbody::createBoxBody(float width, float height, Vector2f position, floa
 void Rigidbody::move(const Vector2f& move)
 {
     this->position_ += move;
+    this->transform_update_required_ = true;
 }
 
 void Rigidbody::moveTo(const Vector2f& move)
 {
-    this-> position_ = move;
+    this->position_ = move;
+    this->transform_update_required_ = true;
+}
+
+void Rigidbody::rotate(const float amount)
+{
+    this->rotation_ += amount;
+    this->transform_update_required_ = true;
 }
 
 sf::Color Rigidbody::randomColor()
@@ -129,4 +150,52 @@ sf::Color Rigidbody::randomColor()
     uint8_t b = (float)std::rand()/RAND_MAX*255;
 
     return sf::Color(r, g, b);
+}
+
+std::vector<Vector2f> Rigidbody::createBoxVertices(float width, float height)
+{
+    float left = -width / 2.f;
+    float right = width / 2.f;
+    float bottom = height / 2.f;
+    float top = -height / 2.f;
+
+    std::vector<Vector2f> vertices(4);
+    vertices[0] = Vector2f(left, top);
+    vertices[1] = Vector2f(right, top);
+    vertices[2] = Vector2f(right, bottom);
+    vertices[3] = Vector2f(left, bottom);
+
+    return vertices;
+}
+
+std::vector<int> Rigidbody::createBoxTriangleIndices()
+{
+    // we go clock wise starting at the top left corner
+    std::vector<int> triangles(6);
+
+    triangles[0] = 0;
+    triangles[1] = 1;
+    triangles[2] = 2;
+    triangles[3] = 0;
+    triangles[4] = 2;
+    triangles[5] = 3;
+
+    return triangles;
+}
+
+const std::vector<Vector2f>& Rigidbody::getTransformedVertices()
+{
+    if (this->transform_update_required_)
+    {
+        for (int i = 0; i < this->vertices_.size(); ++i)
+        {
+            Transform2D transform = Transform2D(this->position_, this->rotation_);
+            Vector2f transformed_vertex_pos = Vector2f::transform(this->vertices_[i], transform);
+            this->transformed_vertices_[i] = transformed_vertex_pos;
+        }
+
+        this->transform_update_required_ = false;
+    }
+
+    return this->transformed_vertices_;
 }

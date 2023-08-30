@@ -41,6 +41,8 @@ namespace Physics2D
         sf::Color color_;
 
         ShapeType shape_type_;
+        
+        std::vector<int> triangle_indices;
 
         // methods
         /// @brief  create a circle rigidbody. Important the body pointer needs to be delted properly after usage, since it's dynamically allocated.
@@ -74,11 +76,33 @@ namespace Physics2D
         /// @brief move the rigidbody to a absolute position
         /// @param move - vector
         void moveTo(const Vector2f& move);
+        
+        /// @brief rotate object
+        /// @param amount how many degrees do you want it to rotate
+        void rotate(const float amount);
 
         /// @brief random color
         /// @return sf::Color 
         static sf::Color randomColor(); 
+        
+        /// @brief transforms the vertices if a transform update is required
+        /// @return returns a list of all transformed vertices of a shape
+        const std::vector<Vector2f>& getTransformedVertices();
+
         private:
+        std::vector<Vector2f> vertices_;
+        std::vector<Vector2f> transformed_vertices_;
+        bool transform_update_required_;
+
+        /// @brief create the vertices of a box; is used to tranform those points accordingly
+        /// @param width 
+        /// @param height 
+        /// @return list of vertices
+        static std::vector<Vector2f> createBoxVertices(float width, float height);
+
+        /// @brief get the indices of the vertices of the two triangles that make up the box
+        /// @return list of traingle vertex indices
+        static std::vector<int> createBoxTriangleIndices();
     };
 }
 

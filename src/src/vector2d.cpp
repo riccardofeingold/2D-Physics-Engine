@@ -70,3 +70,9 @@ std::string Vector2f::toString()
 {
     return "X: " + std::to_string(this->x) + " Y: " + std::to_string(this->y);
 }
+
+Vector2f Vector2f::transform(Vector2f& v, Transform2D& transform)
+{
+    // apply rotation and translation to vector v
+    return Vector2f(transform.cos * v.x - transform.sin * v.y + transform.position_x, transform.sin * v.x + transform.cos * v.y + transform.position_y);
+}

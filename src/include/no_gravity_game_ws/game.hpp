@@ -62,6 +62,8 @@ class Game
     Enemy tester_;
     std::vector<Wall> walls_;
 
+    std::vector<sf::Vector2f> vertex_buffer_;
+
 };
 
 #endif
