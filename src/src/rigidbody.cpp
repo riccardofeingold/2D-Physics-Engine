@@ -143,6 +143,13 @@ void Rigidbody::rotate(const float amount)
     this->transform_update_required_ = true;
 }
 
+void Rigidbody::rotateTo(const float rotation)
+{
+    // the negations is due to the fact that the z axis is pointing into the screen
+    this->rotation_ = rotation;
+    this->transform_update_required_ = true;
+}
+
 sf::Color Rigidbody::randomColor()
 {
     uint8_t r = (float)std::rand()/RAND_MAX*255;
@@ -193,9 +200,8 @@ const std::vector<Vector2f>& Rigidbody::getTransformedVertices()
             Vector2f transformed_vertex_pos = Vector2f::transform(this->vertices_[i], transform);
             this->transformed_vertices_[i] = transformed_vertex_pos;
         }
-
-        this->transform_update_required_ = false;
     }
 
+    this->transform_update_required_ = false;
     return this->transformed_vertices_;
 }

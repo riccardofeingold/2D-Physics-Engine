@@ -50,6 +50,7 @@ class Game
     sf::View view; 
     // Testing
     std::vector<Rigidbody*> rigidbodies;
+    std::vector<sf::Color> outline_color;
 
     private:
     sf::Clock clock_;

@@ -22,23 +22,23 @@ namespace Physics2D
         ~Rigidbody();
 
         // TODO: add a color variable
-        Vector2f position_;
-        Vector2f linear_velocity_;
-        float rotation_;
-        float angular_velocity_;
+        Vector2f position_; // in meters = 1 pixel
+        Vector2f linear_velocity_; // in m/s
+        float rotation_; // in radians
+        float angular_velocity_; // radians/s
 
-        float density_;
-        float mass_;
+        float density_; // in kg/m^3
+        float mass_; // in kg
         float restitution_;
-        float area_;
+        float area_; // m^2
 
         bool is_static_;
      
-        float radius_;
-        float width_;
-        float height_;
+        float radius_; // in meters
+        float width_; // in meters
+        float height_; // in meters
 
-        sf::Color color_;
+        sf::Color color_; // rgba
 
         ShapeType shape_type_;
         
@@ -80,6 +80,10 @@ namespace Physics2D
         /// @brief rotate object
         /// @param amount how many degrees do you want it to rotate
         void rotate(const float amount);
+        
+        /// @brief rotate to a fixed orientation
+        /// @param rotation 
+        void rotateTo(const float rotation);
 
         /// @brief random color
         /// @return sf::Color 

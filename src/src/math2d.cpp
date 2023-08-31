@@ -40,12 +40,12 @@ float Math2D::convertToRadian(float degree)
     return degree * M_PI / 180.f;
 }
 
-float Math2D::norm(Vector2f& a)
+float Math2D::norm(const Vector2f& a)
 {
     return std::sqrt(a.x * a.x + a.y * a.y);
 }
 
-float Math2D::distance(Vector2f& a, Vector2f& b)
+float Math2D::distance(const Vector2f& a, const Vector2f& b)
 {
     return std::sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));
 }
@@ -55,12 +55,12 @@ Vector2f Math2D::normalize(Vector2f& a)
     return a / Math2D::norm(a);
 }
 
-float Math2D::dot(Vector2f& a)
+float Math2D::dot(const Vector2f& a, const Vector2f& b)
 {
-    return a.x * a.x + a.y * a.y;
+    return a.x * b.x + a.y * b.y;
 }
 
-float Math2D::cross(Vector2f& a, Vector2f& b)
+float Math2D::cross(const Vector2f& a, const Vector2f& b)
 {
     return a.x * b.y - a.y * b.x;
 }

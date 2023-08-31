@@ -27,15 +27,15 @@ namespace Physics2D
         
         // Vector math
         /// @brief calculate the length of a vector
-        static float norm(Vector2f& a);
+        static float norm(const Vector2f& a);
         /// @brief calculate the distance between two vectors
-        static float distance(Vector2f& a, Vector2f& b);
+        static float distance(const Vector2f& a, const Vector2f& b);
         /// @brief normalize vector
         static Vector2f normalize(Vector2f& a);
         /// @brief dot product
-        static float dot(Vector2f& a);
+        static float dot(const Vector2f& a, const Vector2f& b);
         /// @brief cross product
-        static float cross(Vector2f& a, Vector2f& b);
+        static float cross(const Vector2f& a, const Vector2f& b);
     }; 
 } // namespace Physics2D
 

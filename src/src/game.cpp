@@ -26,7 +26,7 @@ void Game::start()
 {
     // Camera settings
     this->view.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-    this->view.zoom(0.1f);
+    this->view.zoom(0.08f);
     this->view.setCenter(this->view.getSize().x/2, this->view.getSize().y/2);
     const float padding = this->view.getSize().x * 0.05f;
     this->world_.window_->getWindow().setView(view);
@@ -55,7 +55,10 @@ void Game::start()
             if (!Rigidbody::createBoxBody(2.f, 2.f, position, 2.f, false, 1.f, body, e))
                 std::cout << e << std::endl;
             else
+            {
+                this->outline_color.push_back(sf::Color::White);
                 rigidbodies.push_back(body);
+            }
         } else
         {
             std::cout << "unknown type" << std::endl;
@@ -173,12 +176,12 @@ void Game::update()
     this->window_.update();
 
     // box rotation
-    for (auto b : this->rigidbodies)
+    for (int i = 0; i < this->rigidbodies.size(); ++i)
     {
-        b->rotate(M_PI / 2 * this->dt_.asSeconds());
+        this->rigidbodies[i]->rotate(M_PI / 4 * this->dt_.asSeconds());
+        this->outline_color[i] = sf::Color::White;
     }
 
-#if false
     // checking for circle collision
     for (int i = 0; i < this->rigidbodies.size() - 1; ++i)
     {
@@ -190,14 +193,20 @@ void Game::update()
 
             Vector2f normal;
             float depth;
+            if (Collision2D::polygonCollisionDetection(body_a->getTransformedVertices(), body_b->getTransformedVertices(), normal, depth))
+            {
+                this->outline_color[i] = sf::Color::Green;
+                this->outline_color[j] = sf::Color::Green;
+            }
+#if false
             if (Collision2D::circleCollisionDetection(body_a->position_, body_a->radius_, body_b->position_, body_b->radius_, normal, depth))
             {
                 body_a->move(-normal * depth / 2.f);
                 body_b->move(normal * depth / 2.f);
             }
+#endif
         }
     }
-#endif
 
     #if !debugging
     this->world_.update(this->dt_);
@@ -208,6 +217,7 @@ void Game::render()
 {
     this->window_.beginDraw();
     /********TESTING**********/
+    int i = 0;
     for (auto b : this->rigidbodies)
     {
         sf::Vector2f pos = Vector2Converter::toSFVector2f(b->position_);
@@ -224,20 +234,21 @@ void Game::render()
         {
             Vector2Converter::toSFVector2fList(b->getTransformedVertices(), this->vertex_buffer_);
 
-            sf::ConvexShape box(6);
+            sf::ConvexShape box(4);
             for (int i = 0; i < box.getPointCount(); ++i)
             {
-                box.setPoint(i, this->vertex_buffer_[b->triangle_indices[i]]);
+                box.setPoint(i, this->vertex_buffer_[i]);
             }
 
             box.setFillColor(b->color_);
-            box.setOutlineColor(sf::Color::White);
+            box.setOutlineColor(this->outline_color[i]);
             box.setOutlineThickness(0.1f);
             box.setOrigin(pos);
             box.setPosition(pos);
-            box.setRotation(Math2D::convertToDegree(b->rotation_));
             this->window_.draw(box);
         }
+
+        ++i;
     }
     /********TESTING**********/
     #if !debugging
