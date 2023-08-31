@@ -3,6 +3,7 @@
 
 #include "math2d.hpp"
 #include <iostream>
+#include <map>
 
 namespace Physics2D
 {
@@ -25,12 +26,27 @@ namespace Physics2D
         /// @param vertices_b 
         /// @return true if collided otherwise false 
         static bool polygonCollisionDetection(const std::vector<Vector2f>& vertices_a, const std::vector<Vector2f>& vertices_b, Vector2f& normal, float& depth);
-        
+
+        /// @brief check for circle polygon collision
+        /// @param circle_center 
+        /// @param circle_radius 
+        /// @param vertices 
+        /// @param normal 
+        /// @param depth 
+        /// @return true if collision detected otherwise false
+        static bool circlePolygonCollisionDetection(const Vector2f& circle_center, const float circle_radius, const std::vector<Vector2f>& vertices, Vector2f& normal, float& depth);
+
         /// @brief project the vertices of a polygon onto the axis
         /// @param vertices 
         /// @param axis 
         /// @return min and max value of the projected vertices
         static void projectVertices(const std::vector<Vector2f>& vertices, const Vector2f& axis, float& min, float& max);
+
+        /// @brief calculates the geometric center of the polygon
+        /// @param vertices 
+        /// @return returns the location of the center of the object
+        static Vector2f findArithmeticMean(const std::vector<Vector2f>& vertices);
+
         private:
 
     }; 

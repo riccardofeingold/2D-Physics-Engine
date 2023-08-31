@@ -123,6 +123,8 @@ void Game::handleInput()
 {
     // keyboard steering
     Vector2f dv(0.f, 0.f);
+    float delta_rotation = 0.f;
+    float angular_speed = M_PI/4;
     float speed = 8.f;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
@@ -133,12 +135,23 @@ void Game::handleInput()
         --dv.x;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         ++dv.x;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+        ++delta_rotation;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L))
+        --delta_rotation;
 
     if (dv.x != 0 || dv.y != 0)
     {
         Vector2f direction = Math2D::normalize(dv);
         Vector2f delta_pos = direction * speed * this->dt_.asSeconds();
         this->rigidbodies[0]->move(delta_pos);
+    }
+
+    if (delta_rotation != 0)
+    {
+        int sign = delta_rotation < 0 ? -1 : 1;
+        float rotation = sign * angular_speed * this->dt_.asSeconds();
+        this->rigidbodies[0]->rotate(rotation);
     }
     #if !debugging
     if (sf::Joystick::isConnected(0))
@@ -178,7 +191,7 @@ void Game::update()
     // box rotation
     for (int i = 0; i < this->rigidbodies.size(); ++i)
     {
-        this->rigidbodies[i]->rotate(M_PI / 4 * this->dt_.asSeconds());
+        // this->rigidbodies[i]->rotate(M_PI / 4 * this->dt_.asSeconds());
         this->outline_color[i] = sf::Color::White;
     }
 
@@ -197,6 +210,9 @@ void Game::update()
             {
                 this->outline_color[i] = sf::Color::Green;
                 this->outline_color[j] = sf::Color::Green;
+
+                body_a->move(-normal * depth / 2.f);
+                body_b->move(normal * depth / 2.f);
             }
 #if false
             if (Collision2D::circleCollisionDetection(body_a->position_, body_a->radius_, body_b->position_, body_b->radius_, normal, depth))
