@@ -35,8 +35,6 @@ void Game::start()
     for (int i = 0; i < 10; ++i)
     {
         int shape_random = (float)std::rand()/RAND_MAX > 0.5 ? 1 : 0;
-        // TODO: random shape to 0 = Circle
-        shape_random = ShapeType::Box;
         Rigidbody* body = nullptr;
 
         sf::View current_view = this->world_.window_->getWindow().getView();
@@ -206,6 +204,29 @@ void Game::update()
 
             Vector2f normal;
             float depth;
+
+            if (body_a->shape_type_ == ShapeType::Box && body_b->shape_type_ == ShapeType::Circle)
+            {
+                if (Collision2D::circlePolygonCollisionDetection(body_b->position_, body_b->radius_, body_a->getTransformedVertices(), normal, depth))
+                {
+                    this->outline_color[i] = sf::Color::Green;
+                    this->outline_color[j] = sf::Color::Green;
+
+                    body_a->move(normal * depth / 2.f);
+                    body_b->move(-normal * depth / 2.f); 
+                }
+            } else if (body_a->shape_type_ == ShapeType::Circle && body_b->shape_type_ == ShapeType::Box)
+            {
+                if (Collision2D::circlePolygonCollisionDetection(body_a->position_, body_a->radius_, body_b->getTransformedVertices(), normal, depth))
+                {
+                    this->outline_color[i] = sf::Color::Green;
+                    this->outline_color[j] = sf::Color::Green;
+
+                    body_a->move(-normal * depth / 2.f);
+                    body_b->move(normal * depth / 2.f); 
+                } 
+            }
+#if false
             if (Collision2D::polygonCollisionDetection(body_a->getTransformedVertices(), body_b->getTransformedVertices(), normal, depth))
             {
                 this->outline_color[i] = sf::Color::Green;
@@ -214,7 +235,6 @@ void Game::update()
                 body_a->move(-normal * depth / 2.f);
                 body_b->move(normal * depth / 2.f);
             }
-#if false
             if (Collision2D::circleCollisionDetection(body_a->position_, body_a->radius_, body_b->position_, body_b->radius_, normal, depth))
             {
                 body_a->move(-normal * depth / 2.f);

@@ -20,11 +20,12 @@ namespace Physics2D
         static Vector2f Zero();
 
         // operations
-        Vector2f operator+(const Vector2f& a);
-        Vector2f operator-(const Vector2f& a);
+        Vector2f operator+(const Vector2f& a) const;
+        Vector2f operator-(const Vector2f& a) const;
         Vector2f operator-();
-        Vector2f operator*(const float scalar);
-        Vector2f operator/(const float scalar);
+        Vector2f operator*(const float scalar) const;
+        Vector2f operator/(const float scalar) const;
+        Vector2f operator*=(const float scalar);
         Vector2f operator+=(const Vector2f& a);
         Vector2f operator-=(const Vector2f& a);
         bool operator==(const Vector2f& a);

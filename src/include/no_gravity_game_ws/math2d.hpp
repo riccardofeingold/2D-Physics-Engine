@@ -31,7 +31,7 @@ namespace Physics2D
         /// @brief calculate the distance between two vectors
         static float distance(const Vector2f& a, const Vector2f& b);
         /// @brief normalize vector
-        static Vector2f normalize(Vector2f& a);
+        static Vector2f normalize(const Vector2f& a);
         /// @brief dot product
         static float dot(const Vector2f& a, const Vector2f& b);
         /// @brief cross product

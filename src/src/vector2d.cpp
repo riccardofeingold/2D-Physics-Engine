@@ -19,7 +19,7 @@ Vector2f Vector2f::Zero()
     return Vector2f(0.f, 0.f);
 }
 
-Vector2f Vector2f::operator+(const Vector2f& a)
+Vector2f Vector2f::operator+(const Vector2f& a) const
 {
     return Vector2f(this->x + a.x, this->y + a.y);
 }
@@ -36,7 +36,7 @@ Vector2f Vector2f::operator-=(const Vector2f& a)
     return *this - a;
 }
 
-Vector2f Vector2f::operator-(const Vector2f& a)
+Vector2f Vector2f::operator-(const Vector2f& a) const
 {
     return Vector2f(this->x - a.x, this->y - a.y);
 }
@@ -46,14 +46,21 @@ Vector2f Vector2f::operator-()
     return Vector2f(-this->x, -this->y);
 }
 
-Vector2f Vector2f::operator*(const float scalar)
+Vector2f Vector2f::operator*(const float scalar) const 
 {
     return Vector2f(this->x * scalar, this->y * scalar);
 }
 
-Vector2f Vector2f::operator/(const float scalar)
+Vector2f Vector2f::operator/(const float scalar) const
 {
     return Vector2f(this->x / scalar, this->y / scalar);
+}
+
+Vector2f Vector2f::operator*=(const float scalar)
+{
+    this->x *= scalar;
+    this->y *= scalar;
+    return *this;
 }
 
 bool Vector2f::operator==(const Vector2f& a)

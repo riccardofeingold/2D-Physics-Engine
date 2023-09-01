@@ -50,7 +50,7 @@ float Math2D::distance(const Vector2f& a, const Vector2f& b)
     return std::sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));
 }
 
-Vector2f Math2D::normalize(Vector2f& a)
+Vector2f Math2D::normalize(const Vector2f& a)
 {
     return a / Math2D::norm(a);
 }

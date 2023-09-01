@@ -47,8 +47,24 @@ namespace Physics2D
         /// @return returns the location of the center of the object
         static Vector2f findArithmeticMean(const std::vector<Vector2f>& vertices);
 
+        /// @brief find the index of the closest vertex to the point
+        /// @param point 
+        /// @param vertices 
+        /// @return index of closest vertex
+        static int closestPoint(const Vector2f& point, const std::vector<Vector2f>& vertices);
         private:
 
+        /// @brief project the "vertices" of a circle
+        /// @param center 
+        /// @param radius 
+        /// @param axis 
+        /// @return min and max value of the projected vertices 
+        static void projectCircle(const Vector2f& center, const float radius, const Vector2f& axis, float& min, float& max);
+
+        /// @brief swap the two values
+        /// @param value1 
+        /// @param value2 
+        static void swap(float& value1, float& value2);
     }; 
 } // namespace Physics2D
 

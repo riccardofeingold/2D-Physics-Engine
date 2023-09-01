@@ -89,7 +89,78 @@ bool Collision2D::polygonCollisionDetection(const std::vector<Vector2f>& vertice
 
 bool Collision2D::circlePolygonCollisionDetection(const Vector2f& circle_center, const float circle_radius, const std::vector<Vector2f>& vertices, Vector2f& normal, float& depth)
 {
-   return true; 
+    float min_a, max_a, min_b, max_b;
+    normal = Vector2f::Zero();
+    depth = INFINITY;
+    Vector2f axis = Vector2f::Zero();
+    float penetration_depth = 0.f;
+
+    for (int i = 0; i < vertices.size(); ++i)
+    {
+        Vector2f vertex_a = vertices[i];
+        Vector2f vertex_b = vertices[(i + 1) % vertices.size()];
+
+        Vector2f edge_ab = vertex_b - vertex_a;
+        axis = Vector2f(-edge_ab.y, edge_ab.x);
+
+        Collision2D::projectVertices(vertices, axis, min_a, max_a);
+        Collision2D::projectCircle(circle_center, circle_radius, axis, min_b, max_b);
+        
+        if (min_a >= max_b || min_b >= max_a)
+            return false;
+
+        penetration_depth = std::min(max_b - min_a, max_a - min_b);
+
+        if (penetration_depth < depth)
+        {
+            depth = penetration_depth;
+            normal = axis;
+        }
+    }
+
+    int cp_index = Collision2D::closestPoint(circle_center, vertices);
+    axis = vertices[cp_index] - circle_center;
+
+    Collision2D::projectVertices(vertices, axis, min_a, max_a);
+    Collision2D::projectCircle(circle_center, circle_radius, axis, min_b, max_b);
+    
+    if (min_a >= max_b || min_b >= max_a)
+        return false;
+
+    penetration_depth = std::min(max_b - min_a, max_a - min_b);
+
+    if (penetration_depth < depth)
+    {
+        depth = penetration_depth;
+        normal = axis;
+    }
+
+    depth /= Math2D::norm(normal);
+    normal = Math2D::normalize(normal);
+
+    Vector2f center_to_center = Collision2D::findArithmeticMean(vertices) - circle_center;
+    if (Math2D::dot(normal, center_to_center) < 0)
+        normal = -normal;
+
+    return true; 
+}
+
+int Collision2D::closestPoint(const Vector2f& point, const std::vector<Vector2f>& vertices)
+{
+    int index = -1;
+    float min = INFINITY;
+    
+    for (int i = 0; i < vertices.size(); ++i)
+    {
+        float distance = Math2D::distance(point, vertices[i]);
+        if (distance < min)
+        {
+            min = distance;
+            index = i;
+        }
+    }
+
+    return index;
 }
 
 void Collision2D::projectVertices(const std::vector<Vector2f>& vertices, const Vector2f& axis, float& min, float& max)
@@ -105,6 +176,27 @@ void Collision2D::projectVertices(const std::vector<Vector2f>& vertices, const V
         if (projection > max)
             max = projection;
     }
+}
+
+void Collision2D::projectCircle(const Vector2f& center, const float radius, const Vector2f& axis, float& min, float& max)
+{
+    Vector2f normalized_axis = Math2D::normalize(axis);
+    Vector2f scaled_normal = normalized_axis * radius;
+    Vector2f point1 = center + scaled_normal;
+    Vector2f point2 = center - scaled_normal;
+    
+    min = Math2D::dot(axis, point1);
+    max = Math2D::dot(axis, point2);
+
+    if (max < min)
+        Collision2D::swap(min, max);
+}
+
+void Collision2D::swap(float& value1, float& value2)
+{
+    float temp = value1;
+    value1 = value2;
+    value2 = temp;
 }
 
 Vector2f Collision2D::findArithmeticMean(const std::vector<Vector2f>& vertices)
