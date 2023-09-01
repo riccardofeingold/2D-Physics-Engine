@@ -1,55 +1,59 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 
-#include "physics.hpp"
+#include "rigidbody.hpp"
+#include "vector2dconverter.hpp"
+#include "collision2d.hpp"
 #include "window.hpp"
 #include "ray.hpp"
 #include <iostream>
-#include <map>
 
-// forward declaration 
-class Ray;
-class PhysicsObject;
-
-class World
+namespace Physics2D
 {
-    public:
-    World();
-    World(float gravity);
-    ~World();
+    // forward declaration 
+    class Ray;
+    class Rigidbody;
 
-    // methods
-    void addObject(const std::string& name, PhysicsObject* obj);
-    void removeObject(const std::string& name);
+    class World2D
+    {
+        public:
+        World2D();
+        World2D(float gravity);
+        ~World2D();
 
-    void setup();
-    void update(const sf::Time& dt);
-    void reset();
+        // methods
+        void addObject(const std::string& name, Rigidbody* obj);
+        bool removeObject(const std::string& name);
+        bool collide(Rigidbody* body_a, Rigidbody* body_b, Vector2f& normal, float& depth);
+        
+        void setup();
+        void update(const sf::Time& dt);
+        void reset();
 
-    // collisions
-    void wallCollision();
-    bool checkCollisionBetween(const std::string& name1, const std::string& name2, sf::Time dt);
+        // getters
+        bool getBody(int index, Rigidbody*& body);
+        bool getBody(std::string name, Rigidbody*& body);
+        int getBodyCount() const;
 
-    // getters
-    PhysicsObject& getObject(const std::string& name);
-    int getNumberOfObjects() const;
+        // public variables
+        Window* window_;
+        std::vector<std::string> list_of_object_names_;
+        bool game_over = false;
 
-    // public variables
-    Window* window_;
-    std::vector<std::string> list_of_object_names_;
-    bool game_over = false;
+        // constant values
+        static constexpr float min_body_size = 0.01f * 0.01f;
+        static constexpr float max_body_size = 100.f * 100.f;
+        static constexpr float min_density = 0.25f;
+        static constexpr float max_density = 22.f;
 
-    // constant values
-    static constexpr float min_body_size = 0.01f * 0.01f;
-    static constexpr float max_body_size = 100.f * 100.f;
-    static constexpr float min_density = 0.25f;
-    static constexpr float max_density = 22.f;
-
-    // friend classes
-    friend class Ray;
-    
-    private:
-    std::map<std::string, PhysicsObject*> objects_;
-};
+        // friend classes
+        friend class Ray;
+        
+        private:
+        Vector2f gravity_;
+        std::vector<Rigidbody*> rigidbodies_;
+        std::vector<sf::Color> outline_color_;
+    };
+}
 
 #endif

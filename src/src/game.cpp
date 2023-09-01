@@ -2,11 +2,11 @@
 #define debugging true
 
 Game::Game() : 
-    window_("2D Drone Simulator", sf::Vector2u(SCREEN_WIDTH, SCREEN_HEIGHT), FRAME_RATE), 
-    player_(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, sf::Vector2f(40, 40), 0.f),
-    goal_(sf::Vector2f(20, 20), 0),
-    enemy_(sf::Vector2f(40, 40), 0.f),
-    tester_(sf::Vector2f(40, 40), 0.f)
+    window_("2D Drone Simulator", sf::Vector2u(SCREEN_WIDTH, SCREEN_HEIGHT), FRAME_RATE) 
+    // player_(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, sf::Vector2f(40, 40), 0.f),
+    // goal_(sf::Vector2f(20, 20), 0),
+    // enemy_(sf::Vector2f(40, 40), 0.f),
+    // tester_(sf::Vector2f(40, 40), 0.f)
 {
     this->world_.window_ = &window_;
     
@@ -15,11 +15,19 @@ Game::Game() :
 
 Game::~Game()
 {
-    for (auto r : rigidbodies)
+    for (int i = 0; i < this->world_.getBodyCount(); ++i)
     {
-        if (r != nullptr)
-            delete r;
+        Rigidbody* body;
+        if (this->world_.getBody(i, body))
+        {
+            delete body;
+        }
     }
+    // for (auto r : rigidbodies)
+    // {
+    //     if (r != nullptr)
+    //         delete r;
+    // }
 }
 
 void Game::start()
@@ -47,21 +55,22 @@ void Game::start()
             if (!Rigidbody::createCircleBody(1.f, position, 2.f, false, 1.f, body, e))
                 std::cout << e << std::endl;
             else
-                rigidbodies.push_back(body);
+                this->world_.addObject(std::to_string(i), body);
         } else if (shape_random == ShapeType::Box)
         {
             if (!Rigidbody::createBoxBody(2.f, 2.f, position, 2.f, false, 1.f, body, e))
                 std::cout << e << std::endl;
             else
             {
-                this->outline_color.push_back(sf::Color::White);
-                rigidbodies.push_back(body);
+                // this->outline_color.push_back(sf::Color::White);
+                this->world_.addObject(std::to_string(i), body);
             }
         } else
         {
             std::cout << "unknown type" << std::endl;
         }
     }
+
     /********TESTING*********/
 #if !debugging
     // goals
@@ -142,14 +151,18 @@ void Game::handleInput()
     {
         Vector2f direction = Math2D::normalize(dv);
         Vector2f delta_pos = direction * speed * this->dt_.asSeconds();
-        this->rigidbodies[0]->move(delta_pos);
+        Rigidbody* body;
+        assert(this->world_.getBody(0, body));
+        body->move(delta_pos);
     }
 
     if (delta_rotation != 0)
     {
         int sign = delta_rotation < 0 ? -1 : 1;
         float rotation = sign * angular_speed * this->dt_.asSeconds();
-        this->rigidbodies[0]->rotate(rotation);
+        Rigidbody* body;
+        assert(this->world_.getBody(0, body));
+        body->rotate(rotation);
     }
     #if !debugging
     if (sf::Joystick::isConnected(0))
@@ -185,77 +198,19 @@ void Game::update()
 {
     this->dt_ = this->clock_.restart();
     this->window_.update();
-
-    // box rotation
-    for (int i = 0; i < this->rigidbodies.size(); ++i)
-    {
-        // this->rigidbodies[i]->rotate(M_PI / 4 * this->dt_.asSeconds());
-        this->outline_color[i] = sf::Color::White;
-    }
-
-    // checking for circle collision
-    for (int i = 0; i < this->rigidbodies.size() - 1; ++i)
-    {
-        Rigidbody* body_a = this->rigidbodies[i];
-
-        for (int j = i + 1; j < this->rigidbodies.size(); ++j)
-        {
-            Rigidbody* body_b = this->rigidbodies[j];
-
-            Vector2f normal;
-            float depth;
-
-            if (body_a->shape_type_ == ShapeType::Box && body_b->shape_type_ == ShapeType::Circle)
-            {
-                if (Collision2D::circlePolygonCollisionDetection(body_b->position_, body_b->radius_, body_a->getTransformedVertices(), normal, depth))
-                {
-                    this->outline_color[i] = sf::Color::Green;
-                    this->outline_color[j] = sf::Color::Green;
-
-                    body_a->move(normal * depth / 2.f);
-                    body_b->move(-normal * depth / 2.f); 
-                }
-            } else if (body_a->shape_type_ == ShapeType::Circle && body_b->shape_type_ == ShapeType::Box)
-            {
-                if (Collision2D::circlePolygonCollisionDetection(body_a->position_, body_a->radius_, body_b->getTransformedVertices(), normal, depth))
-                {
-                    this->outline_color[i] = sf::Color::Green;
-                    this->outline_color[j] = sf::Color::Green;
-
-                    body_a->move(-normal * depth / 2.f);
-                    body_b->move(normal * depth / 2.f); 
-                } 
-            }
-#if false
-            if (Collision2D::polygonCollisionDetection(body_a->getTransformedVertices(), body_b->getTransformedVertices(), normal, depth))
-            {
-                this->outline_color[i] = sf::Color::Green;
-                this->outline_color[j] = sf::Color::Green;
-
-                body_a->move(-normal * depth / 2.f);
-                body_b->move(normal * depth / 2.f);
-            }
-            if (Collision2D::circleCollisionDetection(body_a->position_, body_a->radius_, body_b->position_, body_b->radius_, normal, depth))
-            {
-                body_a->move(-normal * depth / 2.f);
-                body_b->move(normal * depth / 2.f);
-            }
-#endif
-        }
-    }
-
-    #if !debugging
     this->world_.update(this->dt_);
-    #endif
 }
 
 void Game::render()
 {
     this->window_.beginDraw();
-    /********TESTING**********/
-    int i = 0;
-    for (auto b : this->rigidbodies)
+
+    for (int i = 0; i < this->world_.getBodyCount(); ++i)
     {
+        Rigidbody* b;
+
+        assert(this->world_.getBody(i, b));
+
         sf::Vector2f pos = Vector2Converter::toSFVector2f(b->position_);
         if (b->shape_type_ == ShapeType::Circle)
         {
@@ -277,14 +232,12 @@ void Game::render()
             }
 
             box.setFillColor(b->color_);
-            box.setOutlineColor(this->outline_color[i]);
+            // box.setOutlineColor(this->world_.outline_color_[i]);
             box.setOutlineThickness(0.1f);
             box.setOrigin(pos);
             box.setPosition(pos);
             this->window_.draw(box);
         }
-
-        ++i;
     }
     /********TESTING**********/
     #if !debugging

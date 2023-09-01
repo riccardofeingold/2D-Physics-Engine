@@ -36,10 +36,6 @@ Rigidbody::Rigidbody(const Vector2f& position, float density, float mass, float 
         this->vertices_ = Rigidbody::createBoxVertices(this->width_, this->height_);
         this->triangle_indices = Rigidbody::createBoxTriangleIndices();
         this->transformed_vertices_ = std::vector<Vector2f>(this->vertices_.size());
-    } else
-    {
-        // this->vertices_.empty();
-        // this->transformed_vertices_.empty();
     }
 
     this->transform_update_required_ = true;
@@ -50,31 +46,31 @@ bool Rigidbody::createCircleBody(float radius, Vector2f position, float density,
     error_message = "";
     float area = M_PI*radius*radius;
 
-    if (area < World::min_body_size)
+    if (area < World2D::min_body_size)
     {
         body = nullptr;
-        error_message = "Circle body is too small. The min body size is " + std::to_string(World::min_body_size);
+        error_message = "Circle body is too small. The min body size is " + std::to_string(World2D::min_body_size);
         return false;
     }
 
-    if (area > World::max_body_size)
+    if (area > World2D::max_body_size)
     {
         body = nullptr;
-        error_message = "Circle body is too big. The max body size is " + std::to_string(World::max_body_size);
+        error_message = "Circle body is too big. The max body size is " + std::to_string(World2D::max_body_size);
         return false;
     }
 
-    if (density < World::min_density)
+    if (density < World2D::min_density)
     {
         body = nullptr;
-        error_message = "The circle's density is too small. The min density is " + std::to_string(World::min_density);
+        error_message = "The circle's density is too small. The min density is " + std::to_string(World2D::min_density);
         return false;
     }
 
-    if (density > World::max_density)
+    if (density > World2D::max_density)
     {
         body = nullptr;
-        error_message = "The circle's density is too big. The max density is " + std::to_string(World::max_density);
+        error_message = "The circle's density is too big. The max density is " + std::to_string(World2D::max_density);
         return false;
     }
 
@@ -90,31 +86,31 @@ bool Rigidbody::createBoxBody(float width, float height, Vector2f position, floa
     error_message = "";
     float area = width*height;
 
-    if (area < World::min_body_size)
+    if (area < World2D::min_body_size)
     {
         body = nullptr;
-        error_message = "Box body is too small. The min body size is " + std::to_string(World::min_body_size);
+        error_message = "Box body is too small. The min body size is " + std::to_string(World2D::min_body_size);
         return false;
     }
 
-    if (area > World::max_body_size)
+    if (area > World2D::max_body_size)
     {
         body = nullptr;
-        error_message = "Box body is too big. The max body size is " + std::to_string(World::max_body_size);
+        error_message = "Box body is too big. The max body size is " + std::to_string(World2D::max_body_size);
         return false;
     }
 
-    if (density < World::min_density)
+    if (density < World2D::min_density)
     {
         body = nullptr;
-        error_message = "The box's density is too small. The min density is " + std::to_string(World::min_density);
+        error_message = "The box's density is too small. The min density is " + std::to_string(World2D::min_density);
         return false;
     }
 
-    if (density > World::max_density)
+    if (density > World2D::max_density)
     {
         body = nullptr;
-        error_message = "The box's density is too big. The max density is " + std::to_string(World::max_density);
+        error_message = "The box's density is too big. The max density is " + std::to_string(World2D::max_density);
         return false;
     }
 
@@ -204,4 +200,10 @@ const std::vector<Vector2f>& Rigidbody::getTransformedVertices()
 
     this->transform_update_required_ = false;
     return this->transformed_vertices_;
+}
+
+void Rigidbody::update(const sf::Time& dt)
+{
+    this->position_ += this->linear_velocity_ * dt.asSeconds();
+    this->rotation_ += this->angular_velocity_ * dt.asSeconds();
 }

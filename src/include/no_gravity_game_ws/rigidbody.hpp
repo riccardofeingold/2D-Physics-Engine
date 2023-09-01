@@ -3,6 +3,7 @@
 
 #include "world.hpp"
 #include "math2d.hpp"
+#include <SFML/Graphics.hpp>
 
 namespace Physics2D
 {
@@ -21,7 +22,6 @@ namespace Physics2D
         Rigidbody(const Vector2f& position, float density, float mass, float restitution, float area, bool isStatic, float radius, float width, float height, ShapeType shape_type);
         ~Rigidbody();
 
-        // TODO: add a color variable
         Vector2f position_; // in meters = 1 pixel
         Vector2f linear_velocity_; // in m/s
         float rotation_; // in radians
@@ -92,6 +92,10 @@ namespace Physics2D
         /// @brief transforms the vertices if a transform update is required
         /// @return returns a list of all transformed vertices of a shape
         const std::vector<Vector2f>& getTransformedVertices();
+
+        /// @brief update the rigidbodies physics
+        /// @param dt delta time
+        void update(const sf::Time& dt);
 
         private:
         std::vector<Vector2f> vertices_;

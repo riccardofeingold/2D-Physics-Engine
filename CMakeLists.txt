@@ -10,16 +10,11 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(NoGravityGameWS 
                src/main.cpp 
-               src/src/player.cpp 
-               src/src/physics.cpp 
                src/src/game.cpp 
                src/src/window.cpp
                src/src/world.cpp
                src/src/momentOfInertia.cpp
-               src/src/goal.cpp
-               src/src/enemy.cpp
                src/src/ray.cpp
-               src/src/wall.cpp
                src/src/vector2d.cpp
                src/src/vector2dconverter.cpp
                src/src/rigidbody.cpp

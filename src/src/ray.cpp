@@ -1,5 +1,7 @@
 #include "../include/no_gravity_game_ws/ray.hpp"
 
+using namespace Physics2D;
+
 Ray::Ray(const sf::Vector2f* start, float angle)
     : start_(start),
       angle_(angle)
@@ -40,21 +42,27 @@ void Ray::draw()
     line_.rotate(this->angle_);
 }
 
-void Ray::castRay(World& w)
+void Ray::castRay(World2D& w)
 {
-    const sf::Vector2f& player = w.getObject("player").getBody().getPosition();
+    Rigidbody* body;
+    Vector2f player;
+    if (w.getBody("player", body))
+    {
+        player = body->position_;
+    }
     std::vector<sf::Vector2f> global_points;
     // wikipedia article about line intersection: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
-    for (auto obj : w.objects_)
+    for (int i = 0; i < w.getBodyCount(); ++i)
     {
-        if (obj.first != "player")
+        Rigidbody* b;
+        if (!w.getBody("player", b))
         {
             std::vector<sf::Vector2f> points;
 
-            const sf::Vector2f& tl = obj.second->getCornerPosition("tl");
-            const sf::Vector2f& bl = obj.second->getCornerPosition("bl");
-            const sf::Vector2f& tr = obj.second->getCornerPosition("tr");
-            const sf::Vector2f& br = obj.second->getCornerPosition("br");
+            const Vector2f& tl = b->getTransformedVertices()[0];
+            const Vector2f& bl = b->getTransformedVertices()[1];
+            const Vector2f& tr = b->getTransformedVertices()[2];
+            const Vector2f& br = b->getTransformedVertices()[3];
 
             // left side
             float den = (tl.x - bl.x) * (player.y - (player.y + direction_.y))

@@ -1,204 +1,126 @@
 #include "../include/no_gravity_game_ws/world.hpp"
 
-World::World()
+using namespace Physics2D;
+
+World2D::World2D()
 {
 }
 
-World::~World() = default;
+World2D::~World2D() = default;
 
-void World::reset()
+void World2D::reset()
 {
-    for (auto obj : this->objects_)
-    {
-        obj.second->reset();
-    }
 }
 
-void World::addObject(const std::string& name, PhysicsObject* obj)
+void World2D::addObject(const std::string& name, Rigidbody* obj)
 {
-    this->objects_.emplace(name, obj);
+    this->rigidbodies_.push_back(obj);
     this->list_of_object_names_.push_back(name);
 }
 
-void World::removeObject(const std::string& name)
+bool World2D::removeObject(const std::string& name)
 {
-    std::map<std::string, PhysicsObject*>::iterator iter = this->objects_.find(name);
-    this->objects_.erase(iter);
+    std::vector<std::string>::iterator it = std::find(this->list_of_object_names_.begin(), this->list_of_object_names_.end(), name);
+    if (it != this->list_of_object_names_.end())
+    {
+        int index = std::distance(this->list_of_object_names_.begin(), it);
+        this->list_of_object_names_.erase(it);
+
+        std::vector<Rigidbody*>::iterator it2 = this->rigidbodies_.begin();
+        std::advance(it2, index);
+        this->rigidbodies_.erase(it2);
+        
+        return true;
+    }
+
+    return false;
 }
 
-bool World::checkCollisionBetween(const std::string& name1, const std::string& name2, sf::Time dt)
+bool World2D::getBody(int index, Rigidbody*& body)
 {
-    PhysicsObject& obj1 = (*(*this->objects_.find(name1)).second);
-    PhysicsObject& obj2 = (*(*this->objects_.find(name2)).second);
-
-    float smallest_penetration_distance = INFINITY;
-    std::map<float, sf::Vector2f> pdistances_and_normal;
-    sf::Vector2f normal_of_collision = sf::Vector2f(0.f, 0.f);
-
-    std::vector<sf::Vector2f> corners_obj1;
-    corners_obj1.push_back(obj1.getCornerPosition("tl"));
-    corners_obj1.push_back(obj1.getCornerPosition("tr"));
-    corners_obj1.push_back(obj1.getCornerPosition("bl"));
-    corners_obj1.push_back(obj1.getCornerPosition("br"));
-
-    std::vector<sf::Vector2f> normals = obj1.getNormals();
-
-    std::vector<sf::Vector2f> corners_obj2;
-    corners_obj2.push_back(obj2.getCornerPosition("tl"));
-    corners_obj2.push_back(obj2.getCornerPosition("tr"));
-    corners_obj2.push_back(obj2.getCornerPosition("bl"));
-    corners_obj2.push_back(obj2.getCornerPosition("br"));
-
-    std::vector<sf::Vector2f> normal2 = obj2.getNormals();
-    normals.push_back(normal2[0]);
-    normals.push_back(normal2[1]);
-
-    for (auto n : normals)
+    if (index < 0 || index >= this->rigidbodies_.size())
     {
-        std::array<float, 4> projections;
-        int counter = 0;
-        for (auto c : corners_obj1)
-        {
-            float dot = n.x * c.x + n.y * c.y;
-            projections[counter] = dot;
-            ++counter;
-        }
-        
-        float obj1_max = *std::max_element(projections.begin(), projections.end());
-        float obj1_min = *std::min_element(projections.begin(), projections.end());
-
-        counter = 0;
-        for (auto c : corners_obj2)
-        {
-            float dot = n.x * c.x + n.y * c.y;
-            projections[counter] = dot;
-            ++counter;
-        }
-
-        float obj2_max = *std::max_element(projections.begin(), projections.end());
-        float obj2_min = *std::min_element(projections.begin(), projections.end());
-
-        bool overlap = (obj1_max >= obj2_min && obj1_max <= obj2_max) || (obj1_min >= obj2_min && obj1_min <= obj2_max); 
-        if (overlap)
-        {
-            if (obj1_max >= obj2_min && obj1_max <= obj2_max)
-                pdistances_and_normal.emplace(obj1_max - obj2_min, n);
-            else if (obj1_min >= obj2_min && obj1_min <= obj2_max)
-                pdistances_and_normal.emplace(obj2_max - obj1_min, n);
-        }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
-    // find minimal penetration distance
-    for (auto pair : pdistances_and_normal)
-    {
-        if (pair.first < smallest_penetration_distance)
-        {
-            smallest_penetration_distance = pair.first;
-            normal_of_collision = pair.second;
-        }
-    }
-
-    std::cout << "COLLISION between " << name1 << " and " << name2 << std::endl;
-    if (name1 == "tester")
-    {
-        obj1.getBody().setFillColor(sf::Color::Green);
-    }
-
-    if (name1 == "goal")
-    {
-        obj1.setRandomPosition();
-        obj2.increaseScoreBy(1);
-    }
-    else if (name2 == "goal")
-    {
-        obj2.setRandomPosition();
-        obj1.increaseScoreBy(1);
-    }
-
-    if (name1 == "enemy" || name2 == "enemy" || name2.find("wall") != std::string::npos)
-    {
-        if (name1 != "tester")
-        {
-            this->reset();
-            this->game_over = true;
-        }
-    }
-
+    body = this->rigidbodies_[index];
     return true;
 }
 
-void World::wallCollision()
+bool World2D::getBody(std::string name, Rigidbody*& body)
 {
-    for (auto obj : this->objects_)
+    std::vector<std::string>::iterator it = std::find(this->list_of_object_names_.begin(), this->list_of_object_names_.end(), name);
+    if (it != this->list_of_object_names_.end())
     {
-        if (obj.second->is_moving_)
+        body = this->rigidbodies_[std::distance(this->list_of_object_names_.begin(), it)];
+        return true;
+    }
+    
+    return false;
+}
+
+int World2D::getBodyCount() const
+{
+    return this->rigidbodies_.size();
+}
+
+void World2D::update(const sf::Time& dt)
+{
+    // Movement step
+    for (int i = 0; i < this->rigidbodies_.size(); ++i)
+    {
+        this->rigidbodies_[i]->update(dt);
+    }
+
+    // collision step
+    Vector2f normal;
+    float depth;
+    for (int i = 0; i < this->rigidbodies_.size() - 1; ++i)
+    {
+        Rigidbody* body_a = this->rigidbodies_[i];
+
+        for (int j = i + 1; j < this->rigidbodies_.size(); ++j)
         {
-            // right wall
-            if (obj.second->getBody().getPosition().x + obj.second->getSize().x/2 > this->window_->getWindowSize().x)
+            Rigidbody* body_b = this->rigidbodies_[j];
+
+            if (this->collide(body_a, body_b, normal, depth))
             {
-                obj.second->getBody().setPosition(sf::Vector2f(this->window_->getWindowSize().x - obj.second->getSize().x/2, obj.second->getBody().getPosition().y));
-                obj.second->setPosition(sf::Vector2f(0, obj.second->getPosition().y));
-                obj.second->setVelocity(sf::Vector2f(0.f, obj.second->getVelocity().y));
-            }
-            // left wall
-            if (obj.second->getBody().getPosition().x - obj.second->getSize().x/2 < 0)
-            {
-                obj.second->getBody().setPosition(sf::Vector2f(obj.second->getSize().x/2, obj.second->getBody().getPosition().y));
-                obj.second->setPosition(sf::Vector2f(0, obj.second->getPosition().y));
-                obj.second->setVelocity(sf::Vector2f(0.f, obj.second->getVelocity().y));
-            }
-            // bottom wall
-            if (obj.second->getBody().getPosition().y + obj.second->getSize().y/2 > this->window_->getWindowSize().y)
-            {
-                obj.second->getBody().setPosition(sf::Vector2f(obj.second->getBody().getPosition().x, this->window_->getWindowSize().y - obj.second->getSize().y/2));
-                obj.second->setPosition(sf::Vector2f(obj.second->getPosition().x, 0));
-                obj.second->setVelocity(sf::Vector2f(obj.second->getVelocity().x, 0.f));
-            }
-            // top wall
-            if (obj.second->getBody().getPosition().y - obj.second->getSize().y/2 < 0)
-            {
-                obj.second->getBody().setPosition(sf::Vector2f(obj.second->getBody().getPosition().x, obj.second->getSize().y/2));
-                obj.second->setPosition(sf::Vector2f(obj.second->getPosition().x, 0));
-                obj.second->setVelocity(sf::Vector2f(obj.second->getVelocity().x, 0.f));
+                body_a->move(-normal * depth / 2.f);
+                body_b->move(normal * depth / 2.f);
             }
         }
     }
 }
 
-void World::update(const sf::Time& dt)
+bool World2D::collide(Rigidbody* body_a, Rigidbody* body_b, Vector2f& normal, float& depth)
 {
-    // check for walls
-    wallCollision();
-    checkCollisionBetween("goal", "player", dt);
-    // checkCollisionBetween("player", "enemy", dt);
+    normal = Vector2f::Zero();
+    depth = 0.f;
 
-    bool tester_collided = false;
-    this->getObject("tester").getBody().setFillColor(sf::Color::Blue);
-    for (auto name : this->list_of_object_names_)
+    ShapeType shape_type_a = body_a->shape_type_;
+    ShapeType shape_type_b = body_b->shape_type_;
+
+    if (shape_type_a == ShapeType::Box)
     {
-        if (name.find("wall") != std::string::npos)
+        if (shape_type_b == ShapeType::Box)
         {
-            checkCollisionBetween("player", name, dt);
-            if (!tester_collided)
-                tester_collided = checkCollisionBetween("tester", name, dt);
+            return Collision2D::polygonCollisionDetection(body_a->getTransformedVertices(), body_b->getTransformedVertices(), normal, depth);
+        } else if (shape_type_b == ShapeType::Circle)
+        {
+            bool result = Collision2D::circlePolygonCollisionDetection(body_b->position_, body_b->radius_, body_a->getTransformedVertices(), normal, depth);
+            normal = -normal;
+            return result;
+        }
+    } else if (shape_type_a == ShapeType::Circle)
+    {
+        if (shape_type_b == ShapeType::Box)
+        {
+            return Collision2D::circlePolygonCollisionDetection(body_a->position_, body_a->radius_, body_b->getTransformedVertices(), normal, depth);   
+        } else if (shape_type_b == ShapeType::Circle)
+        {
+            return Collision2D::circleCollisionDetection(body_a->position_, body_a->radius_, body_b->position_, body_b->radius_, normal, depth);   
         }
     }
 
-    for (auto obj : this->objects_)
-    {
-        obj.second->update(dt);
-        obj.second->move();
-    }
+    return false;
 }
-
-// getters
-PhysicsObject& World::getObject(const std::string& name)
-{
-    return (*(*this->objects_.find(name)).second);
-}
-
-int World::getNumberOfObjects() const { return this->objects_.size(); }

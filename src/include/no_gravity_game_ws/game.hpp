@@ -48,20 +48,17 @@ class Game
 
     // public variables
     sf::View view; 
-    // Testing
-    std::vector<Rigidbody*> rigidbodies;
-    std::vector<sf::Color> outline_color;
 
     private:
     sf::Clock clock_;
     sf::Time dt_;
     Window window_;
-    World world_;
-    Player player_;
-    Goal goal_;
-    Enemy enemy_;
-    Enemy tester_;
-    std::vector<Wall> walls_;
+    World2D world_;
+    // Player player_;
+    // Goal goal_;
+    // Enemy enemy_;
+    // Enemy tester_;
+    // std::vector<Wall> walls_;
 
     std::vector<sf::Vector2f> vertex_buffer_;
 
