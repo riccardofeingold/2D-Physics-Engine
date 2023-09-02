@@ -38,13 +38,18 @@ bool World2D::removeObject(const std::string& name)
 
 void World2D::resolveCollision(Rigidbody*& body_a, Rigidbody*& body_b, const Vector2f& normal, const float& depth)
 {
-    float e = std::min(body_a->restitution, body_b->restitution);
     Vector2f v_diff = body_b->getLinearVelocity() - body_a->getLinearVelocity();
+
+    // only apply impulse if the object are moving apart
+    if (Math2D::dot(v_diff, normal) > 0.f)
+        return;
+
+    float e = std::min(body_a->restitution, body_b->restitution);
     float j = -(1 + e) * Math2D::dot(v_diff, normal);
     j /= body_a->inverse_mass + body_b->inverse_mass;
     
     Vector2f impulse = normal * j;
-    
+
     body_a->setLinearVelocity(body_a->getLinearVelocity() - impulse * body_a->inverse_mass);
     body_b->setLinearVelocity(body_b->getLinearVelocity() + impulse * body_b->inverse_mass);
 }
@@ -95,6 +100,10 @@ void World2D::update(const sf::Time& dt)
         for (int j = i + 1; j < this->rigidbodies_.size(); ++j)
         {
             Rigidbody* body_b = this->rigidbodies_[j];
+            
+            if (body_a->is_static && body_b->is_static)
+                continue;
+            
             if (this->collide(body_a, body_b, normal, depth))
             {
                 Vector2f penetration = normal * depth;
