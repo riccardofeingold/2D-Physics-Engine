@@ -22,28 +22,29 @@ namespace Physics2D
         Rigidbody(const Vector2f& position, float density, float mass, float restitution, float area, bool isStatic, float radius, float width, float height, ShapeType shape_type);
         ~Rigidbody();
 
-        Vector2f force_; // N
-        Vector2f position_; // in meters = 1 pixel
-        Vector2f linear_velocity_; // in m/s
-        float rotation_; // in radians
-        float angular_velocity_; // radians/s
+        float density; // in kg/m^3
+        float mass; // in kg
+        float restitution;
+        float area; // m^2
 
-        float density_; // in kg/m^3
-        float mass_; // in kg
-        float restitution_;
-        float area_; // m^2
-
-        bool is_static_;
+        bool is_static;
      
-        float radius_; // in meters
-        float width_; // in meters
-        float height_; // in meters
+        float radius; // in meters
+        float width; // in meters
+        float height; // in meters
 
-        sf::Color color_; // rgba
+        sf::Color color; // rgba
 
-        ShapeType shape_type_;
+        ShapeType shape_type;
         
         std::vector<int> triangle_indices;
+
+        // getters
+        Vector2f getForce() const;
+        Vector2f getPosition() const;
+        Vector2f getLinearVelocity() const;
+        float getRotation() const;
+        float getAngularVelocity() const;
 
         // methods
         /// @brief  create a circle rigidbody. Important the body pointer needs to be delted properly after usage, since it's dynamically allocated.
@@ -103,6 +104,12 @@ namespace Physics2D
         void applyForce(const Vector2f& force);
 
         private:
+        Vector2f force_; // N
+        Vector2f position_; // in meters = 1 pixel
+        Vector2f linear_velocity_; // in m/s
+        float rotation_; // in radians
+        float angular_velocity_; // radians/s
+
         std::vector<Vector2f> vertices_;
         std::vector<Vector2f> transformed_vertices_;
         bool transform_update_required_;

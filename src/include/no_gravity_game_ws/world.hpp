@@ -25,7 +25,8 @@ namespace Physics2D
         void addObject(const std::string& name, Rigidbody* obj);
         bool removeObject(const std::string& name);
         bool collide(Rigidbody* body_a, Rigidbody* body_b, Vector2f& normal, float& depth);
-        
+        void resolveCollision(const Rigidbody*& body_a, const Rigidbody*& body_b, const Vector2f& normal, const float& depth);
+
         void setup();
         void update(const sf::Time& dt);
         void reset();

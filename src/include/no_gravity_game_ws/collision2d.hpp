@@ -19,7 +19,7 @@ namespace Physics2D
         /// @param center_b
         /// @param radius_b
         /// @return @param depth @param normal and bool indicating if a collision has been detected or not 
-        static bool circleCollisionDetection(Vector2f& center_a, const float radius_a, Vector2f& center_b, const float radius_b, Vector2f& normal, float& depth);
+        static bool circleCollisionDetection(const Vector2f& center_a, const float radius_a, const Vector2f& center_b, const float radius_b, Vector2f& normal, float& depth);
         
         /// @brief checking for collision between polygons
         /// @param vertices_a 

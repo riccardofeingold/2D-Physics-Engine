@@ -4,14 +4,14 @@ using namespace Physics2D;
 
 Rigidbody::Rigidbody()
 {
-    this->color_ = Rigidbody::randomColor();
+    this->color = Rigidbody::randomColor();
 }
 
 Rigidbody::~Rigidbody() = default;
 
 Rigidbody::Rigidbody(const Vector2f& position, float density, float mass, float restitution, float area, bool is_static, float radius, float width, float height, ShapeType shape_type)
 {
-    this->color_ = Rigidbody::randomColor();
+    this->color = Rigidbody::randomColor();
 
     this->force_ = Vector2f::Zero();
 
@@ -20,22 +20,22 @@ Rigidbody::Rigidbody(const Vector2f& position, float density, float mass, float 
     this->rotation_ = 0.f;
     this->angular_velocity_ = 0.f;
 
-    this->density_ = density;
-    this->mass_ = mass;
-    this->restitution_ = restitution;
-    this->area_ = area;
+    this->density = density;
+    this->mass = mass;
+    this->restitution = restitution;
+    this->area = area;
     
-    this->is_static_ = is_static;
+    this->is_static = is_static;
 
-    this->radius_ = radius;
-    this->width_ = width;
-    this->height_ = height;
+    this->radius = radius;
+    this->width = width;
+    this->height = height;
 
-    this->shape_type_ = shape_type;
+    this->shape_type = shape_type;
 
-    if (this->shape_type_ == ShapeType::Box)
+    if (this->shape_type == ShapeType::Box)
     {
-        this->vertices_ = Rigidbody::createBoxVertices(this->width_, this->height_);
+        this->vertices_ = Rigidbody::createBoxVertices(this->width, this->height);
         this->triangle_indices = Rigidbody::createBoxTriangleIndices();
         this->transformed_vertices_ = std::vector<Vector2f>(this->vertices_.size());
     }
@@ -206,7 +206,7 @@ const std::vector<Vector2f>& Rigidbody::getTransformedVertices()
 
 void Rigidbody::update(const sf::Time& dt)
 {
-    this->linear_velocity_ += this->force_ / this->mass_ * dt.asSeconds();
+    this->linear_velocity_ += this->force_ / this->mass * dt.asSeconds();
     this->position_ += this->linear_velocity_ * dt.asSeconds();
     this->rotation_ += this->angular_velocity_ * dt.asSeconds();
     
@@ -219,3 +219,10 @@ void Rigidbody::applyForce(const Vector2f& force)
 {
     this->force_ = force;
 }
+
+// getters
+Vector2f Rigidbody::getForce() const { return this->force_; }
+Vector2f Rigidbody::getPosition() const { return this->position_; }
+Vector2f Rigidbody::getLinearVelocity() const { return this->linear_velocity_; }
+float Rigidbody::getRotation() const { return this->rotation_; }
+float Rigidbody::getAngularVelocity() const { return this->angular_velocity_; }

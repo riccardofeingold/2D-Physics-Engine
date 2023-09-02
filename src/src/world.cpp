@@ -36,6 +36,11 @@ bool World2D::removeObject(const std::string& name)
     return false;
 }
 
+void World2D::resolveCollision(const Rigidbody*& body_a, const Rigidbody*& body_b, const Vector2f& normal, const float& depth)
+{
+    
+}
+
 bool World2D::getBody(int index, Rigidbody*& body)
 {
     if (index < 0 || index >= this->rigidbodies_.size())
@@ -97,8 +102,8 @@ bool World2D::collide(Rigidbody* body_a, Rigidbody* body_b, Vector2f& normal, fl
     normal = Vector2f::Zero();
     depth = 0.f;
 
-    ShapeType shape_type_a = body_a->shape_type_;
-    ShapeType shape_type_b = body_b->shape_type_;
+    ShapeType shape_type_a = body_a->shape_type;
+    ShapeType shape_type_b = body_b->shape_type;
 
     if (shape_type_a == ShapeType::Box)
     {
@@ -107,7 +112,7 @@ bool World2D::collide(Rigidbody* body_a, Rigidbody* body_b, Vector2f& normal, fl
             return Collision2D::polygonCollisionDetection(body_a->getTransformedVertices(), body_b->getTransformedVertices(), normal, depth);
         } else if (shape_type_b == ShapeType::Circle)
         {
-            bool result = Collision2D::circlePolygonCollisionDetection(body_b->position_, body_b->radius_, body_a->getTransformedVertices(), normal, depth);
+            bool result = Collision2D::circlePolygonCollisionDetection(body_b->getPosition(), body_b->radius, body_a->getTransformedVertices(), normal, depth);
             normal = -normal;
             return result;
         }
@@ -115,10 +120,10 @@ bool World2D::collide(Rigidbody* body_a, Rigidbody* body_b, Vector2f& normal, fl
     {
         if (shape_type_b == ShapeType::Box)
         {
-            return Collision2D::circlePolygonCollisionDetection(body_a->position_, body_a->radius_, body_b->getTransformedVertices(), normal, depth);   
+            return Collision2D::circlePolygonCollisionDetection(body_a->getPosition(), body_a->radius, body_b->getTransformedVertices(), normal, depth);   
         } else if (shape_type_b == ShapeType::Circle)
         {
-            return Collision2D::circleCollisionDetection(body_a->position_, body_a->radius_, body_b->position_, body_b->radius_, normal, depth);   
+            return Collision2D::circleCollisionDetection(body_a->getPosition(), body_a->radius, body_b->getPosition(), body_b->radius, normal, depth);   
         }
     }
 

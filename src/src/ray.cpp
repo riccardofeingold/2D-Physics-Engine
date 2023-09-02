@@ -48,7 +48,7 @@ void Ray::castRay(World2D& w)
     Vector2f player;
     if (w.getBody("player", body))
     {
-        player = body->position_;
+        player = body->getPosition();
     }
     std::vector<sf::Vector2f> global_points;
     // wikipedia article about line intersection: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection

@@ -211,17 +211,17 @@ void Game::render()
 
         assert(this->world_.getBody(i, b));
 
-        sf::Vector2f pos = Vector2Converter::toSFVector2f(b->position_);
-        if (b->shape_type_ == ShapeType::Circle)
+        sf::Vector2f pos = Vector2Converter::toSFVector2f(b->getPosition());
+        if (b->shape_type == ShapeType::Circle)
         {
-            sf::CircleShape circle(b->radius_);
-            circle.setFillColor(b->color_);
+            sf::CircleShape circle(b->radius);
+            circle.setFillColor(b->color);
             circle.setOutlineColor(sf::Color::White);
             circle.setOutlineThickness(0.1f);
             circle.setOrigin(circle.getRadius(), circle.getRadius());
             circle.setPosition(pos);
             this->window_.draw(circle);
-        } else if (b->shape_type_ == ShapeType::Box)
+        } else if (b->shape_type == ShapeType::Box)
         {
             Vector2Converter::toSFVector2fList(b->getTransformedVertices(), this->vertex_buffer_);
 
@@ -231,7 +231,7 @@ void Game::render()
                 box.setPoint(i, this->vertex_buffer_[i]);
             }
 
-            box.setFillColor(b->color_);
+            box.setFillColor(b->color);
             // box.setOutlineColor(this->world_.outline_color_[i]);
             box.setOutlineThickness(0.1f);
             box.setOrigin(pos);

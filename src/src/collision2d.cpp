@@ -2,7 +2,7 @@
 
 using namespace Physics2D;
 
-bool Collision2D::circleCollisionDetection(Vector2f& center_a, const float radius_a, Vector2f& center_b, const float radius_b, Vector2f& normal, float& depth)
+bool Collision2D::circleCollisionDetection(const Vector2f& center_a, const float radius_a, const Vector2f& center_b, const float radius_b, Vector2f& normal, float& depth)
 {
     normal = Vector2f::Zero();
     depth = 0.f;
