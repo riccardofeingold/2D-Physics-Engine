@@ -22,6 +22,12 @@ Rigidbody::Rigidbody(const Vector2f& position, float density, float mass, float 
 
     this->density = density;
     this->mass = mass;
+
+    if (!is_static)
+        this->inverse_mass = 1/mass;
+    else
+        this->inverse_mass = 0;
+        
     this->restitution = restitution;
     this->area = area;
     

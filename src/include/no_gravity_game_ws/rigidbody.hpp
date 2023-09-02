@@ -24,6 +24,7 @@ namespace Physics2D
 
         float density; // in kg/m^3
         float mass; // in kg
+        float inverse_mass;
         float restitution;
         float area; // m^2
 

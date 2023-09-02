@@ -50,25 +50,36 @@ void Game::start()
         Vector2f position((float)std::rand()/RAND_MAX * (current_view.getSize().x - padding), (float)std::rand()/RAND_MAX * (current_view.getSize().y - padding));
 
         std::string e;
-        if (shape_random == ShapeType::Circle && i != 0)
+        if (shape_random == ShapeType::Circle)
         {
             if (!Rigidbody::createCircleBody(1.f, position, 2.f, false, 1.f, body, e))
                 std::cout << e << std::endl;
             else
                 this->world_.addObject(std::to_string(i), body);
-        } else if (shape_random == ShapeType::Box || i == 0)
+        } else if (shape_random == ShapeType::Box)
         {
-            if (!Rigidbody::createBoxBody(2.f, 2.f, position, 2.f, false, 1.f, body, e))
+            if (!Rigidbody::createBoxBody(1.77f, 1.77f, position, 2.f, false, 1.f, body, e))
                 std::cout << e << std::endl;
             else
             {
-                // this->outline_color.push_back(sf::Color::White);
                 this->world_.addObject(std::to_string(i), body);
             }
         } else
         {
             std::cout << "unknown type" << std::endl;
         }
+    }
+
+    // add walls
+    for (int i = 0; i < 10; ++i)
+    {
+        Rigidbody* body = nullptr;
+        Vector2f position = Vector2f((float)std::rand()/RAND_MAX * this->view.getSize().x, (float)std::rand()/RAND_MAX * this->view.getSize().y);
+        std::string e = "Error in creating static box!";
+        if (!Rigidbody::createBoxBody(3.f, 2.f, position, 2.f, true, (float)std::rand()/RAND_MAX, body, e))
+            std::cout << e << std::endl;
+        else
+            this->world_.addObject("wall" + std::to_string(i), body);
     }
 
     /********TESTING*********/
