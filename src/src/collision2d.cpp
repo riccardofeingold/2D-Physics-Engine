@@ -36,6 +36,7 @@ bool Collision2D::polygonCollisionDetection(const std::vector<Vector2f>& vertice
 
         Vector2f edge_ab = vertex_b - vertex_a;
         Vector2f axis = Vector2f(-edge_ab.y, edge_ab.x);
+        axis = Math2D::normalize(axis);
 
         Collision2D::projectVertices(vertices_a, axis, min_a, max_a);
         Collision2D::projectVertices(vertices_b, axis, min_b, max_b);
@@ -60,6 +61,7 @@ bool Collision2D::polygonCollisionDetection(const std::vector<Vector2f>& vertice
 
         Vector2f edge_ab = vertex_b - vertex_a;
         Vector2f axis = Vector2f(-edge_ab.y, edge_ab.x);
+        axis = Math2D::normalize(axis);
 
         Collision2D::projectVertices(vertices_a, axis, min_a, max_a);
         Collision2D::projectVertices(vertices_b, axis, min_b, max_b);
@@ -76,9 +78,6 @@ bool Collision2D::polygonCollisionDetection(const std::vector<Vector2f>& vertice
             normal = axis;
         }
     }
-    
-    depth /= Math2D::norm(normal);
-    normal = Math2D::normalize(normal);
 
     Vector2f center_to_center = Collision2D::findArithmeticMean(vertices_b) - Collision2D::findArithmeticMean(vertices_a);
     if (Math2D::dot(normal, center_to_center) < 0)
@@ -102,6 +101,7 @@ bool Collision2D::circlePolygonCollisionDetection(const Vector2f& circle_center,
 
         Vector2f edge_ab = vertex_b - vertex_a;
         axis = Vector2f(-edge_ab.y, edge_ab.x);
+        axis = Math2D::normalize(axis);
 
         Collision2D::projectVertices(vertices, axis, min_a, max_a);
         Collision2D::projectCircle(circle_center, circle_radius, axis, min_b, max_b);
@@ -120,6 +120,7 @@ bool Collision2D::circlePolygonCollisionDetection(const Vector2f& circle_center,
 
     int cp_index = Collision2D::closestPoint(circle_center, vertices);
     axis = vertices[cp_index] - circle_center;
+    axis = Math2D::normalize(axis);
 
     Collision2D::projectVertices(vertices, axis, min_a, max_a);
     Collision2D::projectCircle(circle_center, circle_radius, axis, min_b, max_b);
@@ -134,9 +135,6 @@ bool Collision2D::circlePolygonCollisionDetection(const Vector2f& circle_center,
         depth = penetration_depth;
         normal = axis;
     }
-
-    depth /= Math2D::norm(normal);
-    normal = Math2D::normalize(normal);
 
     Vector2f center_to_center = Collision2D::findArithmeticMean(vertices) - circle_center;
     if (Math2D::dot(normal, center_to_center) < 0)

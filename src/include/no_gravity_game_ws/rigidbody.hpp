@@ -22,6 +22,7 @@ namespace Physics2D
         Rigidbody(const Vector2f& position, float density, float mass, float restitution, float area, bool isStatic, float radius, float width, float height, ShapeType shape_type);
         ~Rigidbody();
 
+        Vector2f force_; // N
         Vector2f position_; // in meters = 1 pixel
         Vector2f linear_velocity_; // in m/s
         float rotation_; // in radians
@@ -96,6 +97,10 @@ namespace Physics2D
         /// @brief update the rigidbodies physics
         /// @param dt delta time
         void update(const sf::Time& dt);
+
+        /// @brief applies a force onto the rigidbody
+        /// @param force 
+        void applyForce(const Vector2f& force);
 
         private:
         std::vector<Vector2f> vertices_;

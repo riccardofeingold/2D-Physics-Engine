@@ -50,13 +50,13 @@ void Game::start()
         Vector2f position((float)std::rand()/RAND_MAX * (current_view.getSize().x - padding), (float)std::rand()/RAND_MAX * (current_view.getSize().y - padding));
 
         std::string e;
-        if (shape_random == ShapeType::Circle)
+        if (shape_random == ShapeType::Circle && i != 0)
         {
             if (!Rigidbody::createCircleBody(1.f, position, 2.f, false, 1.f, body, e))
                 std::cout << e << std::endl;
             else
                 this->world_.addObject(std::to_string(i), body);
-        } else if (shape_random == ShapeType::Box)
+        } else if (shape_random == ShapeType::Box || i == 0)
         {
             if (!Rigidbody::createBoxBody(2.f, 2.f, position, 2.f, false, 1.f, body, e))
                 std::cout << e << std::endl;
@@ -132,7 +132,7 @@ void Game::handleInput()
     Vector2f dv(0.f, 0.f);
     float delta_rotation = 0.f;
     float angular_speed = M_PI/4;
-    float speed = 8.f;
+    float force_magnitude = 60.f;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         --dv.y;
@@ -149,11 +149,11 @@ void Game::handleInput()
 
     if (dv.x != 0 || dv.y != 0)
     {
-        Vector2f direction = Math2D::normalize(dv);
-        Vector2f delta_pos = direction * speed * this->dt_.asSeconds();
+        Vector2f force_direction = Math2D::normalize(dv);
+        Vector2f force = force_direction * force_magnitude;
         Rigidbody* body;
         assert(this->world_.getBody(0, body));
-        body->move(delta_pos);
+        body->applyForce(force);
     }
 
     if (delta_rotation != 0)

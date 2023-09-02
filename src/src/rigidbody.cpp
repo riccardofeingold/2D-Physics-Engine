@@ -13,6 +13,8 @@ Rigidbody::Rigidbody(const Vector2f& position, float density, float mass, float 
 {
     this->color_ = Rigidbody::randomColor();
 
+    this->force_ = Vector2f::Zero();
+
     this->position_ = position;
     this->linear_velocity_ = Vector2f::Zero();
     this->rotation_ = 0.f;
@@ -204,6 +206,16 @@ const std::vector<Vector2f>& Rigidbody::getTransformedVertices()
 
 void Rigidbody::update(const sf::Time& dt)
 {
+    this->linear_velocity_ += this->force_ / this->mass_ * dt.asSeconds();
     this->position_ += this->linear_velocity_ * dt.asSeconds();
     this->rotation_ += this->angular_velocity_ * dt.asSeconds();
+    
+    // resetting the force
+    this->force_ = Vector2f::Zero();
+    this->transform_update_required_ = true;
+}
+
+void Rigidbody::applyForce(const Vector2f& force)
+{
+    this->force_ = force;
 }
