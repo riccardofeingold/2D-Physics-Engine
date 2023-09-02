@@ -3,6 +3,7 @@
 
 #include "world.hpp"
 #include "math2d.hpp"
+#include "aabb.hpp"
 #include <SFML/Graphics.hpp>
 
 namespace Physics2D
@@ -110,6 +111,10 @@ namespace Physics2D
         /// @param force 
         void applyForce(const Vector2f& force);
 
+        /// @brief get the axis alignement bounding box based on the shape
+        /// @return return AABB
+        AABB getAABB();
+
         private:
         Vector2f force_; // N
         Vector2f position_; // in meters = 1 pixel
@@ -117,9 +122,12 @@ namespace Physics2D
         float rotation_; // in radians
         float angular_velocity_; // radians/s
 
+        AABB aabb_;
+
         std::vector<Vector2f> vertices_;
         std::vector<Vector2f> transformed_vertices_;
         bool transform_update_required_;
+        bool aabb_update_required_;
         bool apply_gravity_;
 
         /// @brief create the vertices of a box; is used to tranform those points accordingly

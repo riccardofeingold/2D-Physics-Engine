@@ -228,7 +228,23 @@ void Game::update()
     this->dt_ = this->clock_.restart();
     this->window_.update();
     this->world_.update(this->dt_);
-    this->wrapScreen();
+
+    for (int i = 0; i < this->world_.getBodyCount(); ++i)
+    {
+        Rigidbody* body;
+        if (!this->world_.getBody(i, body))
+        {
+            std::cout << "ERROR" << std::endl;
+        }
+
+        AABB box = body->getAABB();
+
+        if (box.min.y > this->view.getSize().y)
+        {
+            this->world_.removeObject(body->name);
+            std::cout << "DELETED" << std::endl;
+        }
+    }
 }
 
 void Game::render()
@@ -321,14 +337,12 @@ void Game::wrapScreen()
 
         if (body->getPosition().y > this->view.getSize().y)
         {
-            this->world_.removeObject(body->name);
-            // body->moveTo(Vector2f(body->getPosition().x, 0));
+            body->moveTo(Vector2f(body->getPosition().x, 0));
         }
 
         if (body->getPosition().y < 0)
         {
-            this->world_.removeObject(body->name);
-            // body->moveTo(Vector2f(body->getPosition().x, this->view.getSize().y));
+            body->moveTo(Vector2f(body->getPosition().x, this->view.getSize().y));
         }
     }
 }

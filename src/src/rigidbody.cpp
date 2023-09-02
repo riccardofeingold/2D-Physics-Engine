@@ -50,6 +50,7 @@ Rigidbody::Rigidbody(std::string name, const Vector2f& position, float density, 
     }
 
     this->transform_update_required_ = true;
+    this->aabb_update_required_ = true;
 }
 
 bool Rigidbody::createCircleBody(std::string name, float radius, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message, bool apply_gravity)
@@ -136,18 +137,21 @@ void Rigidbody::move(const Vector2f& move)
 {
     this->position_ += move;
     this->transform_update_required_ = true;
+    this->aabb_update_required_ = true;
 }
 
 void Rigidbody::moveTo(const Vector2f& move)
 {
     this->position_ = move;
     this->transform_update_required_ = true;
+    this->aabb_update_required_ = true;
 }
 
 void Rigidbody::rotate(const float amount)
 {
     this->rotation_ += amount;
     this->transform_update_required_ = true;
+    this->aabb_update_required_ = true;
 }
 
 void Rigidbody::rotateTo(const float rotation)
@@ -155,6 +159,7 @@ void Rigidbody::rotateTo(const float rotation)
     // the negations is due to the fact that the z axis is pointing into the screen
     this->rotation_ = rotation;
     this->transform_update_required_ = true;
+    this->aabb_update_required_ = true;
 }
 
 sf::Color Rigidbody::randomColor()
@@ -225,6 +230,7 @@ void Rigidbody::update(const sf::Time& dt, const Vector2f& gravity)
     // resetting the force
     this->force_ = Vector2f::Zero();
     this->transform_update_required_ = true;
+    this->aabb_update_required_ = true;
 }
 
 void Rigidbody::applyForce(const Vector2f& force)
@@ -238,6 +244,50 @@ Vector2f Rigidbody::getPosition() const { return this->position_; }
 Vector2f Rigidbody::getLinearVelocity() const { return this->linear_velocity_; }
 float Rigidbody::getRotation() const { return this->rotation_; }
 float Rigidbody::getAngularVelocity() const { return this->angular_velocity_; }
+
+AABB Rigidbody::getAABB()
+{
+    if (this->aabb_update_required_)
+    {
+        
+        float min_x = INFINITY;
+        float min_y = INFINITY;
+        float max_x = -INFINITY;
+        float max_y = -INFINITY;
+
+        if (this->shape_type == ShapeType::Circle)
+        {
+            min_x = this->position_.x - this->radius;
+            min_y = this->position_.y - this->radius;
+            max_x = this->position_.y + this->radius;
+            max_y = this->position_.y + this->radius;   
+        } else if (this->shape_type == ShapeType::Box)
+        {
+            std::vector<Vector2f> vertices = this->getTransformedVertices();
+
+            for (int i = 0; i < vertices.size(); ++i)
+            {
+                Vector2f v = vertices[i];
+                if (v.x < min_x)
+                    min_x = v.x;
+                if (v.y < min_y)
+                    min_y = v.y;
+                if (v.x > max_x)
+                    max_x = v.x;
+                if (v.y > max_y)
+                    max_y = v.y;
+            }
+        } else
+        {
+            std::cout << "ERROR" << std::endl;
+        }
+
+        this->aabb_ = AABB(min_x, min_y, max_x, max_y);
+    }
+
+    this->aabb_update_required_ = false;
+    return this->aabb_;
+}
 
 // setters
 void Rigidbody::setLinearVelocity(const Vector2f& value) { this->linear_velocity_ = value; }
