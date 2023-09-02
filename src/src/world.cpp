@@ -40,12 +40,13 @@ void World2D::resolveCollision(Rigidbody*& body_a, Rigidbody*& body_b, const Vec
 {
     float e = std::min(body_a->restitution, body_b->restitution);
     Vector2f v_diff = body_b->getLinearVelocity() - body_a->getLinearVelocity();
-    float j_nom = -(1 + e) * Math2D::dot(v_diff, normal);
-    float j_den = body_a->inverse_mass + body_b->inverse_mass;
-    float j = j_nom / j_den; 
-
-    body_a->setLinearVelocity(body_a->getLinearVelocity() - normal * j * body_a->inverse_mass);
-    body_b->setLinearVelocity(body_b->getLinearVelocity() + normal * j * body_b->inverse_mass);
+    float j = -(1 + e) * Math2D::dot(v_diff, normal);
+    j /= body_a->inverse_mass + body_b->inverse_mass;
+    
+    Vector2f impulse = normal * j;
+    
+    body_a->setLinearVelocity(body_a->getLinearVelocity() - impulse * body_a->inverse_mass);
+    body_b->setLinearVelocity(body_b->getLinearVelocity() + impulse * body_b->inverse_mass);
 }
 
 bool World2D::getBody(int index, Rigidbody*& body)
@@ -94,19 +95,19 @@ void World2D::update(const sf::Time& dt)
         for (int j = i + 1; j < this->rigidbodies_.size(); ++j)
         {
             Rigidbody* body_b = this->rigidbodies_[j];
-
             if (this->collide(body_a, body_b, normal, depth))
             {
+                Vector2f penetration = normal * depth;
                 if (body_a->is_static)
                 {
-                    body_b->move(-normal * depth);
+                    body_b->move(-penetration);
                 } else if (body_b->is_static)
                 {
-                    body_a->move(-normal * depth);
+                    body_a->move(-penetration);
                 } else
                 {
-                    body_a->move(-normal * depth / 2.f);
-                    body_b->move(normal * depth / 2.f);
+                    body_a->move(-penetration / 2.f);
+                    body_b->move(penetration / 2.f);
                 }
                 this->resolveCollision(body_a, body_b, normal, depth);
             }
