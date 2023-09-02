@@ -23,6 +23,69 @@ bool Collision2D::circleCollisionDetection(const Vector2f& center_a, const float
 
 }
 
+bool Collision2D::polygonCollisionDetection(const std::vector<Vector2f>& vertices_a, const Vector2f& center_a, const std::vector<Vector2f>& vertices_b, const Vector2f& center_b, Vector2f& normal, float& depth)
+{
+    float min_a, max_a, min_b, max_b;
+    normal = Vector2f::Zero();
+    depth = INFINITY;
+
+    for (int i = 0; i < vertices_a.size(); ++i)
+    {
+        Vector2f vertex_a = vertices_a[i];
+        Vector2f vertex_b = vertices_a[(i + 1) % vertices_a.size()];
+
+        Vector2f edge_ab = vertex_b - vertex_a;
+        Vector2f axis = Vector2f(-edge_ab.y, edge_ab.x);
+        axis = Math2D::normalize(axis);
+
+        Collision2D::projectVertices(vertices_a, axis, min_a, max_a);
+        Collision2D::projectVertices(vertices_b, axis, min_b, max_b);
+
+        if (min_a >= max_b || min_b >= max_a)
+            return false;
+
+        float penetration_depth = std::min(max_b - min_a, max_a - min_b);
+
+        if (penetration_depth < depth)
+        {
+            depth = penetration_depth;
+            normal = axis;
+        }
+
+    }
+
+    for (int i = 0; i < vertices_b.size(); ++i)
+    {
+        Vector2f vertex_a = vertices_b[i];
+        Vector2f vertex_b = vertices_b[(i + 1) % vertices_b.size()];
+
+        Vector2f edge_ab = vertex_b - vertex_a;
+        Vector2f axis = Vector2f(-edge_ab.y, edge_ab.x);
+        axis = Math2D::normalize(axis);
+
+        Collision2D::projectVertices(vertices_a, axis, min_a, max_a);
+        Collision2D::projectVertices(vertices_b, axis, min_b, max_b);
+
+        if (min_a >= max_b || min_b >= max_a)
+            return false;
+        
+
+        float penetration_depth = std::min(max_b - min_a, max_a - min_b);
+
+        if (penetration_depth < depth)
+        {
+            depth = penetration_depth;
+            normal = axis;
+        }
+    }
+
+    Vector2f center_to_center = center_b - center_a;
+    if (Math2D::dot(normal, center_to_center) < 0)
+        normal = -normal;
+
+    return true; 
+}
+
 bool Collision2D::polygonCollisionDetection(const std::vector<Vector2f>& vertices_a, const std::vector<Vector2f>& vertices_b, Vector2f& normal, float& depth)
 {
     float min_a, max_a, min_b, max_b;
@@ -84,6 +147,63 @@ bool Collision2D::polygonCollisionDetection(const std::vector<Vector2f>& vertice
         normal = -normal;
 
     return true;
+}
+
+bool Collision2D::circlePolygonCollisionDetection(const Vector2f& circle_center, const float circle_radius, const Vector2f& polygon_center, const std::vector<Vector2f>& vertices, Vector2f& normal, float& depth)
+{
+    float min_a, max_a, min_b, max_b;
+    normal = Vector2f::Zero();
+    depth = INFINITY;
+    Vector2f axis = Vector2f::Zero();
+    float penetration_depth = 0.f;
+
+    for (int i = 0; i < vertices.size(); ++i)
+    {
+        Vector2f vertex_a = vertices[i];
+        Vector2f vertex_b = vertices[(i + 1) % vertices.size()];
+
+        Vector2f edge_ab = vertex_b - vertex_a;
+        axis = Vector2f(-edge_ab.y, edge_ab.x);
+        axis = Math2D::normalize(axis);
+
+        Collision2D::projectVertices(vertices, axis, min_a, max_a);
+        Collision2D::projectCircle(circle_center, circle_radius, axis, min_b, max_b);
+        
+        if (min_a >= max_b || min_b >= max_a)
+            return false;
+
+        penetration_depth = std::min(max_b - min_a, max_a - min_b);
+
+        if (penetration_depth < depth)
+        {
+            depth = penetration_depth;
+            normal = axis;
+        }
+    }
+
+    int cp_index = Collision2D::closestPoint(circle_center, vertices);
+    axis = vertices[cp_index] - circle_center;
+    axis = Math2D::normalize(axis);
+
+    Collision2D::projectVertices(vertices, axis, min_a, max_a);
+    Collision2D::projectCircle(circle_center, circle_radius, axis, min_b, max_b);
+    
+    if (min_a >= max_b || min_b >= max_a)
+        return false;
+
+    penetration_depth = std::min(max_b - min_a, max_a - min_b);
+
+    if (penetration_depth < depth)
+    {
+        depth = penetration_depth;
+        normal = axis;
+    }
+
+    Vector2f center_to_center = polygon_center - circle_center;
+    if (Math2D::dot(normal, center_to_center) < 0)
+        normal = -normal;
+
+    return true; 
 }
 
 bool Collision2D::circlePolygonCollisionDetection(const Vector2f& circle_center, const float circle_radius, const std::vector<Vector2f>& vertices, Vector2f& normal, float& depth)

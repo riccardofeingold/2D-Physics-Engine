@@ -4,6 +4,7 @@ using namespace Physics2D;
 
 World2D::World2D()
 {
+    this->gravity_ = Vector2f(0, 9.81f);
 }
 
 World2D::~World2D() = default;
@@ -87,7 +88,7 @@ void World2D::update(const sf::Time& dt)
     // Movement step
     for (int i = 0; i < this->rigidbodies_.size(); ++i)
     {
-        this->rigidbodies_[i]->update(dt);
+        this->rigidbodies_[i]->update(dt, this->gravity_);
     }
 
     // collision step
@@ -95,11 +96,11 @@ void World2D::update(const sf::Time& dt)
     float depth;
     for (int i = 0; i < this->rigidbodies_.size() - 1; ++i)
     {
-        Rigidbody* body_a = this->rigidbodies_[i];
+        Rigidbody*& body_a = this->rigidbodies_[i];
 
         for (int j = i + 1; j < this->rigidbodies_.size(); ++j)
         {
-            Rigidbody* body_b = this->rigidbodies_[j];
+            Rigidbody*& body_b = this->rigidbodies_[j];
             
             if (body_a->is_static && body_b->is_static)
                 continue;
@@ -109,7 +110,7 @@ void World2D::update(const sf::Time& dt)
                 Vector2f penetration = normal * depth;
                 if (body_a->is_static)
                 {
-                    body_b->move(-penetration);
+                    body_b->move(penetration);
                 } else if (body_b->is_static)
                 {
                     body_a->move(-penetration);
@@ -124,7 +125,7 @@ void World2D::update(const sf::Time& dt)
     }
 }
 
-bool World2D::collide(Rigidbody* body_a, Rigidbody* body_b, Vector2f& normal, float& depth)
+bool World2D::collide(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& normal, float& depth)
 {
     normal = Vector2f::Zero();
     depth = 0.f;
@@ -136,10 +137,10 @@ bool World2D::collide(Rigidbody* body_a, Rigidbody* body_b, Vector2f& normal, fl
     {
         if (shape_type_b == ShapeType::Box)
         {
-            return Collision2D::polygonCollisionDetection(body_a->getTransformedVertices(), body_b->getTransformedVertices(), normal, depth);
+            return Collision2D::polygonCollisionDetection(body_a->getTransformedVertices(), body_a->getPosition(), body_b->getTransformedVertices(), body_b->getPosition(), normal, depth);
         } else if (shape_type_b == ShapeType::Circle)
         {
-            bool result = Collision2D::circlePolygonCollisionDetection(body_b->getPosition(), body_b->radius, body_a->getTransformedVertices(), normal, depth);
+            bool result = Collision2D::circlePolygonCollisionDetection(body_b->getPosition(), body_b->radius, body_a->getPosition(), body_a->getTransformedVertices(), normal, depth);
             normal = -normal;
             return result;
         }
@@ -147,7 +148,7 @@ bool World2D::collide(Rigidbody* body_a, Rigidbody* body_b, Vector2f& normal, fl
     {
         if (shape_type_b == ShapeType::Box)
         {
-            return Collision2D::circlePolygonCollisionDetection(body_a->getPosition(), body_a->radius, body_b->getTransformedVertices(), normal, depth);   
+            return Collision2D::circlePolygonCollisionDetection(body_a->getPosition(), body_a->radius, body_b->getPosition(), body_b->getTransformedVertices(), normal, depth);   
         } else if (shape_type_b == ShapeType::Circle)
         {
             return Collision2D::circleCollisionDetection(body_a->getPosition(), body_a->radius, body_b->getPosition(), body_b->radius, normal, depth);   

@@ -9,10 +9,13 @@ Rigidbody::Rigidbody()
 
 Rigidbody::~Rigidbody() = default;
 
-Rigidbody::Rigidbody(const Vector2f& position, float density, float mass, float restitution, float area, bool is_static, float radius, float width, float height, ShapeType shape_type)
+Rigidbody::Rigidbody(std::string name, const Vector2f& position, float density, float mass, float restitution, float area, bool is_static, float radius, float width, float height, ShapeType shape_type, bool apply_gravity)
 {
+    this->name = name;
+
     this->color = Rigidbody::randomColor();
 
+    this->apply_gravity_ = apply_gravity;
     this->force_ = Vector2f::Zero();
 
     this->position_ = position;
@@ -27,7 +30,7 @@ Rigidbody::Rigidbody(const Vector2f& position, float density, float mass, float 
         this->inverse_mass = 1/mass;
     else
         this->inverse_mass = 0;
-        
+
     this->restitution = restitution;
     this->area = area;
     
@@ -49,7 +52,7 @@ Rigidbody::Rigidbody(const Vector2f& position, float density, float mass, float 
     this->transform_update_required_ = true;
 }
 
-bool Rigidbody::createCircleBody(float radius, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message)
+bool Rigidbody::createCircleBody(std::string name, float radius, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message, bool apply_gravity)
 {
     error_message = "";
     float area = M_PI*radius*radius;
@@ -84,12 +87,12 @@ bool Rigidbody::createCircleBody(float radius, Vector2f position, float density,
 
     restitution = Math2D::clip(restitution, 0.f, 1.f);
     float mass = area * density;
-    body = new Rigidbody(position, density, mass, restitution, area, is_static, radius, 0, 0, ShapeType::Circle);
+    body = new Rigidbody(name, position, density, mass, restitution, area, is_static, radius, 0, 0, ShapeType::Circle, apply_gravity);
 
     return true;
 }
 
-bool Rigidbody::createBoxBody(float width, float height, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message)
+bool Rigidbody::createBoxBody(std::string name, float width, float height, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message, bool apply_gravity)
 {
     error_message = "";
     float area = width*height;
@@ -124,7 +127,7 @@ bool Rigidbody::createBoxBody(float width, float height, Vector2f position, floa
 
     restitution = Math2D::clip(restitution, 0.f, 1.f);
     float mass = area * density;
-    body = new Rigidbody(position, density, mass, restitution, area, is_static,0.f, width, height, ShapeType::Box);
+    body = new Rigidbody(name, position, density, mass, restitution, area, is_static,0.f, width, height, ShapeType::Box, apply_gravity);
 
     return true;
 }
@@ -210,8 +213,11 @@ const std::vector<Vector2f>& Rigidbody::getTransformedVertices()
     return this->transformed_vertices_;
 }
 
-void Rigidbody::update(const sf::Time& dt)
+void Rigidbody::update(const sf::Time& dt, const Vector2f& gravity)
 {
+    if (this->apply_gravity_)
+        this->linear_velocity_ += gravity * dt.asSeconds();
+
     this->linear_velocity_ += this->force_ / this->mass * dt.asSeconds();
     this->position_ += this->linear_velocity_ * dt.asSeconds();
     this->rotation_ += this->angular_velocity_ * dt.asSeconds();

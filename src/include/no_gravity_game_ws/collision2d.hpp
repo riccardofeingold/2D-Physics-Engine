@@ -27,6 +27,16 @@ namespace Physics2D
         /// @return true if collided otherwise false 
         static bool polygonCollisionDetection(const std::vector<Vector2f>& vertices_a, const std::vector<Vector2f>& vertices_b, Vector2f& normal, float& depth);
 
+        /// @brief checking for collision between polygons
+        /// @param vertices_a 
+        /// @param center_a 
+        /// @param vertices_b 
+        /// @param center_b 
+        /// @param normal 
+        /// @param depth 
+        /// @return true if collided otherwise false  
+        static bool polygonCollisionDetection(const std::vector<Vector2f>& vertices_a, const Vector2f& center_a, const std::vector<Vector2f>& vertices_b, const Vector2f& center_b, Vector2f& normal, float& depth);
+
         /// @brief check for circle polygon collision
         /// @param circle_center 
         /// @param circle_radius 
@@ -35,6 +45,16 @@ namespace Physics2D
         /// @param depth 
         /// @return true if collision detected otherwise false
         static bool circlePolygonCollisionDetection(const Vector2f& circle_center, const float circle_radius, const std::vector<Vector2f>& vertices, Vector2f& normal, float& depth);
+
+        /// @brief check for circle collision
+        /// @param circle_center 
+        /// @param circle_radius
+        /// @param polygon_center 
+        /// @param vertices 
+        /// @param normal 
+        /// @param depth 
+        /// @return true if collision detected otherwise false
+        static bool circlePolygonCollisionDetection(const Vector2f& circle_center, const float circle_radius, const Vector2f& polygon_center, const std::vector<Vector2f>& vertices, Vector2f& normal, float& depth);
 
         /// @brief project the vertices of a polygon onto the axis
         /// @param vertices 

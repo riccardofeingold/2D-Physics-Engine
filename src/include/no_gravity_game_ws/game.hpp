@@ -23,6 +23,7 @@
 #define FRAME_RATE 60
 #define NUM_WALLS 0
 #define MAX_WALL_SIZE 100
+#define ZOOM 0.08
 
 // air drag values
 #define DRAG_COEFFICIENT 1.05 // https://en.wikipedia.org/wiki/Drag_coefficient

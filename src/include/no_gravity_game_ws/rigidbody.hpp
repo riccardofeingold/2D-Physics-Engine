@@ -19,8 +19,10 @@ namespace Physics2D
     {
         public:
         Rigidbody();
-        Rigidbody(const Vector2f& position, float density, float mass, float restitution, float area, bool isStatic, float radius, float width, float height, ShapeType shape_type);
+        Rigidbody(std::string name, const Vector2f& position, float density, float mass, float restitution, float area, bool isStatic, float radius, float width, float height, ShapeType shape_type, bool apply_gravity = false);
         ~Rigidbody();
+
+        std::string name;
 
         float density; // in kg/m^3
         float mass; // in kg
@@ -62,7 +64,7 @@ namespace Physics2D
         /// @param body 
         /// @param error_message 
         /// @return true if successfully initialized otherwise false
-        static bool createCircleBody(float radius, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message);
+        static bool createCircleBody(std::string name, float radius, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message, bool apply_gravity = false);
         
         /// @brief create a box rigidbody.
         /// @param width 
@@ -74,7 +76,7 @@ namespace Physics2D
         /// @param body 
         /// @param error_message 
         /// @return true if successfully initialized otherwise false
-        static bool createBoxBody(float width, float height, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message);
+        static bool createBoxBody(std::string name, float width, float height, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message, bool apply_gravity = false);
 
         /// @brief moving the rigidbody by the vector move
         /// @param move - vector
@@ -102,7 +104,7 @@ namespace Physics2D
 
         /// @brief update the rigidbodies physics
         /// @param dt delta time
-        void update(const sf::Time& dt);
+        void update(const sf::Time& dt, const Vector2f& gravity);
 
         /// @brief applies a force onto the rigidbody
         /// @param force 
@@ -118,6 +120,7 @@ namespace Physics2D
         std::vector<Vector2f> vertices_;
         std::vector<Vector2f> transformed_vertices_;
         bool transform_update_required_;
+        bool apply_gravity_;
 
         /// @brief create the vertices of a box; is used to tranform those points accordingly
         /// @param width 

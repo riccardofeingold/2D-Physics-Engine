@@ -52,6 +52,9 @@ void Window::update()
         } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F5)
         {
             Window::toggleFullscreen();
+        } else if (event.type == sf::Event::MouseButtonReleased)
+        {
+            this->mouse_button_pressed = false;
         }
     }
 }

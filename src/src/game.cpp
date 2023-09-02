@@ -34,74 +34,39 @@ void Game::start()
 {
     // Camera settings
     this->view.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-    this->view.zoom(0.08f);
+    this->view.zoom(ZOOM);
     this->view.setCenter(this->view.getSize().x/2, this->view.getSize().y/2);
     const float padding = this->view.getSize().x * 0.05f;
     this->world_.window_->getWindow().setView(view);
 
-    /********TESTING*********/
-    for (int i = 0; i < 10; ++i)
+    std::string e = "Error!";
+    for (int i = 0; i < 2; ++i)
     {
-        int shape_random = (float)std::rand()/RAND_MAX > 0.5 ? 1 : 0;
-        Rigidbody* body = nullptr;
-
-        sf::View current_view = this->world_.window_->getWindow().getView();
-
-        Vector2f position((float)std::rand()/RAND_MAX * (current_view.getSize().x - padding), (float)std::rand()/RAND_MAX * (current_view.getSize().y - padding));
-
-        std::string e;
-        if (shape_random == ShapeType::Circle)
+        Rigidbody* body;
+        if (i == 0)
         {
-            if (!Rigidbody::createCircleBody(1.f, position, 2.f, false, 1.f, body, e))
-                std::cout << e << std::endl;
-            else
-                this->world_.addObject(std::to_string(i), body);
-        } else if (shape_random == ShapeType::Box)
-        {
-            if (!Rigidbody::createBoxBody(1.77f, 1.77f, position, 2.f, false, 1.f, body, e))
+            if (!Rigidbody::createBoxBody("player", 1.77f, 1.77f, Vector2f(this->view.getSize().x / 2, this->view.getSize().y / 2), 2.f, false, 1.f, body, e, true))
                 std::cout << e << std::endl;
             else
             {
-                this->world_.addObject(std::to_string(i), body);
+                body->color = Colors().PLAYER;
+                this->world_.addObject(body->name, body);
             }
-        } else
+            continue;
+        } else if (i == 1)
         {
-            std::cout << "unknown type" << std::endl;
+            if (!Rigidbody::createBoxBody("ground", this->view.getSize().x - padding * 2, 3.f, Vector2f(this->view.getSize().x/2, this->view.getSize().y - 1.5f - padding), 2.f, true, 0.f, body, e))
+                std::cout << e << std::endl;
+            else 
+            {
+                body->color = Colors().WALL;
+                this->world_.addObject(body->name, body);
+            }
+            continue;
         }
     }
 
-    // add walls
-    for (int i = 0; i < 10; ++i)
-    {
-        Rigidbody* body = nullptr;
-        int shape_random = (float)std::rand()/RAND_MAX > 0.5 ? 1 : 0;
-        Vector2f position = Vector2f((float)std::rand()/RAND_MAX * this->view.getSize().x, (float)std::rand()/RAND_MAX * this->view.getSize().y);
-        std::string e = "Error in creating static box!";
-        if (shape_random == ShapeType::Circle)
-        {
-            if (!Rigidbody::createCircleBody(1.f, position, 2.f, true, (float)std::rand()/RAND_MAX, body, e))
-                std::cout << e << std::endl;
-            else
-            {
-                body->color = sf::Color::Black;
-                this->world_.addObject(std::to_string(i), body);
-            }
-        } else if (shape_random == ShapeType::Box)
-        {
-            if (!Rigidbody::createBoxBody(1.77f, 1.77f, position, 2.f, true, (float)std::rand()/RAND_MAX, body, e))
-                std::cout << e << std::endl;
-            else
-            {
-                body->color = sf::Color::Black;
-                this->world_.addObject(std::to_string(i), body);
-            }
-        } else
-        {
-            std::cout << "unknown type" << std::endl;
-        }
-    }
-
-    /********TESTING*********/
+/********TESTING*********/
 #if !debugging
     // goals
     this->goal_.setWindow(window_);
@@ -162,7 +127,7 @@ void Game::handleInput()
     Vector2f dv(0.f, 0.f);
     float delta_rotation = 0.f;
     float angular_speed = M_PI/4;
-    float force_magnitude = 60.f;
+    float force_magnitude = 100.f;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         --dv.y;
@@ -182,7 +147,7 @@ void Game::handleInput()
         Vector2f force_direction = Math2D::normalize(dv);
         Vector2f force = force_direction * force_magnitude;
         Rigidbody* body;
-        assert(this->world_.getBody(0, body));
+        assert(this->world_.getBody("player", body));
         body->applyForce(force);
     }
 
@@ -191,9 +156,43 @@ void Game::handleInput()
         int sign = delta_rotation < 0 ? -1 : 1;
         float rotation = sign * angular_speed * this->dt_.asSeconds();
         Rigidbody* body;
-        assert(this->world_.getBody(0, body));
+        assert(this->world_.getBody("player", body));
         body->rotate(rotation);
     }
+
+    // add box
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !this->window_.mouse_button_pressed)
+    {
+        float width = std::max((float)std::rand()/RAND_MAX * 3, 1.f);
+        float height = std::max((float)std::rand()/RAND_MAX * 3, 1.f);
+        Rigidbody* body;
+        std::string e = "ERROR";
+        Vector2f position = Vector2f((float)sf::Mouse::getPosition(this->window_.getWindow()).x * ZOOM, (float)sf::Mouse::getPosition(this->window_.getWindow()).y * ZOOM);
+        
+        if (!Rigidbody::createBoxBody(std::to_string(this->world_.getBodyCount()), width, height, position, 2.f, false, 1.f, body, e, true))
+            std::cout << e << std::endl;
+        else
+            this->world_.addObject(body->name, body);
+
+        this->window_.mouse_button_pressed = true;
+    }
+
+    // add circle
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !this->window_.mouse_button_pressed)
+    {
+        float radius = std::max((float)std::rand()/RAND_MAX * 3, 1.f);
+        Rigidbody* body;
+        std::string e = "ERROR";
+        Vector2f position = Vector2f((float)sf::Mouse::getPosition(this->window_.getWindow()).x * ZOOM, (float)sf::Mouse::getPosition(this->window_.getWindow()).y * ZOOM);
+
+        if (!Rigidbody::createCircleBody(std::to_string(this->world_.getBodyCount()), radius, position, 2.f, false, 1.f, body, e, true))
+            std::cout << e << std::endl;
+        else
+            this->world_.addObject(body->name, body);
+
+        this->window_.mouse_button_pressed = true;
+    }
+    
     #if !debugging
     if (sf::Joystick::isConnected(0))
     {
@@ -294,7 +293,6 @@ void Game::render()
     
     if (this->world_.game_over)
     {
-        // sf::sleep(sf::Time(sf::seconds(3)));
         this->world_.game_over = false;
     }
 }
@@ -323,12 +321,14 @@ void Game::wrapScreen()
 
         if (body->getPosition().y > this->view.getSize().y)
         {
-            body->moveTo(Vector2f(body->getPosition().x, 0));
+            this->world_.removeObject(body->name);
+            // body->moveTo(Vector2f(body->getPosition().x, 0));
         }
 
         if (body->getPosition().y < 0)
         {
-            body->moveTo(Vector2f(body->getPosition().x, this->view.getSize().y));
+            this->world_.removeObject(body->name);
+            // body->moveTo(Vector2f(body->getPosition().x, this->view.getSize().y));
         }
     }
 }

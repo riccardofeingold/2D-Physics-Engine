@@ -27,6 +27,9 @@ class Window
     bool isFullscreen() const;
     sf::Vector2u getWindowSize() const;
     sf::RenderWindow& getWindow();
+    
+    // public variables
+    bool mouse_button_pressed = false;
 
     private:
     // methods
