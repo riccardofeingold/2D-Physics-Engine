@@ -54,14 +54,16 @@ class Game
     sf::Time dt_;
     Window window_;
     World2D world_;
+    std::vector<sf::Vector2f> vertex_buffer_;
     // Player player_;
     // Goal goal_;
     // Enemy enemy_;
     // Enemy tester_;
     // std::vector<Wall> walls_;
 
-    std::vector<sf::Vector2f> vertex_buffer_;
-
+    // private methods
+    /// @brief keeps the objects inside the screen
+    void wrapScreen();
 };
 
 #endif

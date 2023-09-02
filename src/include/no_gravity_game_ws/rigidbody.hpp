@@ -46,6 +46,10 @@ namespace Physics2D
         float getRotation() const;
         float getAngularVelocity() const;
 
+        // setters
+        void setLinearVelocity(const Vector2f& value);
+        void setAngularVelocity(const float value);
+
         // methods
         /// @brief  create a circle rigidbody. Important the body pointer needs to be delted properly after usage, since it's dynamically allocated.
         /// @param width 

@@ -226,3 +226,7 @@ Vector2f Rigidbody::getPosition() const { return this->position_; }
 Vector2f Rigidbody::getLinearVelocity() const { return this->linear_velocity_; }
 float Rigidbody::getRotation() const { return this->rotation_; }
 float Rigidbody::getAngularVelocity() const { return this->angular_velocity_; }
+
+// setters
+void Rigidbody::setLinearVelocity(const Vector2f& value) { this->linear_velocity_ = value; }
+void Rigidbody::setAngularVelocity(const float value) { this->angular_velocity_ = value; }

@@ -36,9 +36,16 @@ bool World2D::removeObject(const std::string& name)
     return false;
 }
 
-void World2D::resolveCollision(const Rigidbody*& body_a, const Rigidbody*& body_b, const Vector2f& normal, const float& depth)
+void World2D::resolveCollision(Rigidbody*& body_a, Rigidbody*& body_b, const Vector2f& normal, const float& depth)
 {
-    
+    float e = std::min(body_a->restitution, body_b->restitution);
+    Vector2f v_diff = body_b->getLinearVelocity() - body_a->getLinearVelocity();
+    float j_nom = -(1 + e) * Math2D::dot(v_diff, normal);
+    float j_den = 1.f/body_a->mass + 1.f/body_b->mass;
+    float j = j_nom / j_den; 
+
+    body_a->setLinearVelocity(body_a->getLinearVelocity() - normal * j / body_a->mass);
+    body_b->setLinearVelocity(body_b->getLinearVelocity() + normal * j / body_b->mass);
 }
 
 bool World2D::getBody(int index, Rigidbody*& body)
@@ -92,6 +99,7 @@ void World2D::update(const sf::Time& dt)
             {
                 body_a->move(-normal * depth / 2.f);
                 body_b->move(normal * depth / 2.f);
+                this->resolveCollision(body_a, body_b, normal, depth);
             }
         }
     }

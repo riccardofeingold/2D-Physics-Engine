@@ -199,6 +199,7 @@ void Game::update()
     this->dt_ = this->clock_.restart();
     this->window_.update();
     this->world_.update(this->dt_);
+    this->wrapScreen();
 }
 
 void Game::render()
@@ -232,7 +233,6 @@ void Game::render()
             }
 
             box.setFillColor(b->color);
-            // box.setOutlineColor(this->world_.outline_color_[i]);
             box.setOutlineThickness(0.1f);
             box.setOrigin(pos);
             box.setPosition(pos);
@@ -272,4 +272,33 @@ void Game::render()
 Window* Game::getWindow()
 {
     return &(this->window_);
+}
+
+void Game::wrapScreen()
+{
+    for (int i = 0; i < this->world_.getBodyCount(); ++i)
+    {
+        Rigidbody* body;
+        assert(this->world_.getBody(i, body));
+
+        if (body->getPosition().x > this->view.getSize().x)
+        {
+            body->moveTo(Vector2f(0, body->getPosition().y));
+        }
+
+        if (body->getPosition().x < 0)
+        {
+            body->moveTo(Vector2f(this->view.getSize().x, body->getPosition().y));
+        }
+
+        if (body->getPosition().y > this->view.getSize().y)
+        {
+            body->moveTo(Vector2f(body->getPosition().x, 0));
+        }
+
+        if (body->getPosition().y < 0)
+        {
+            body->moveTo(Vector2f(body->getPosition().x, this->view.getSize().y));
+        }
+    }
 }
