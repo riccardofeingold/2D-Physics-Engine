@@ -1,6 +1,8 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include <chrono>
+
 #include "window.hpp"
 #include "player.hpp"
 #include "physics.hpp"
@@ -56,6 +58,11 @@ class Game
     Window window_;
     World2D world_;
     std::vector<sf::Vector2f> vertex_buffer_;
+
+    std::chrono::steady_clock::time_point watch_start_;
+    std::chrono::steady_clock::time_point watch_stop_;
+    std::chrono::microseconds duration_;
+
     // Player player_;
     // Goal goal_;
     // Enemy enemy_;

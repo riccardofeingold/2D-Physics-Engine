@@ -14,6 +14,7 @@ namespace Physics2D
         // other math stuff
         /// @brief clipping a value between min and max
         static float clip(float value, float min, float max);
+        static int clip(int value, int min, int max);
         
         /// @brief convert to degree from radian
         /// @param value 

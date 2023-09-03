@@ -218,14 +218,20 @@ const std::vector<Vector2f>& Rigidbody::getTransformedVertices()
     return this->transformed_vertices_;
 }
 
-void Rigidbody::update(const sf::Time& dt, const Vector2f& gravity)
+void Rigidbody::update(const sf::Time& dt, const Vector2f& gravity, int substeps)
 {
-    if (this->apply_gravity_)
-        this->linear_velocity_ += gravity * dt.asSeconds();
+    if (this->is_static)
+        return;
 
-    this->linear_velocity_ += this->force_ / this->mass * dt.asSeconds();
-    this->position_ += this->linear_velocity_ * dt.asSeconds();
-    this->rotation_ += this->angular_velocity_ * dt.asSeconds();
+    float time = (float)dt.asSeconds() / substeps;
+    
+    if (this->apply_gravity_)
+        this->linear_velocity_ += gravity * time;
+
+
+    this->linear_velocity_ += this->force_ / this->mass * time;
+    this->position_ += this->linear_velocity_ * time;
+    this->rotation_ += this->angular_velocity_ * time;
     
     // resetting the force
     this->force_ = Vector2f::Zero();

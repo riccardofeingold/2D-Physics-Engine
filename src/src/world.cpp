@@ -83,43 +83,48 @@ int World2D::getBodyCount() const
     return this->rigidbodies_.size();
 }
 
-void World2D::update(const sf::Time& dt)
+void World2D::update(const sf::Time& dt, int substeps)
 {
-    // Movement step
-    for (int i = 0; i < this->rigidbodies_.size(); ++i)
-    {
-        this->rigidbodies_[i]->update(dt, this->gravity_);
-    }
+    substeps = Math2D::clip(substeps, this->min_substeps, this->max_substeps);
 
-    // collision step
-    Vector2f normal;
-    float depth;
-    for (int i = 0; i < this->rigidbodies_.size() - 1; ++i)
+    for (int step = 0; step < substeps; ++step)
     {
-        Rigidbody*& body_a = this->rigidbodies_[i];
-
-        for (int j = i + 1; j < this->rigidbodies_.size(); ++j)
+        // Movement step
+        for (int i = 0; i < this->rigidbodies_.size(); ++i)
         {
-            Rigidbody*& body_b = this->rigidbodies_[j];
-            
-            if (body_a->is_static && body_b->is_static)
-                continue;
-            
-            if (this->collide(body_a, body_b, normal, depth))
+            this->rigidbodies_[i]->update(dt, this->gravity_, substeps);
+        }
+
+        // collision step
+        Vector2f normal;
+        float depth;
+        for (int i = 0; i < this->rigidbodies_.size() - 1; ++i)
+        {
+            Rigidbody*& body_a = this->rigidbodies_[i];
+
+            for (int j = i + 1; j < this->rigidbodies_.size(); ++j)
             {
-                Vector2f penetration = normal * depth;
-                if (body_a->is_static)
+                Rigidbody*& body_b = this->rigidbodies_[j];
+                
+                if (body_a->is_static && body_b->is_static)
+                    continue;
+                
+                if (this->collide(body_a, body_b, normal, depth))
                 {
-                    body_b->move(penetration);
-                } else if (body_b->is_static)
-                {
-                    body_a->move(-penetration);
-                } else
-                {
-                    body_a->move(-penetration / 2.f);
-                    body_b->move(penetration / 2.f);
+                    Vector2f penetration = normal * depth;
+                    if (body_a->is_static)
+                    {
+                        body_b->move(penetration);
+                    } else if (body_b->is_static)
+                    {
+                        body_a->move(-penetration);
+                    } else
+                    {
+                        body_a->move(-penetration / 2.f);
+                        body_b->move(penetration / 2.f);
+                    }
+                    this->resolveCollision(body_a, body_b, normal, depth);
                 }
-                this->resolveCollision(body_a, body_b, normal, depth);
             }
         }
     }

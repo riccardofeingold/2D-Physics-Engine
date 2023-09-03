@@ -105,7 +105,7 @@ namespace Physics2D
 
         /// @brief update the rigidbodies physics
         /// @param dt delta time
-        void update(const sf::Time& dt, const Vector2f& gravity);
+        void update(const sf::Time& dt, const Vector2f& gravity, int substeps);
 
         /// @brief applies a force onto the rigidbody
         /// @param force 

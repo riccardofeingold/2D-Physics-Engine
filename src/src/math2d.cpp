@@ -30,6 +30,29 @@ float Math2D::clip(float value, float min, float max)
         return value;
 }
 
+int Math2D::clip(int value, int min, int max)
+{
+    if (min == max)
+        return min;
+    
+    if (min > max)
+    {
+        try
+        {}
+        catch(const std::exception& e)
+        {
+            throw "min is greater than max!";
+        }
+    }
+        
+    if (value > max)
+        return max;
+    else if (value < min)
+        return min;
+    else
+        return value; 
+}
+
 float Math2D::convertToDegree(float radian)
 {
     return radian * 180.f / M_PI;

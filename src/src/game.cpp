@@ -17,7 +17,7 @@ Game::~Game()
 {
     for (int i = 0; i < this->world_.getBodyCount(); ++i)
     {
-        Rigidbody* body;
+        Rigidbody* body = nullptr;
         if (this->world_.getBody(i, body))
         {
             delete body;
@@ -42,7 +42,7 @@ void Game::start()
     std::string e = "Error!";
     for (int i = 0; i < 2; ++i)
     {
-        Rigidbody* body;
+        Rigidbody* body = nullptr;
         if (i == 0)
         {
             if (!Rigidbody::createBoxBody("player", 1.77f, 1.77f, Vector2f(this->view.getSize().x / 2, this->view.getSize().y / 2), 2.f, false, 1.f, body, e, true))
@@ -146,7 +146,7 @@ void Game::handleInput()
     {
         Vector2f force_direction = Math2D::normalize(dv);
         Vector2f force = force_direction * force_magnitude;
-        Rigidbody* body;
+        Rigidbody* body = nullptr;
         assert(this->world_.getBody("player", body));
         body->applyForce(force);
     }
@@ -155,7 +155,7 @@ void Game::handleInput()
     {
         int sign = delta_rotation < 0 ? -1 : 1;
         float rotation = sign * angular_speed * this->dt_.asSeconds();
-        Rigidbody* body;
+        Rigidbody* body = nullptr;
         assert(this->world_.getBody("player", body));
         body->rotate(rotation);
     }
@@ -165,7 +165,7 @@ void Game::handleInput()
     {
         float width = std::max((float)std::rand()/RAND_MAX * 3, 1.f);
         float height = std::max((float)std::rand()/RAND_MAX * 3, 1.f);
-        Rigidbody* body;
+        Rigidbody* body = nullptr;
         std::string e = "ERROR";
         Vector2f position = Vector2f((float)sf::Mouse::getPosition(this->window_.getWindow()).x * ZOOM, (float)sf::Mouse::getPosition(this->window_.getWindow()).y * ZOOM);
         
@@ -181,7 +181,7 @@ void Game::handleInput()
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !this->window_.mouse_button_pressed)
     {
         float radius = std::max((float)std::rand()/RAND_MAX * 3, 1.f);
-        Rigidbody* body;
+        Rigidbody* body = nullptr;
         std::string e = "ERROR";
         Vector2f position = Vector2f((float)sf::Mouse::getPosition(this->window_.getWindow()).x * ZOOM, (float)sf::Mouse::getPosition(this->window_.getWindow()).y * ZOOM);
 
@@ -193,6 +193,12 @@ void Game::handleInput()
         this->window_.mouse_button_pressed = true;
     }
     
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+    {
+        std::cout << "Body count: " << this->world_.getBodyCount() << std::endl;
+        std::cout << "Time for physics step: " << this->duration_.count() << std::endl;
+    }
+
     #if !debugging
     if (sf::Joystick::isConnected(0))
     {
@@ -227,11 +233,14 @@ void Game::update()
 {
     this->dt_ = this->clock_.restart();
     this->window_.update();
-    this->world_.update(this->dt_);
+    this->watch_start_ = std::chrono::high_resolution_clock::now();
+    this->world_.update(this->dt_, 20);
+    this->watch_stop_ = std::chrono::high_resolution_clock::now();
+    this->duration_ = std::chrono::duration_cast<std::chrono::microseconds>(this->watch_stop_ - this->watch_start_);
 
     for (int i = 0; i < this->world_.getBodyCount(); ++i)
     {
-        Rigidbody* body;
+        Rigidbody* body = nullptr;
         if (!this->world_.getBody(i, body))
         {
             std::cout << "ERROR" << std::endl;
@@ -242,7 +251,6 @@ void Game::update()
         if (box.min.y > this->view.getSize().y)
         {
             this->world_.removeObject(body->name);
-            std::cout << "DELETED" << std::endl;
         }
     }
 }
@@ -253,7 +261,7 @@ void Game::render()
 
     for (int i = 0; i < this->world_.getBodyCount(); ++i)
     {
-        Rigidbody* b;
+        Rigidbody* b = nullptr;
 
         assert(this->world_.getBody(i, b));
 
@@ -322,7 +330,7 @@ void Game::wrapScreen()
 {
     for (int i = 0; i < this->world_.getBodyCount(); ++i)
     {
-        Rigidbody* body;
+        Rigidbody* body = nullptr;
         assert(this->world_.getBody(i, body));
 
         if (body->getPosition().x > this->view.getSize().x)

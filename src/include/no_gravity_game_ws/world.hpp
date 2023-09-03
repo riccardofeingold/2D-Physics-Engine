@@ -28,7 +28,7 @@ namespace Physics2D
         void resolveCollision(Rigidbody*& body_a, Rigidbody*& body_b, const Vector2f& normal, const float& depth);
 
         void setup();
-        void update(const sf::Time& dt);
+        void update(const sf::Time& dt, int substeps);
         void reset();
 
         // getters
@@ -46,6 +46,8 @@ namespace Physics2D
         static constexpr float max_body_size = 100.f * 100.f;
         static constexpr float min_density = 0.25f;
         static constexpr float max_density = 22.f;
+        static constexpr int min_substeps = 1;
+        static constexpr int max_substeps = 128;
 
         // friend classes
         friend class Ray;

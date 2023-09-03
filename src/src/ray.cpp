@@ -44,7 +44,7 @@ void Ray::draw()
 
 void Ray::castRay(World2D& w)
 {
-    Rigidbody* body;
+    Rigidbody* body = nullptr;
     Vector2f player;
     if (w.getBody("player", body))
     {
