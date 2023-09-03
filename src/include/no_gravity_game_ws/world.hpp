@@ -6,6 +6,7 @@
 #include "collision2d.hpp"
 #include "window.hpp"
 #include "ray.hpp"
+#include "collisionManifold.hpp"
 #include <iostream>
 
 namespace Physics2D
@@ -13,6 +14,7 @@ namespace Physics2D
     // forward declaration 
     class Ray;
     class Rigidbody;
+    class CollisionManifold;
 
     class World2D
     {
@@ -25,7 +27,7 @@ namespace Physics2D
         void addObject(const std::string& name, Rigidbody* obj);
         bool removeObject(const std::string& name);
         bool collide(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& normal, float& depth);
-        void resolveCollision(Rigidbody*& body_a, Rigidbody*& body_b, const Vector2f& normal, const float& depth);
+        void resolveCollision(const CollisionManifold& collision);
 
         void setup();
         void update(const sf::Time& dt, int substeps);
@@ -40,6 +42,7 @@ namespace Physics2D
         Window* window_;
         std::vector<std::string> list_of_object_names_;
         bool game_over = false;
+        std::vector<Vector2f> contact_points;
 
         // constant values
         static constexpr float min_body_size = 0.01f * 0.01f;
@@ -56,6 +59,7 @@ namespace Physics2D
         Vector2f gravity_;
         std::vector<Rigidbody*> rigidbodies_;
         std::vector<sf::Color> outline_color_;
+        std::vector<CollisionManifold> contacts_;
     };
 }
 

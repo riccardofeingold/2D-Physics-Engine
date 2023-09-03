@@ -197,6 +197,7 @@ void Game::handleInput()
     {
         std::cout << "Body count: " << this->world_.getBodyCount() << std::endl;
         std::cout << "Time for physics step: " << this->duration_.count() << std::endl;
+        std::cout << "Number of contact points: " << this->world_.contact_points.size() << std::endl;
     }
 
     #if !debugging
@@ -291,6 +292,17 @@ void Game::render()
             box.setPosition(pos);
             this->window_.draw(box);
         }
+    }
+
+    // draw contact points
+    for (int i = 0; i < this->world_.contact_points.size(); ++i)
+    {
+        float radius = 0.3f;
+        sf::CircleShape point(radius);
+        point.setFillColor(sf::Color::Red);
+        point.setOrigin(radius, radius);
+        point.setPosition(this->world_.contact_points[i].x, this->world_.contact_points[i].y);
+        this->window_.draw(point);
     }
     /********TESTING**********/
     #if !debugging

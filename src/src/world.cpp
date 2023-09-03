@@ -37,22 +37,22 @@ bool World2D::removeObject(const std::string& name)
     return false;
 }
 
-void World2D::resolveCollision(Rigidbody*& body_a, Rigidbody*& body_b, const Vector2f& normal, const float& depth)
+void World2D::resolveCollision(const CollisionManifold& collision)
 {
-    Vector2f v_diff = body_b->getLinearVelocity() - body_a->getLinearVelocity();
+    Vector2f v_diff = collision.body_b->getLinearVelocity() - collision.body_a->getLinearVelocity();
 
     // only apply impulse if the object are moving apart
-    if (Math2D::dot(v_diff, normal) > 0.f)
+    if (Math2D::dot(v_diff, collision.normal) > 0.f)
         return;
 
-    float e = std::min(body_a->restitution, body_b->restitution);
-    float j = -(1 + e) * Math2D::dot(v_diff, normal);
-    j /= body_a->inverse_mass + body_b->inverse_mass;
+    float e = std::min(collision.body_a->restitution, collision.body_b->restitution);
+    float j = -(1 + e) * Math2D::dot(v_diff, collision.normal);
+    j /= collision.body_a->inverse_mass + collision.body_b->inverse_mass;
     
-    Vector2f impulse = normal * j;
+    Vector2f impulse = collision.normal * j;
 
-    body_a->setLinearVelocity(body_a->getLinearVelocity() - impulse * body_a->inverse_mass);
-    body_b->setLinearVelocity(body_b->getLinearVelocity() + impulse * body_b->inverse_mass);
+    collision.body_a->setLinearVelocity(collision.body_a->getLinearVelocity() - impulse * collision.body_a->inverse_mass);
+    collision.body_b->setLinearVelocity(collision.body_b->getLinearVelocity() + impulse * collision.body_b->inverse_mass);
 }
 
 bool World2D::getBody(int index, Rigidbody*& body)
@@ -86,7 +86,8 @@ int World2D::getBodyCount() const
 void World2D::update(const sf::Time& dt, int substeps)
 {
     substeps = Math2D::clip(substeps, this->min_substeps, this->max_substeps);
-
+    this->contact_points.clear();
+    
     for (int step = 0; step < substeps; ++step)
     {
         // Movement step
@@ -94,6 +95,9 @@ void World2D::update(const sf::Time& dt, int substeps)
         {
             this->rigidbodies_[i]->update(dt, this->gravity_, substeps);
         }
+
+        // clearing contacts list
+        this->contacts_.clear();
 
         // collision step
         Vector2f normal;
@@ -109,7 +113,7 @@ void World2D::update(const sf::Time& dt, int substeps)
                 if (body_a->is_static && body_b->is_static)
                     continue;
                 
-                if (this->collide(body_a, body_b, normal, depth))
+                if (Collision2D::collide(body_a, body_b, normal, depth))
                 {
                     Vector2f penetration = normal * depth;
                     if (body_a->is_static)
@@ -123,42 +127,32 @@ void World2D::update(const sf::Time& dt, int substeps)
                         body_a->move(-penetration / 2.f);
                         body_b->move(penetration / 2.f);
                     }
-                    this->resolveCollision(body_a, body_b, normal, depth);
+
+                    Vector2f contact_one = Vector2f::Zero();
+                    Vector2f contact_two = Vector2f::Zero();
+                    int contact_count = 0;
+
+                    Collision2D::findContactPoint(body_a, body_b, contact_one, contact_two, contact_count);
+
+                    CollisionManifold collision = CollisionManifold(body_a, body_b, normal, depth, contact_one, contact_two, contact_count);
+                    this->contacts_.push_back(collision);
                 }
             }
         }
-    }
-}
 
-bool World2D::collide(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& normal, float& depth)
-{
-    normal = Vector2f::Zero();
-    depth = 0.f;
+        for (int i = 0; i < this->contacts_.size(); ++i)
+        {
+            CollisionManifold contact = this->contacts_[i];
+            this->resolveCollision(this->contacts_[i]);
 
-    ShapeType shape_type_a = body_a->shape_type;
-    ShapeType shape_type_b = body_b->shape_type;
+            if (contact.contact_count > 0)
+            {
+                this->contact_points.push_back(contact.contact_one);
 
-    if (shape_type_a == ShapeType::Box)
-    {
-        if (shape_type_b == ShapeType::Box)
-        {
-            return Collision2D::polygonCollisionDetection(body_a->getTransformedVertices(), body_a->getPosition(), body_b->getTransformedVertices(), body_b->getPosition(), normal, depth);
-        } else if (shape_type_b == ShapeType::Circle)
-        {
-            bool result = Collision2D::circlePolygonCollisionDetection(body_b->getPosition(), body_b->radius, body_a->getPosition(), body_a->getTransformedVertices(), normal, depth);
-            normal = -normal;
-            return result;
-        }
-    } else if (shape_type_a == ShapeType::Circle)
-    {
-        if (shape_type_b == ShapeType::Box)
-        {
-            return Collision2D::circlePolygonCollisionDetection(body_a->getPosition(), body_a->radius, body_b->getPosition(), body_b->getTransformedVertices(), normal, depth);   
-        } else if (shape_type_b == ShapeType::Circle)
-        {
-            return Collision2D::circleCollisionDetection(body_a->getPosition(), body_a->radius, body_b->getPosition(), body_b->radius, normal, depth);   
+                if (contact.contact_count > 1)
+                    this->contact_points.push_back(contact.contact_two);
+            }
+            
         }
     }
-
-    return false;
 }
