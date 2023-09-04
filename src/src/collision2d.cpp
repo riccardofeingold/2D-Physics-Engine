@@ -329,8 +329,10 @@ Vector2f Collision2D::findArithmeticMean(const std::vector<Vector2f>& vertices)
 
 bool Collision2D::intersectAABBs(const AABB& a, const AABB& b)
 {
-    if (a.min.x >= b.max.x || a.max.x <= b.min.x ||
-        a.min.y >= b.max.y || a.max.y <= b.min.y)
+    if (a.max.x <= b.min.x ||
+        a.min.x >= b.max.x ||
+        a.max.y <= b.min.y ||
+        a.min.y >= b.max.y)
         return false;
     return true;
 }

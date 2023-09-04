@@ -263,7 +263,7 @@ AABB Rigidbody::getAABB()
         {
             min_x = this->position_.x - this->radius;
             min_y = this->position_.y - this->radius;
-            max_x = this->position_.y + this->radius;
+            max_x = this->position_.x + this->radius;
             max_y = this->position_.y + this->radius;   
         } else if (this->shape_type == ShapeType::Box)
         {

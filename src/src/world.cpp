@@ -105,16 +105,18 @@ void World2D::update(const sf::Time& dt, int substeps)
         for (int i = 0; i < this->rigidbodies_.size() - 1; ++i)
         {
             Rigidbody*& body_a = this->rigidbodies_[i];
+            AABB body_a_aabb = body_a->getAABB();
 
             for (int j = i + 1; j < this->rigidbodies_.size(); ++j)
             {
                 Rigidbody*& body_b = this->rigidbodies_[j];
-                
+                AABB body_b_aabb = body_b->getAABB();
+
                 if (body_a->is_static && body_b->is_static)
                     continue;
                 
                 // AABB collision checking
-                if (!Collision2D::intersectAABBs(body_a->getAABB(), body_b->getAABB()))
+                if (!Collision2D::intersectAABBs(body_a_aabb, body_b_aabb))
                     continue;
 
                 // SAT collision checking
