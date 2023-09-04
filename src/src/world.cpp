@@ -154,5 +154,12 @@ void World2D::update(const sf::Time& dt, int substeps)
             }
             
         }
+
+    }
+    
+    // reset forces
+    for (int i = 0; i < this->rigidbodies_.size(); ++i)
+    {
+        this->rigidbodies_[i]->setForce(Vector2f::Zero());
     }
 }

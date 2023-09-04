@@ -59,10 +59,21 @@ class Game
     World2D world_;
     std::vector<sf::Vector2f> vertex_buffer_;
 
+    // first stopwatch
     std::chrono::steady_clock::time_point watch_start_;
     std::chrono::steady_clock::time_point watch_stop_;
     std::chrono::microseconds duration_;
 
+    // second stopwatch
+    std::chrono::steady_clock::time_point watch2_start_;
+    std::chrono::steady_clock::time_point watch2_stop_;
+    std::chrono::microseconds duration2_;
+
+    long long total_world_time_step_ = 0;
+    int total_body_count_ = 0;
+    int total_samples_ = 0;
+    std::string time_step_string_ = "";
+    std::string body_count_string_ = "";
     // Player player_;
     // Goal goal_;
     // Enemy enemy_;

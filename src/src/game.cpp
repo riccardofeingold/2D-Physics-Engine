@@ -23,15 +23,13 @@ Game::~Game()
             delete body;
         }
     }
-    // for (auto r : rigidbodies)
-    // {
-    //     if (r != nullptr)
-    //         delete r;
-    // }
 }
 
 void Game::start()
 {
+    // start second stop watch
+    this->watch2_start_ = std::chrono::high_resolution_clock::now();
+
     // Camera settings
     this->view.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     this->view.zoom(ZOOM);
@@ -232,12 +230,30 @@ void Game::handleInput()
 
 void Game::update()
 {
+    // second stopwatch
+    this->watch2_stop_ = std::chrono::high_resolution_clock::now();
+    this->duration2_ = std::chrono::duration_cast<std::chrono::microseconds>(this->watch2_stop_ - this->watch2_start_);
+    if (this->duration2_.count() > 1000000)
+    {
+        this->time_step_string_ = std::to_string((float)this->total_world_time_step_ / this->total_samples_);
+        this->body_count_string_ = std::to_string((float)this->total_body_count_ / this->total_samples_);
+        this->total_world_time_step_ = 0;
+        this->total_body_count_ = 0;
+        this->total_samples_ = 0;
+        this->watch2_start_ = std::chrono::high_resolution_clock::now();
+    }
+
     this->dt_ = this->clock_.restart();
     this->window_.update();
+
     this->watch_start_ = std::chrono::high_resolution_clock::now();
     this->world_.update(this->dt_, 20);
     this->watch_stop_ = std::chrono::high_resolution_clock::now();
     this->duration_ = std::chrono::duration_cast<std::chrono::microseconds>(this->watch_stop_ - this->watch_start_);
+
+    this->total_world_time_step_ += duration_.count();
+    this->total_body_count_ += this->world_.getBodyCount();
+    ++this->total_samples_;
 
     for (int i = 0; i < this->world_.getBodyCount(); ++i)
     {
@@ -304,6 +320,22 @@ void Game::render()
         point.setPosition(this->world_.contact_points[i].x, this->world_.contact_points[i].y);
         this->window_.draw(point);
     }
+
+    // draw text
+    sf::Font font;
+    if (!font.loadFromFile("/Users/riccardofeingold/opt/GameCreations/no_gravity_game_ws/fonts/Roboto-Light.ttf"))
+        std::cout << "Couldn't find font!" << std::endl;
+
+    sf::Text step_time_text;
+    step_time_text.setString("Step Time: " + this->time_step_string_ + " microseconds\n" + "Body Count: " + this->body_count_string_);
+    step_time_text.setStyle(sf::Text::Regular);
+    step_time_text.setFillColor(sf::Color::White);
+    step_time_text.setFont(font);
+    step_time_text.setCharacterSize(20);
+    step_time_text.setScale(ZOOM, ZOOM);
+    step_time_text.setPosition(0, 0);
+    this->window_.draw(step_time_text);
+
     /********TESTING**********/
     #if !debugging
     for (auto r : this->world_.getObject("player").rays)

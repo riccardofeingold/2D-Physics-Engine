@@ -53,6 +53,7 @@ namespace Physics2D
         // setters
         void setLinearVelocity(const Vector2f& value);
         void setAngularVelocity(const float value);
+        void setForce(const Vector2f& value);
 
         // methods
         /// @brief  create a circle rigidbody. Important the body pointer needs to be delted properly after usage, since it's dynamically allocated.

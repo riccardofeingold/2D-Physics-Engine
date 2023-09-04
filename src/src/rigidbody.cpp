@@ -228,13 +228,11 @@ void Rigidbody::update(const sf::Time& dt, const Vector2f& gravity, int substeps
     if (this->apply_gravity_)
         this->linear_velocity_ += gravity * time;
 
-
     this->linear_velocity_ += this->force_ / this->mass * time;
     this->position_ += this->linear_velocity_ * time;
     this->rotation_ += this->angular_velocity_ * time;
     
-    // resetting the force
-    this->force_ = Vector2f::Zero();
+    // this->force_ = Vector2f::Zero();
     this->transform_update_required_ = true;
     this->aabb_update_required_ = true;
 }
@@ -298,3 +296,4 @@ AABB Rigidbody::getAABB()
 // setters
 void Rigidbody::setLinearVelocity(const Vector2f& value) { this->linear_velocity_ = value; }
 void Rigidbody::setAngularVelocity(const float value) { this->angular_velocity_ = value; }
+void Rigidbody::setForce(const Vector2f& value) { this->force_ = value; }
