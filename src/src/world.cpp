@@ -152,7 +152,8 @@ void World2D::update(const sf::Time& dt, int substeps)
 
             if (contact.contact_count > 0)
             {
-                this->contact_points.push_back(contact.contact_one);
+                if (std::find<std::vector<CollisionManifold>::iterator, CollisionManifold>(this->contacts_.begin(), this->contacts_.end(), contact) != this->contacts_.end())
+                    this->contact_points.push_back(contact.contact_one);
 
                 if (contact.contact_count > 1)
                     this->contact_points.push_back(contact.contact_two);

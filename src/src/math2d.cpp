@@ -68,9 +68,19 @@ float Math2D::norm(const Vector2f& a)
     return std::sqrt(a.x * a.x + a.y * a.y);
 }
 
+float Math2D::norm_squared(const Vector2f& a)
+{
+    return a.x * a.x + a.y * a.y;
+}
+
 float Math2D::distance(const Vector2f& a, const Vector2f& b)
 {
     return std::sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));
+}
+
+float Math2D::distance_squared(const Vector2f& a, const Vector2f& b)
+{
+    return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
 }
 
 Vector2f Math2D::normalize(const Vector2f& a)

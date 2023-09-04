@@ -72,13 +72,15 @@ void Collision2D::findContactPoint(Rigidbody*& body_a, Rigidbody*& body_b, Vecto
 
         } else if (shape_type_b == ShapeType::Circle)
         {
-
+            Collision2D::findContactPoint(body_b->getPosition(), body_b->radius, body_a->getTransformedVertices(), body_a->getPosition(), contact_one);
+            contact_count = 1;
         }
     } else if (shape_type_a == ShapeType::Circle)
     {
         if (shape_type_b == ShapeType::Box)
         {
-
+            Collision2D::findContactPoint(body_a->getPosition(), body_a->radius, body_b->getTransformedVertices(), body_b->getPosition(), contact_one);
+            contact_count = 1;
         } else if (shape_type_b == ShapeType::Circle)
         {
             Collision2D::findContactPoint(body_a->getPosition(), body_a->radius, body_b->getPosition(), body_b->radius, contact_one);
@@ -93,6 +95,47 @@ void Collision2D::findContactPoint(const Vector2f& circle_center_a, const float 
     v_diff = Math2D::normalize(v_diff);
 
     contact_point = circle_center_a + v_diff * radius_a;
+}
+
+void Collision2D::findContactPoint(const Vector2f& circle_center, const float radius, const std::vector<Vector2f>& vertices, const Vector2f& polygon_center, Vector2f& contact_point)
+{
+    float min_distance = INFINITY;
+    contact_point = Vector2f::Zero();
+
+    for (int i = 0; i < vertices.size(); ++i)
+    {
+        Vector2f va = vertices[i];
+        Vector2f vb = vertices[(i + 1) % vertices.size()];
+
+        float distance_squared;
+        Vector2f cp;
+        pointSegmentDistance(circle_center, va, vb, distance_squared, cp);
+
+        if (distance_squared < min_distance)
+        {
+            min_distance = distance_squared;
+            contact_point = cp;
+        }    
+    }
+}
+
+void Collision2D::pointSegmentDistance(const Vector2f& p, const Vector2f& point_begin, const Vector2f& point_end, float& distance_squared, Vector2f& contact_point)
+{
+    Vector2f ab = point_end - point_begin;
+    Vector2f ap = p - point_begin;
+
+    float proj = Math2D::dot(ap, ab);
+    float ab_mag = Math2D::norm_squared(ab); // ab dot ab
+    float ratio = proj / ab_mag;
+
+    if (ratio <= 0.f)
+        contact_point = point_begin;
+    else if (ratio >= 1.f)
+        contact_point = point_end;
+    else
+        contact_point = point_begin + ab * ratio;
+
+    distance_squared = Math2D::distance_squared(p, contact_point);
 }
 
 bool Collision2D::polygonCollisionDetection(const std::vector<Vector2f>& vertices_a, const Vector2f& center_a, const std::vector<Vector2f>& vertices_b, const Vector2f& center_b, Vector2f& normal, float& depth)

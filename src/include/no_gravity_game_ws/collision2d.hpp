@@ -85,6 +85,14 @@ namespace Physics2D
         /// @return true if collision detected otherwise false
         static bool intersectAABBs(const AABB& a, const AABB& b);
 
+        /// @brief give the shortest path from point p to the line segment (point_begin to point_end) and the contact point
+        /// @param p 
+        /// @param point_begin 
+        /// @param point_end 
+        /// @param distance_squared 
+        /// @param contact_point 
+        static void pointSegmentDistance(const Vector2f& p, const Vector2f& point_begin, const Vector2f& point_end, float& distance_squared, Vector2f& contact_point);
+
         private:
         /// @brief return contact point between a circle / circle collision
         /// @param circle_center_a 
@@ -92,6 +100,14 @@ namespace Physics2D
         /// @param circle_center_b 
         /// @return @param contact_point 
         static void findContactPoint(const Vector2f& circle_center_a, const float radius_a, const Vector2f& circle_center_b, const float radius_b, Vector2f& contact_point);
+
+        /// @brief return contact point between circle and polygon
+        /// @param circle_center 
+        /// @param radius_a 
+        /// @param vertices 
+        /// @param polygon_center 
+        /// @param contact_point 
+        static void findContactPoint(const Vector2f& circle_center, const float radius, const std::vector<Vector2f>& vertices, const Vector2f& polygon_center, Vector2f& contact_point);
 
         /// @brief project the "vertices" of a circle
         /// @param center 

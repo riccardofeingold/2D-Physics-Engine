@@ -12,3 +12,14 @@ CollisionManifold::CollisionManifold(Rigidbody*& body_a, Rigidbody*& body_b, Vec
     this->contact_two = contact_two;
     this->contact_count = contact_count;
 }
+
+bool CollisionManifold::operator==(const CollisionManifold& object)
+{
+    return (this->body_a == object.body_a &&
+            this->body_b == object.body_b &&
+            this->normal == object.normal &&
+            this->depth == object.depth &&
+            this->contact_one == object.contact_one &&
+            this->contact_two == object.contact_two &&
+            this->contact_count == object.contact_count);
+}
