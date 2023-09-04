@@ -236,7 +236,7 @@ void Game::update()
     if (this->duration2_.count() > 1000000)
     {
         this->time_step_string_ = std::to_string((float)this->total_world_time_step_ / this->total_samples_);
-        this->body_count_string_ = std::to_string((float)this->total_body_count_ / this->total_samples_);
+        this->body_count_string_ = std::to_string(this->total_body_count_ / this->total_samples_);
         this->total_world_time_step_ = 0;
         this->total_body_count_ = 0;
         this->total_samples_ = 0;

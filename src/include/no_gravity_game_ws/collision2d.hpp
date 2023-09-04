@@ -3,6 +3,7 @@
 
 #include "math2d.hpp"
 #include "rigidbody.hpp"
+#include "aabb.hpp"
 #include <iostream>
 #include <map>
 
@@ -77,7 +78,13 @@ namespace Physics2D
         /// @param vertices 
         /// @return index of closest vertex
         static int closestPoint(const Vector2f& point, const std::vector<Vector2f>& vertices);
-        
+
+        /// @brief Do AABB collision check
+        /// @param a 
+        /// @param b 
+        /// @return true if collision detected otherwise false
+        static bool intersectAABBs(const AABB& a, const AABB& b);
+
         private:
         /// @brief return contact point between a circle / circle collision
         /// @param circle_center_a 

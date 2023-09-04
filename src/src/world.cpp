@@ -113,6 +113,11 @@ void World2D::update(const sf::Time& dt, int substeps)
                 if (body_a->is_static && body_b->is_static)
                     continue;
                 
+                // AABB collision checking
+                if (!Collision2D::intersectAABBs(body_a->getAABB(), body_b->getAABB()))
+                    continue;
+
+                // SAT collision checking
                 if (Collision2D::collide(body_a, body_b, normal, depth))
                 {
                     Vector2f penetration = normal * depth;
