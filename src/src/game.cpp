@@ -251,7 +251,7 @@ void Game::update()
     // second stopwatch
     this->watch2_stop_ = std::chrono::high_resolution_clock::now();
     this->duration2_ = std::chrono::duration_cast<std::chrono::microseconds>(this->watch2_stop_ - this->watch2_start_);
-    if (this->duration2_.count() > 1000000)
+    if (this->duration2_.count() > 250000)
     {
         this->time_step_string_ = std::to_string((float)this->total_world_time_step_ / this->total_samples_);
         this->body_count_string_ = std::to_string(this->total_body_count_ / this->total_samples_);

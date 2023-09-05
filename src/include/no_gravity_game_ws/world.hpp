@@ -15,6 +15,19 @@ namespace Physics2D
     class Ray;
     class Rigidbody;
     class CollisionManifold;
+    
+    template <typename T1, typename T2>
+    struct Tuple
+    {
+        T1 item1;
+        T2 item2;
+
+        Tuple(T1 item1, T2 item2)
+        {
+            this->item1 = item1;
+            this->item2 = item2;
+        }
+    };
 
     class World2D
     {
@@ -43,6 +56,8 @@ namespace Physics2D
         std::vector<std::string> list_of_object_names_;
         bool game_over = false;
         std::vector<Vector2f> contact_points;
+        std::vector<Tuple<int, int>> contact_pairs;
+        bool render_collision_points = false;
 
         // constant values
         static constexpr float min_body_size = 0.01f * 0.01f;
@@ -63,6 +78,9 @@ namespace Physics2D
 
         // private methods
         void separateBodies(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& mtv);
+        void broadPhase();
+        void narrowPhase(const int current_step, const int substeps);
+        void movementStep(const sf::Time& dt, const int substeps);
     };
 }
 

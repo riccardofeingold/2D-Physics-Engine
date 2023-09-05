@@ -102,64 +102,81 @@ void World2D::update(const sf::Time& dt, int substeps)
 {
     substeps = Math2D::clip(substeps, this->min_substeps, this->max_substeps);
     this->contact_points.clear();
+    this->contacts_.clear();
     
     for (int step = 0; step < substeps; ++step)
     {
-        // Movement step
-        for (int i = 0; i < this->rigidbodies_.size(); ++i)
+        this->contact_pairs.clear();
+        this->movementStep(dt, substeps); 
+        this->broadPhase();
+        this->narrowPhase(step, substeps);
+    }
+    
+    // reset forces
+    for (int i = 0; i < this->rigidbodies_.size(); ++i)
+    {
+        this->rigidbodies_[i]->setForce(Vector2f::Zero());
+    }
+}
+
+void World2D::broadPhase()
+{
+    for (int i = 0; i < this->rigidbodies_.size() - 1; ++i)
+    {
+        Rigidbody*& body_a = this->rigidbodies_[i];
+        AABB body_a_aabb = body_a->getAABB();
+
+        for (int j = i + 1; j < this->rigidbodies_.size(); ++j)
         {
-            if (!this->rigidbodies_[i]->is_static)
-                this->rigidbodies_[i]->update(dt, this->gravity_, substeps);
+            Rigidbody*& body_b = this->rigidbodies_[j];
+            AABB body_b_aabb = body_b->getAABB();
+
+            if (body_a->is_static && body_b->is_static)
+                continue;
+            
+            // AABB collision checking
+            if (!Collision2D::intersectAABBs(body_a_aabb, body_b_aabb))
+                continue;
+
+            this->contact_pairs.push_back(Tuple(i, j));
+        }
+    }
+}
+
+void World2D::narrowPhase(const int current_step, const int substeps)
+{
+    Vector2f normal = Vector2f::Zero();
+    float depth = 0;
+
+    for (int i = 0; i < this->contact_pairs.size(); ++i)
+    {
+        Tuple indices = this->contact_pairs[i];
+        Rigidbody* body_a = this->rigidbodies_[indices.item1];
+        Rigidbody* body_b = this->rigidbodies_[indices.item2];
+
+        // SAT collision checking
+        if (Collision2D::collide(body_a, body_b, normal, depth))
+        {
+            Vector2f mtv = normal * depth;
+
+            this->separateBodies(body_a, body_b, mtv);                
+
+            Vector2f contact_one = Vector2f::Zero();
+            Vector2f contact_two = Vector2f::Zero();
+            int contact_count = 0;
+
+            Collision2D::findContactPoint(body_a, body_b, contact_one, contact_two, contact_count);
+
+            CollisionManifold collision = CollisionManifold(body_a, body_b, normal, depth, contact_one, contact_two, contact_count);
+            this->resolveCollision(collision);
+            this->contacts_.push_back(collision);
         }
 
-        // clearing contacts list
-        this->contacts_.clear();
 
-        // collision step
-        Vector2f normal;
-        float depth;
-        for (int i = 0; i < this->rigidbodies_.size() - 1; ++i)
-        {
-            Rigidbody*& body_a = this->rigidbodies_[i];
-            AABB body_a_aabb = body_a->getAABB();
-
-            for (int j = i + 1; j < this->rigidbodies_.size(); ++j)
-            {
-                Rigidbody*& body_b = this->rigidbodies_[j];
-                AABB body_b_aabb = body_b->getAABB();
-
-                if (body_a->is_static && body_b->is_static)
-                    continue;
-                
-                // AABB collision checking
-                if (!Collision2D::intersectAABBs(body_a_aabb, body_b_aabb))
-                    continue;
-
-                // SAT collision checking
-                if (Collision2D::collide(body_a, body_b, normal, depth))
-                {
-                    Vector2f mtv = normal * depth;
-
-                    this->separateBodies(body_a, body_b, mtv);                
-
-                    Vector2f contact_one = Vector2f::Zero();
-                    Vector2f contact_two = Vector2f::Zero();
-                    int contact_count = 0;
-
-                    Collision2D::findContactPoint(body_a, body_b, contact_one, contact_two, contact_count);
-
-                    CollisionManifold collision = CollisionManifold(body_a, body_b, normal, depth, contact_one, contact_two, contact_count);
-                    this->contacts_.push_back(collision);
-                }
-            }
-        }
-
-        for (int i = 0; i < this->contacts_.size(); ++i)
+        if (this->render_collision_points)
         {
             CollisionManifold contact = this->contacts_[i];
-            this->resolveCollision(this->contacts_[i]);
-
-            if (step == substeps - 1)
+            if (current_step == substeps - 1)
             {
                 if (std::find<std::vector<CollisionManifold>::iterator, CollisionManifold>(this->contacts_.begin(), this->contacts_.end(), contact) != this->contacts_.end())
                     this->contact_points.push_back(contact.contact_one);
@@ -171,12 +188,14 @@ void World2D::update(const sf::Time& dt, int substeps)
                 }
             }
         }
-
     }
-    
-    // reset forces
+}
+
+void World2D::movementStep(const sf::Time& dt, const int substeps)
+{
     for (int i = 0; i < this->rigidbodies_.size(); ++i)
     {
-        this->rigidbodies_[i]->setForce(Vector2f::Zero());
+        if (!this->rigidbodies_[i]->is_static)
+            this->rigidbodies_[i]->update(dt, this->gravity_, substeps);
     }
 }
