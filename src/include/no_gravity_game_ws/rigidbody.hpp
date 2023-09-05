@@ -8,6 +8,9 @@
 
 namespace Physics2D
 {
+    // forward declarations
+    class Ray;
+    
     enum ShapeType
     {
         Circle = 0,
@@ -20,7 +23,7 @@ namespace Physics2D
     {
         public:
         Rigidbody();
-        Rigidbody(float density, float inertia, float mass, float restitution, float area, bool isStatic, float radius, float width, float height, std::vector<Vector2f>& vertices, ShapeType shape_type, bool apply_gravity = false);
+        Rigidbody(float density, float inertia, float mass, float restitution, float area, bool isStatic, float radius, float width, float height, const float static_friction, const float dynamic_friction, std::vector<Vector2f>& vertices, ShapeType shape_type, bool apply_gravity = false);
         ~Rigidbody();
 
         ShapeType shape_type;
@@ -37,6 +40,8 @@ namespace Physics2D
         float height; // in meters
         float static_friction;
         float dynamic_friction;
+
+        std::vector<Ray> rays;
         
         // getters
         Vector2f getForce() const;
@@ -61,7 +66,7 @@ namespace Physics2D
         /// @param body 
         /// @param error_message 
         /// @return true if successfully initialized otherwise false
-        static bool createCircleBody(const float radius, const float density, const bool is_static, float restitution, Rigidbody*& body, std::string& error_message, const bool apply_gravity = false);
+        static bool createCircleBody(const float radius, const float density, const bool is_static, float restitution, const float static_friction, const float dynamic_friction, Rigidbody*& body, std::string& error_message, const bool apply_gravity = false);
         
         /// @brief create a box rigidbody.
         /// @param width 
@@ -73,7 +78,7 @@ namespace Physics2D
         /// @param body 
         /// @param error_message 
         /// @return true if successfully initialized otherwise false
-        static bool createBoxBody(const float width, const float height, const float density, const bool is_static, float restitution, Rigidbody*& body, std::string& error_message, const bool apply_gravity = false);
+        static bool createBoxBody(const float width, const float height, const float density, const bool is_static, float restitution, const float static_friction, const float dynamic_friction, Rigidbody*& body, std::string& error_message, const bool apply_gravity = false);
 
         /// @brief moving the rigidbody by the vector move
         /// @param move - vector

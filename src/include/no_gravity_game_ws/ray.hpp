@@ -17,7 +17,7 @@ namespace Physics2D
     class Ray
     {
         public:
-        Ray(const sf::Vector2f* start, float angle);
+        Ray(const Vector2f* start, float angle);
         ~Ray();
 
         void castRay(World2D& w);
@@ -32,7 +32,7 @@ namespace Physics2D
         private:
         sf::RectangleShape line_;
         sf::Vector2f direction_;
-        const sf::Vector2f* start_;
+        const Vector2f* start_;
         const float angle_; // degrees
         float distance_;
         sf::Vector2f point_of_contact_;

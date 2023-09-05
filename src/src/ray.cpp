@@ -2,7 +2,7 @@
 
 using namespace Physics2D;
 
-Ray::Ray(const sf::Vector2f* start, float angle)
+Ray::Ray(const Vector2f* start, float angle)
     : start_(start),
       angle_(angle)
 {
@@ -10,7 +10,7 @@ Ray::Ray(const sf::Vector2f* start, float angle)
     this->direction_ = sf::Vector2f(std::cos(rad), std::sin(rad));
     this->line_ = sf::RectangleShape(sf::Vector2f(0, THICKNESS));
     line_.setOrigin(sf::Vector2f(0, line_.getSize().y/2));
-    line_.setPosition(*start_);
+    line_.setPosition(Vector2Converter::toSFVector2f(*start_));
     this->line_.setFillColor(sf::Color::White);
 
 }
@@ -24,7 +24,7 @@ const float Ray::getAngle() const { return this->angle_; }
 
 float Ray::calculateMagnitude(sf::Vector2f& end_point)
 {
-    sf::Vector2f line_vector = *this->start_ - end_point;
+    sf::Vector2f line_vector = Vector2Converter::toSFVector2f(*this->start_) - end_point;
     return std::sqrt(line_vector.x * line_vector.x + line_vector.y * line_vector.y);
 }
 
@@ -32,7 +32,7 @@ void Ray::draw()
 {
     this->distance_ = this->calculateMagnitude(this->point_of_contact_);
     line_.setOrigin(sf::Vector2f(0, line_.getSize().y/2));
-    line_.setPosition(*start_);
+    line_.setPosition(Vector2Converter::toSFVector2f(*start_));
 
     if (this->distance_ <= MAX_DISTANCE)
         line_.setSize(sf::Vector2f(this->distance_, THICKNESS));
@@ -146,7 +146,7 @@ void Ray::castRay(World2D& w)
 
             // if nothing has been found set contact point to start
             if (points.size() == 0)
-                this->point_of_contact_ = *this->start_ + sf::Vector2f(200, 200);
+                this->point_of_contact_ = Vector2Converter::toSFVector2f(*this->start_) + sf::Vector2f(200, 200);
             else
             {
                 float min_d = INFINITY;

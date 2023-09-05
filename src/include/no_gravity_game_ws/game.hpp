@@ -4,12 +4,7 @@
 #include <chrono>
 
 #include "window.hpp"
-#include "player.hpp"
-#include "physics.hpp"
 #include "world.hpp"
-#include "goal.hpp"
-#include "enemy.hpp"
-#include "wall.hpp"
 #include "rigidbody.hpp"
 #include "vector2dconverter.hpp"
 #include "collision2d.hpp"
@@ -33,6 +28,24 @@
 #define AIR_DENSITY 1.293
 
 using namespace Physics2D;
+
+namespace Physics2D
+{
+    struct FrictionCoefficients
+    {
+        static constexpr float PLAYER_STATIC = 0.4f;
+        static constexpr float PLAYER_DYNAMIC = 0.2f;
+        static constexpr float GROUND_STATIC = 0.6f;
+        static constexpr float GROUND_DYNAMIC = 0.4f;
+        static constexpr float WALL_STATIC = 0.5f;
+        static constexpr float WALL_DYNAMIC = 0.3f;
+    };
+
+    // forward declarations
+    class Ray;
+}
+
+// Forward declarations
 
 class Game
 {

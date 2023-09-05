@@ -13,7 +13,6 @@ add_executable(NoGravityGameWS
                src/src/game.cpp 
                src/src/window.cpp
                src/src/world.cpp
-               src/src/momentOfInertia.cpp
                src/src/ray.cpp
                src/src/vector2d.cpp
                src/src/vector2dconverter.cpp

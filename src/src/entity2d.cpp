@@ -24,7 +24,7 @@ Entity2D::Entity2D(const std::string& name, const float radius, const bool is_st
 {
     Rigidbody* body;
     std::string e;
-    if (!Rigidbody::createCircleBody(radius, 1.f, is_static, 1.f, body, e, true))
+    if (!Rigidbody::createCircleBody(radius, 1.f, is_static, 1.f, 0.6f, 0.4f, body, e, true))
     {
         std::cout << e << std::endl;
         assert(1 == 0);
@@ -41,7 +41,7 @@ Entity2D::Entity2D(const std::string& name, const float width, const float heigh
 {
     Rigidbody* body;
     std::string e;
-    if (!Rigidbody::createBoxBody(width, height, 1.f, is_static, 1.f, body, e, true))
+    if (!Rigidbody::createBoxBody(width, height, 1.f, is_static, 1.f, 0.6f, 0.4f, body, e, true))
     {
         std::cout << e << std::endl;
         assert(1 == 0);

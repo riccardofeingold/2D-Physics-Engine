@@ -2,11 +2,7 @@
 #define debugging true
 
 Game::Game() : 
-    window_("2D Drone Simulator", sf::Vector2u(SCREEN_WIDTH, SCREEN_HEIGHT), FRAME_RATE) 
-    // player_(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, sf::Vector2f(40, 40), 0.f),
-    // goal_(sf::Vector2f(20, 20), 0),
-    // enemy_(sf::Vector2f(40, 40), 0.f),
-    // tester_(sf::Vector2f(40, 40), 0.f)
+    window_("2D Drone Simulator", sf::Vector2u(SCREEN_WIDTH, SCREEN_HEIGHT), FRAME_RATE)
 {
     this->world_.window = &window_;
     
@@ -46,17 +42,23 @@ void Game::start()
         Rigidbody* body = nullptr;
         if (i == 0)
         {
-            if (!Rigidbody::createBoxBody(1.77f, 1.77f, 2.f, false, 1.f, body, e, true))
+            if (!Rigidbody::createBoxBody(1.77f, 1.77f, 2.f, false, 1.f, FrictionCoefficients::PLAYER_STATIC, FrictionCoefficients::PLAYER_DYNAMIC, body, e, true))
                 std::cout << e << std::endl;
             else
             {
                 body->moveTo(Vector2f(this->view.getSize().x / 2, this->view.getSize().y / 2));
+                // int num_rays = 20;
+                // for (int i = 0; i < num_rays; ++i)
+                // {
+                //     Ray ray = Ray(body->getPosition(), (float)360 / num_rays * i);
+                //     body->rays.push_back(ray);
+                // }
                 this->entities_.push_back(Entity2D("player", body, Colors().PLAYER, this->world_));
             }
             continue;
         } else if (i == 1)
         {
-            if (!Rigidbody::createBoxBody(this->view.getSize().x - padding * 2, 3.f, 2.f, true, 0.f, body, e))
+            if (!Rigidbody::createBoxBody(this->view.getSize().x - padding * 2, 3.f, 2.f, true, 0.f, FrictionCoefficients::GROUND_STATIC, FrictionCoefficients::GROUND_DYNAMIC, body, e))
                 std::cout << e << std::endl;
             else 
             {
@@ -66,7 +68,7 @@ void Game::start()
             continue;
         } else if (i == 2)
         {
-            if (!Rigidbody::createBoxBody(this->view.getSize().x / 4, 3.f, 2.f, true, 0.f, body, e))
+            if (!Rigidbody::createBoxBody(this->view.getSize().x / 4, 3.f, 2.f, true, 0.f, FrictionCoefficients::WALL_STATIC, FrictionCoefficients::WALL_DYNAMIC, body, e))
                 std::cout << e << std::endl;
             else 
             {
@@ -77,7 +79,7 @@ void Game::start()
             continue;      
         } else if (i == 3)
         {
-            if (!Rigidbody::createBoxBody(this->view.getSize().x / 4, 3.f, 2.f, true, 0.f, body, e))
+            if (!Rigidbody::createBoxBody(this->view.getSize().x / 4, 3.f, 2.f, true, 0.f, FrictionCoefficients::WALL_STATIC, FrictionCoefficients::WALL_DYNAMIC, body, e))
                 std::cout << e << std::endl;
             else 
             {
@@ -88,60 +90,6 @@ void Game::start()
             continue;    
         }
     }
-
-/********TESTING*********/
-#if !debugging
-    // goals
-    this->goal_.setWindow(window_);
-    this->goal_.setRandomPosition();
-
-    // enemy
-    this->enemy_.setSpeed(5);
-    this->enemy_.setWindow(window_);
-    this->enemy_.setRandomPosition();
-    this->enemy_.setTarget(&(this->player_.getBody().getPosition()));
-
-    // tester
-    this->tester_.setSpeed(0);
-    this->tester_.setWindow(window_);
-
-    // set properties of player
-    this->player_.setWindow(window_);
-    this->player_.applyAirDrag(DRAG_COEFFICIENT, 1, AIR_DENSITY);
-    this->player_.setMass(1);
-
-    // add objects to the world
-    this->world_.addObject("player", &this->player_);
-    this->world_.addObject("goal", &this->goal_);
-    this->world_.addObject("enemy", &this->enemy_);
-    this->world_.addObject("tester", &this->tester_);
-
-    // walls
-    for (int i = 0; i < NUM_WALLS; ++i)
-    {
-        float random_width = std::max((float)std::rand()/RAND_MAX*MAX_WALL_SIZE, 20.f);
-        float random_height = std::max((float)std::rand()/RAND_MAX*MAX_WALL_SIZE, 20.f);
-        Wall wall = Wall(sf::Vector2f((float)std::rand()/RAND_MAX*(i+1)*SCREEN_WIDTH/NUM_WALLS, (float)std::rand()/RAND_MAX*(i+1)*SCREEN_HEIGHT/NUM_WALLS), sf::Vector2f(random_width, random_height), (float)std::rand()/RAND_MAX*180);
-        this->walls_.push_back(wall);
-    }
-
-    int counter = 0;
-    for (auto it = this->walls_.begin(); it != this->walls_.end(); ++it)
-    {
-        std::string name = "wall";
-        name += std::to_string(counter);
-        this->world_.addObject(name, &*it);
-        ++counter;
-        while (this->world_.checkCollisionBetween("goal", name, this->dt_))
-        {
-            this->goal_.setRandomPosition();
-        }
-        while (this->world_.checkCollisionBetween("player", name, this->dt_))
-        {
-            this->world_.getObject("name").getBody().move(sf::Vector2f((float)std::rand()/RAND_MAX*20, (float)std::rand()/RAND_MAX*20));
-        }
-    }
-#endif
 }
 
 void Game::handleInput()
@@ -218,35 +166,6 @@ void Game::handleInput()
         std::cout << "Time for physics step: " << this->duration_.count() << std::endl;
         std::cout << "Number of contact points: " << this->world_.contact_points.size() << std::endl;
     }
-
-    #if !debugging
-    if (sf::Joystick::isConnected(0))
-    {
-        int throttle = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
-        int roll = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z);
-
-        this->player_.applyForce(sf::Vector2f(0.f, MAX_THRUST_FORCE * throttle));
-        this->player_.applyForce(sf::Vector2f(MAX_THRUST_FORCE * roll, 0.f));
-
-        // restart
-        if (sf::Joystick::isButtonPressed(0, 0))
-        {
-            this->world_.reset();
-        }
-    } else
-    {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-            this->player_.move(sf::Vector2f(1.f, -SPEED * this->dt_.asSeconds()));
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            this->player_.move(sf::Vector2f(1.f, SPEED * this->dt_.asSeconds()));
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            this->player_.move(sf::Vector2f(-SPEED * this->dt_.asSeconds(), 0.f));
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            this->player_.move(sf::Vector2f(SPEED * this->dt_.asSeconds(), 0.f));
-    }
-    
-    this->tester_.getBody().setPosition(sf::Mouse::getPosition().x * SCREEN_WIDTH / 5118.f, (sf::Mouse::getPosition().y - 2880.f) * SCREEN_HEIGHT / (5758.f - 2880.f));
-    #endif
 }
 
 void Game::update()
@@ -356,25 +275,9 @@ void Game::render()
         r.draw();
         this->window_.draw(r.getLineShape());
     }
-
-    for (std::string name : this->world_.list_of_object_names_)
-    {
-        this->window_.draw(this->world_.getObject(name).getBody());
-    }
-
-    if (this->world_.game_over)
-    {
-        std::cout << "GAME OVER! 😂" << " Your score: " << this->player_.getScore() << std::endl;
-        this->player_.setScoreToZero();
-    }
     #endif
 
     this->window_.endDraw();
-    
-    if (this->world_.game_over)
-    {
-        this->world_.game_over = false;
-    }
 }
 
 Window* Game::getWindow()

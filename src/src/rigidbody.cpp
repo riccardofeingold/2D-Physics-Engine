@@ -8,7 +8,7 @@ Rigidbody::Rigidbody()
 
 Rigidbody::~Rigidbody() = default;
 
-Rigidbody::Rigidbody(float density, float inertia, float mass, float restitution, float area, bool is_static, float radius, float width, float height, std::vector<Vector2f>& vertices, ShapeType shape_type, bool apply_gravity)
+Rigidbody::Rigidbody(float density, float inertia, float mass, float restitution, float area, bool is_static, float radius, float width, float height, const float static_friction, const float dynamic_friction, std::vector<Vector2f>& vertices, ShapeType shape_type, bool apply_gravity)
 {
     this->position_ = Vector2f::Zero();
     this->linear_velocity_ = Vector2f::Zero();
@@ -18,8 +18,8 @@ Rigidbody::Rigidbody(float density, float inertia, float mass, float restitution
     this->force_ = Vector2f::Zero();
     this->apply_gravity_ = apply_gravity;
 
-    this->static_friction = 0.6f;
-    this->dynamic_friction = 0.4f;
+    this->static_friction = static_friction;
+    this->dynamic_friction = dynamic_friction;
 
     this->shape_type = shape_type;
     this->density = density;
@@ -44,7 +44,7 @@ Rigidbody::Rigidbody(float density, float inertia, float mass, float restitution
     this->aabb_update_required_ = true;
 }
 
-bool Rigidbody::createCircleBody(const float radius, const float density, const bool is_static, float restitution, Rigidbody*& body, std::string& error_message, const bool apply_gravity)
+bool Rigidbody::createCircleBody(const float radius, const float density, const bool is_static, float restitution, const float static_friction, const float dynamic_friction, Rigidbody*& body, std::string& error_message, const bool apply_gravity)
 {
     error_message = "";
     float area = M_PI*radius*radius;
@@ -90,11 +90,11 @@ bool Rigidbody::createCircleBody(const float radius, const float density, const 
 
     std::vector<Vector2f> vertices;
 
-    body = new Rigidbody(density, inertia, mass, restitution, area, is_static, radius, 0, 0, vertices, ShapeType::Circle, apply_gravity);
+    body = new Rigidbody(density, inertia, mass, restitution, area, is_static, radius, 0, 0, static_friction, dynamic_friction, vertices, ShapeType::Circle, apply_gravity);
     return true;
 }
 
-bool Rigidbody::createBoxBody(const float width, const float height, const float density, const bool is_static, float restitution, Rigidbody*& body, std::string& error_message, const bool apply_gravity)
+bool Rigidbody::createBoxBody(const float width, const float height, const float density, const bool is_static, float restitution, const float static_friction, const float dynamic_friction, Rigidbody*& body, std::string& error_message, const bool apply_gravity)
 {
     error_message = "";
     float area = width*height;
@@ -140,7 +140,7 @@ bool Rigidbody::createBoxBody(const float width, const float height, const float
 
     std::vector<Vector2f> vertices = Rigidbody::createBoxVertices(width, height);
 
-    body = new Rigidbody(density, inertia, mass, restitution, area, is_static,0.f, width, height, vertices, ShapeType::Box, apply_gravity);
+    body = new Rigidbody(density, inertia, mass, restitution, area, is_static,0.f, width, height, static_friction, dynamic_friction, vertices, ShapeType::Box, apply_gravity);
     return true;
 }
 
