@@ -171,19 +171,21 @@ void World2D::narrowPhase(const int current_step, const int substeps)
             this->resolveCollision(collision);
             this->contacts_.push_back(collision);
         }
+    }
 
-
-        if (this->render_collision_points)
+    if (this->render_collision_points)
+    {
+        if (current_step == substeps - 1)
         {
-            CollisionManifold contact = this->contacts_[i];
-            if (current_step == substeps - 1)
+            for (int i = 0; i < this->contacts_.size(); ++i)
             {
-                if (std::find<std::vector<CollisionManifold>::iterator, CollisionManifold>(this->contacts_.begin(), this->contacts_.end(), contact) != this->contacts_.end())
+                CollisionManifold contact = this->contacts_[i];
+                if (!(std::find<std::vector<Vector2f>::iterator, Vector2f>(this->contact_points.begin(), this->contact_points.end(), contact.contact_one) != this->contact_points.end()))
                     this->contact_points.push_back(contact.contact_one);
 
                 if (contact.contact_count > 1)
                 {
-                    if (std::find<std::vector<CollisionManifold>::iterator, CollisionManifold>(this->contacts_.begin(), this->contacts_.end(), contact) != this->contacts_.end())
+                    if (!(std::find<std::vector<Vector2f>::iterator, Vector2f>(this->contact_points.begin(), this->contact_points.end(), contact.contact_two) != this->contact_points.end()))
                         this->contact_points.push_back(contact.contact_two);
                 }
             }

@@ -13,7 +13,8 @@ namespace Physics2D
         // constructor
         Vector2f();
         Vector2f(float x, float y);
-
+        
+        static constexpr float EPSILON = 0.0005f;
         // variables
         float x;
         float y;

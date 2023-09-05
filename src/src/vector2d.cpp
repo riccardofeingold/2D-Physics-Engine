@@ -65,7 +65,7 @@ Vector2f Vector2f::operator*=(const float scalar)
 
 bool Vector2f::operator==(const Vector2f& a)
 {
-    return this->x == a.x && this->y == a.y;
+    return std::abs(this->x - a.x) < EPSILON && std::abs(this->y - a.y) < EPSILON;
 }
 
 std::size_t Vector2f::getHashCode()

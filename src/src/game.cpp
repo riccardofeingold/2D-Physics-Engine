@@ -27,6 +27,9 @@ Game::~Game()
 
 void Game::start()
 {
+    // show contact points
+    this->world_.render_collision_points = true;
+
     // start second stop watch
     this->watch2_start_ = std::chrono::high_resolution_clock::now();
 
@@ -317,14 +320,17 @@ void Game::render()
     }
 
     // draw contact points
-    for (int i = 0; i < this->world_.contact_points.size(); ++i)
+    if (this->world_.render_collision_points)
     {
-        float radius = 0.3f;
-        sf::CircleShape point(radius);
-        point.setFillColor(sf::Color::Red);
-        point.setOrigin(radius, radius);
-        point.setPosition(this->world_.contact_points[i].x, this->world_.contact_points[i].y);
-        this->window_.draw(point);
+        for (int i = 0; i < this->world_.contact_points.size(); ++i)
+        {
+            float radius = 0.3f;
+            sf::CircleShape point(radius);
+            point.setFillColor(sf::Color::Red);
+            point.setOrigin(radius, radius);
+            point.setPosition(this->world_.contact_points[i].x, this->world_.contact_points[i].y);
+            this->window_.draw(point);
+        }
     }
 
     // draw text
