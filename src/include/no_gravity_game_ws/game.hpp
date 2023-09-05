@@ -13,6 +13,7 @@
 #include "rigidbody.hpp"
 #include "vector2dconverter.hpp"
 #include "collision2d.hpp"
+#include "entity2d.hpp"
 #include <SFML/Graphics.hpp>
 
 #define SCREEN_WIDTH 640
@@ -57,7 +58,9 @@ class Game
     sf::Time dt_;
     Window window_;
     World2D world_;
-    std::vector<sf::Vector2f> vertex_buffer_;
+
+    std::vector<Entity2D> entities_;
+    std::vector<Entity2D> removable_entities_;
 
     // first stopwatch
     std::chrono::steady_clock::time_point watch_start_;

@@ -83,6 +83,21 @@ int World2D::getBodyCount() const
     return this->rigidbodies_.size();
 }
 
+void World2D::separateBodies(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& mtv)
+{
+    if (body_a->is_static)
+    {
+        body_b->move(mtv);
+    } else if (body_b->is_static)
+    {
+        body_a->move(-mtv);
+    } else
+    {
+        body_a->move(-mtv / 2.f);
+        body_b->move(mtv / 2.f);
+    }
+}
+
 void World2D::update(const sf::Time& dt, int substeps)
 {
     substeps = Math2D::clip(substeps, this->min_substeps, this->max_substeps);
@@ -93,7 +108,8 @@ void World2D::update(const sf::Time& dt, int substeps)
         // Movement step
         for (int i = 0; i < this->rigidbodies_.size(); ++i)
         {
-            this->rigidbodies_[i]->update(dt, this->gravity_, substeps);
+            if (!this->rigidbodies_[i]->is_static)
+                this->rigidbodies_[i]->update(dt, this->gravity_, substeps);
         }
 
         // clearing contacts list
@@ -122,18 +138,9 @@ void World2D::update(const sf::Time& dt, int substeps)
                 // SAT collision checking
                 if (Collision2D::collide(body_a, body_b, normal, depth))
                 {
-                    Vector2f penetration = normal * depth;
-                    if (body_a->is_static)
-                    {
-                        body_b->move(penetration);
-                    } else if (body_b->is_static)
-                    {
-                        body_a->move(-penetration);
-                    } else
-                    {
-                        body_a->move(-penetration / 2.f);
-                        body_b->move(penetration / 2.f);
-                    }
+                    Vector2f mtv = normal * depth;
+
+                    this->separateBodies(body_a, body_b, mtv);                
 
                     Vector2f contact_one = Vector2f::Zero();
                     Vector2f contact_two = Vector2f::Zero();
@@ -152,15 +159,17 @@ void World2D::update(const sf::Time& dt, int substeps)
             CollisionManifold contact = this->contacts_[i];
             this->resolveCollision(this->contacts_[i]);
 
-            if (contact.contact_count > 0)
+            if (step == substeps - 1)
             {
                 if (std::find<std::vector<CollisionManifold>::iterator, CollisionManifold>(this->contacts_.begin(), this->contacts_.end(), contact) != this->contacts_.end())
                     this->contact_points.push_back(contact.contact_one);
 
                 if (contact.contact_count > 1)
-                    this->contact_points.push_back(contact.contact_two);
+                {
+                    if (std::find<std::vector<CollisionManifold>::iterator, CollisionManifold>(this->contacts_.begin(), this->contacts_.end(), contact) != this->contacts_.end())
+                        this->contact_points.push_back(contact.contact_two);
+                }
             }
-            
         }
 
     }

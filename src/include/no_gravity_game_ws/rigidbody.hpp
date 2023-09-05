@@ -20,29 +20,22 @@ namespace Physics2D
     {
         public:
         Rigidbody();
-        Rigidbody(std::string name, const Vector2f& position, float density, float mass, float restitution, float area, bool isStatic, float radius, float width, float height, ShapeType shape_type, bool apply_gravity = false);
+        Rigidbody(float density, float inertia, float mass, float restitution, float area, bool isStatic, float radius, float width, float height, std::vector<Vector2f>& vertices, ShapeType shape_type, bool apply_gravity = false);
         ~Rigidbody();
 
-        std::string name;
-
+        ShapeType shape_type;
         float density; // in kg/m^3
         float mass; // in kg
         float inverse_mass;
         float restitution;
         float area; // m^2
-
+        float inertia;
+        float inv_inertia;
         bool is_static;
-     
         float radius; // in meters
         float width; // in meters
         float height; // in meters
-
-        sf::Color color; // rgba
-
-        ShapeType shape_type;
         
-        std::vector<int> triangle_indices;
-
         // getters
         Vector2f getForce() const;
         Vector2f getPosition() const;
@@ -66,7 +59,7 @@ namespace Physics2D
         /// @param body 
         /// @param error_message 
         /// @return true if successfully initialized otherwise false
-        static bool createCircleBody(std::string name, float radius, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message, bool apply_gravity = false);
+        static bool createCircleBody(const float radius, const float density, const bool is_static, float restitution, Rigidbody*& body, std::string& error_message, const bool apply_gravity = false);
         
         /// @brief create a box rigidbody.
         /// @param width 
@@ -78,7 +71,7 @@ namespace Physics2D
         /// @param body 
         /// @param error_message 
         /// @return true if successfully initialized otherwise false
-        static bool createBoxBody(std::string name, float width, float height, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message, bool apply_gravity = false);
+        static bool createBoxBody(const float width, const float height, const float density, const bool is_static, float restitution, Rigidbody*& body, std::string& error_message, const bool apply_gravity = false);
 
         /// @brief moving the rigidbody by the vector move
         /// @param move - vector
@@ -89,7 +82,7 @@ namespace Physics2D
         void moveTo(const Vector2f& move);
         
         /// @brief rotate object
-        /// @param amount how many degrees do you want it to rotate
+        /// @param amount how many radians do you want it to rotate
         void rotate(const float amount);
         
         /// @brief rotate to a fixed orientation
@@ -120,11 +113,10 @@ namespace Physics2D
         Vector2f force_; // N
         Vector2f position_; // in meters = 1 pixel
         Vector2f linear_velocity_; // in m/s
-        float rotation_; // in radians
+        float angle_; // in radians
         float angular_velocity_; // radians/s
 
         AABB aabb_;
-
         std::vector<Vector2f> vertices_;
         std::vector<Vector2f> transformed_vertices_;
         bool transform_update_required_;
@@ -136,10 +128,6 @@ namespace Physics2D
         /// @param height 
         /// @return list of vertices
         static std::vector<Vector2f> createBoxVertices(float width, float height);
-
-        /// @brief get the indices of the vertices of the two triangles that make up the box
-        /// @return list of traingle vertex indices
-        static std::vector<int> createBoxTriangleIndices();
     };
 }
 

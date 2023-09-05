@@ -60,6 +60,9 @@ namespace Physics2D
         std::vector<Rigidbody*> rigidbodies_;
         std::vector<sf::Color> outline_color_;
         std::vector<CollisionManifold> contacts_;
+
+        // private methods
+        void separateBodies(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& mtv);
     };
 }
 

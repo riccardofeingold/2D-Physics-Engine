@@ -38,29 +38,51 @@ void Game::start()
     this->world_.window_->getWindow().setView(view);
 
     std::string e = "Error!";
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 4; ++i)
     {
         Rigidbody* body = nullptr;
         if (i == 0)
         {
-            if (!Rigidbody::createBoxBody("player", 1.77f, 1.77f, Vector2f(this->view.getSize().x / 2, this->view.getSize().y / 2), 2.f, false, 1.f, body, e, true))
+            if (!Rigidbody::createBoxBody(1.77f, 1.77f, 2.f, false, 1.f, body, e, true))
                 std::cout << e << std::endl;
             else
             {
-                body->color = Colors().PLAYER;
-                this->world_.addObject(body->name, body);
+                body->moveTo(Vector2f(this->view.getSize().x / 2, this->view.getSize().y / 2));
+                this->entities_.push_back(Entity2D("player", body, Colors().PLAYER, this->world_));
             }
             continue;
         } else if (i == 1)
         {
-            if (!Rigidbody::createBoxBody("ground", this->view.getSize().x - padding * 2, 3.f, Vector2f(this->view.getSize().x/2, this->view.getSize().y - 1.5f - padding), 2.f, true, 0.f, body, e))
+            if (!Rigidbody::createBoxBody(this->view.getSize().x - padding * 2, 3.f, 2.f, true, 0.f, body, e))
                 std::cout << e << std::endl;
             else 
             {
-                body->color = Colors().WALL;
-                this->world_.addObject(body->name, body);
+                body->moveTo(Vector2f(this->view.getSize().x/2, this->view.getSize().y - 1.5f - padding));
+                this->entities_.push_back(Entity2D("ground", body, Colors().WALL, this->world_));
             }
             continue;
+        } else if (i == 2)
+        {
+            if (!Rigidbody::createBoxBody(this->view.getSize().x / 4, 3.f, 2.f, true, 0.f, body, e))
+                std::cout << e << std::endl;
+            else 
+            {
+                body->moveTo(Vector2f(this->view.getSize().x/4 - 2, this->view.getSize().y/4));
+                body->rotate(M_PI / 5);
+                this->entities_.push_back(Entity2D("wall" + std::to_string(i), body, Colors().WALL, this->world_));
+            }
+            continue;      
+        } else if (i == 3)
+        {
+            if (!Rigidbody::createBoxBody(this->view.getSize().x / 4, 3.f, 2.f, true, 0.f, body, e))
+                std::cout << e << std::endl;
+            else 
+            {
+                body->moveTo(Vector2f(this->view.getSize().x/4 * 3 - 2, this->view.getSize().y/4 - padding));
+                body->rotate(-M_PI / 5);
+                this->entities_.push_back(Entity2D("wall" + std::to_string(i), body, Colors().WALL, this->world_));
+            }
+            continue;    
         }
     }
 
@@ -167,10 +189,8 @@ void Game::handleInput()
         std::string e = "ERROR";
         Vector2f position = Vector2f((float)sf::Mouse::getPosition(this->window_.getWindow()).x * ZOOM, (float)sf::Mouse::getPosition(this->window_.getWindow()).y * ZOOM);
         
-        if (!Rigidbody::createBoxBody(std::to_string(this->world_.getBodyCount()), width, height, position, 2.f, false, 1.f, body, e, true))
-            std::cout << e << std::endl;
-        else
-            this->world_.addObject(body->name, body);
+        std::string name = std::to_string(this->world_.getBodyCount() + 1);
+        this->entities_.push_back(Entity2D(name, width, height, false, position, this->world_));
 
         this->window_.mouse_button_pressed = true;
     }
@@ -183,10 +203,8 @@ void Game::handleInput()
         std::string e = "ERROR";
         Vector2f position = Vector2f((float)sf::Mouse::getPosition(this->window_.getWindow()).x * ZOOM, (float)sf::Mouse::getPosition(this->window_.getWindow()).y * ZOOM);
 
-        if (!Rigidbody::createCircleBody(std::to_string(this->world_.getBodyCount()), radius, position, 2.f, false, 1.f, body, e, true))
-            std::cout << e << std::endl;
-        else
-            this->world_.addObject(body->name, body);
+        std::string name = std::to_string(this->world_.getBodyCount() + 1);
+        this->entities_.push_back(Entity2D(name, radius, false, position, this->world_));
 
         this->window_.mouse_button_pressed = true;
     }
@@ -246,6 +264,7 @@ void Game::update()
     this->dt_ = this->clock_.restart();
     this->window_.update();
 
+    // first stopwatch
     this->watch_start_ = std::chrono::high_resolution_clock::now();
     this->world_.update(this->dt_, 20);
     this->watch_stop_ = std::chrono::high_resolution_clock::now();
@@ -255,6 +274,8 @@ void Game::update()
     this->total_body_count_ += this->world_.getBodyCount();
     ++this->total_samples_;
 
+    // delete non-static object that are off the screen
+    this->removable_entities_.clear();
     for (int i = 0; i < this->world_.getBodyCount(); ++i)
     {
         Rigidbody* body = nullptr;
@@ -263,12 +284,26 @@ void Game::update()
             std::cout << "ERROR" << std::endl;
         }
 
+        if (body->is_static)
+            continue;
+
         AABB box = body->getAABB();
 
         if (box.min.y > this->view.getSize().y)
         {
-            this->world_.removeObject(body->name);
+            this->removable_entities_.push_back(this->entities_[i]);
         }
+    }
+
+    // remove entities
+    for (int i = 0; i < this->removable_entities_.size(); ++i)
+    {
+        // delete rigidbody
+        this->world_.removeObject(this->removable_entities_[i].name);
+        
+        // delete entity too
+        auto it_entities = std::find(this->entities_.begin(), this->entities_.end(), this->removable_entities_[i]);
+        this->entities_.erase(it_entities);
     }
 }
 
@@ -276,38 +311,9 @@ void Game::render()
 {
     this->window_.beginDraw();
 
-    for (int i = 0; i < this->world_.getBodyCount(); ++i)
+    for (int i = 0; i < this->entities_.size(); ++i)
     {
-        Rigidbody* b = nullptr;
-
-        assert(this->world_.getBody(i, b));
-
-        sf::Vector2f pos = Vector2Converter::toSFVector2f(b->getPosition());
-        if (b->shape_type == ShapeType::Circle)
-        {
-            sf::CircleShape circle(b->radius);
-            circle.setFillColor(b->color);
-            circle.setOutlineColor(sf::Color::White);
-            circle.setOutlineThickness(0.1f);
-            circle.setOrigin(circle.getRadius(), circle.getRadius());
-            circle.setPosition(pos);
-            this->window_.draw(circle);
-        } else if (b->shape_type == ShapeType::Box)
-        {
-            Vector2Converter::toSFVector2fList(b->getTransformedVertices(), this->vertex_buffer_);
-
-            sf::ConvexShape box(4);
-            for (int i = 0; i < box.getPointCount(); ++i)
-            {
-                box.setPoint(i, this->vertex_buffer_[i]);
-            }
-
-            box.setFillColor(b->color);
-            box.setOutlineThickness(0.1f);
-            box.setOrigin(pos);
-            box.setPosition(pos);
-            this->window_.draw(box);
-        }
+        this->entities_[i].draw(this->window_);
     }
 
     // draw contact points

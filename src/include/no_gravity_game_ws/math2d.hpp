@@ -6,18 +6,17 @@
 namespace Physics2D
 {
     class Vector2f;
-
-    #define EPSILON 0.0005f;
-
     class Math2D
     {
         public:
         Math2D();
 
+        constexpr static float EPSILON = 0.0005f;
+
         // other math stuff
         /// @brief clipping a value between min and max
-        static float clip(float value, float min, float max);
-        static int clip(int value, int min, int max);
+        static float clip(const float value, float min, float max);
+        static int clip(const int value, int min, int max);
         
         /// @brief convert to degree from radian
         /// @param value 

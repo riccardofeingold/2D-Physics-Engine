@@ -7,7 +7,7 @@ Math2D::Math2D()
 
 }
 
-float Math2D::clip(float value, float min, float max)
+float Math2D::clip(const float value, float min, float max)
 {
     if (min == max)
         return min;
@@ -30,7 +30,7 @@ float Math2D::clip(float value, float min, float max)
         return value;
 }
 
-int Math2D::clip(int value, int min, int max)
+int Math2D::clip(const int value, int min, int max)
 {
     if (min == max)
         return min;
@@ -100,10 +100,10 @@ float Math2D::cross(const Vector2f& a, const Vector2f& b)
 
 bool Math2D::nearlyEqual(const float x, const float y)
 {
-    return std::abs(x - y) < EPSILON;
+    return std::abs(x - y) < Math2D::EPSILON;
 }
 
 bool Math2D::nearlyEqual(const Vector2f& v1, const Vector2f& v2)
 {
-    return Math2D::nearlyEqual(v1.x, v2.x) && Math2D::nearlyEqual(v1.y, v2.y);
+    return Math2D::distance_squared(v1, v2) < Math2D::EPSILON*Math2D::EPSILON;
 }

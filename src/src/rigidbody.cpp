@@ -4,48 +4,36 @@ using namespace Physics2D;
 
 Rigidbody::Rigidbody()
 {
-    this->color = Rigidbody::randomColor();
 }
 
 Rigidbody::~Rigidbody() = default;
 
-Rigidbody::Rigidbody(std::string name, const Vector2f& position, float density, float mass, float restitution, float area, bool is_static, float radius, float width, float height, ShapeType shape_type, bool apply_gravity)
+Rigidbody::Rigidbody(float density, float inertia, float mass, float restitution, float area, bool is_static, float radius, float width, float height, std::vector<Vector2f>& vertices, ShapeType shape_type, bool apply_gravity)
 {
-    this->name = name;
-
-    this->color = Rigidbody::randomColor();
-
-    this->apply_gravity_ = apply_gravity;
-    this->force_ = Vector2f::Zero();
-
-    this->position_ = position;
+    this->position_ = Vector2f::Zero();
     this->linear_velocity_ = Vector2f::Zero();
-    this->rotation_ = 0.f;
+    this->angle_ = 0.f;
     this->angular_velocity_ = 0.f;
 
+    this->force_ = Vector2f::Zero();
+    this->apply_gravity_ = apply_gravity;
+
+    this->shape_type = shape_type;
     this->density = density;
     this->mass = mass;
-
-    if (!is_static)
-        this->inverse_mass = 1/mass;
-    else
-        this->inverse_mass = 0;
-
+    this->inverse_mass = mass > 0.f ? 1/mass : 0.f;
+    this->inertia = inertia;
+    this->inv_inertia = inertia > 0.f ? 1.f / inertia : 0.f;
+    this->is_static = is_static;
     this->restitution = restitution;
     this->area = area;
-    
-    this->is_static = is_static;
-
     this->radius = radius;
     this->width = width;
     this->height = height;
 
-    this->shape_type = shape_type;
-
     if (this->shape_type == ShapeType::Box)
     {
-        this->vertices_ = Rigidbody::createBoxVertices(this->width, this->height);
-        this->triangle_indices = Rigidbody::createBoxTriangleIndices();
+        this->vertices_ = vertices;
         this->transformed_vertices_ = std::vector<Vector2f>(this->vertices_.size());
     }
 
@@ -53,7 +41,7 @@ Rigidbody::Rigidbody(std::string name, const Vector2f& position, float density, 
     this->aabb_update_required_ = true;
 }
 
-bool Rigidbody::createCircleBody(std::string name, float radius, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message, bool apply_gravity)
+bool Rigidbody::createCircleBody(const float radius, const float density, const bool is_static, float restitution, Rigidbody*& body, std::string& error_message, const bool apply_gravity)
 {
     error_message = "";
     float area = M_PI*radius*radius;
@@ -87,13 +75,23 @@ bool Rigidbody::createCircleBody(std::string name, float radius, Vector2f positi
     }
 
     restitution = Math2D::clip(restitution, 0.f, 1.f);
-    float mass = area * density;
-    body = new Rigidbody(name, position, density, mass, restitution, area, is_static, radius, 0, 0, ShapeType::Circle, apply_gravity);
 
+    float mass = 0.f;
+    float inertia = 0.f;
+
+    if (!is_static)
+    {
+        mass = area * density;
+        inertia = 0.5 * mass * radius * radius;
+    }
+
+    std::vector<Vector2f> vertices;
+
+    body = new Rigidbody(density, inertia, mass, restitution, area, is_static, radius, 0, 0, vertices, ShapeType::Circle, apply_gravity);
     return true;
 }
 
-bool Rigidbody::createBoxBody(std::string name, float width, float height, Vector2f position, float density, bool is_static, float restitution, Rigidbody*& body, std::string& error_message, bool apply_gravity)
+bool Rigidbody::createBoxBody(const float width, const float height, const float density, const bool is_static, float restitution, Rigidbody*& body, std::string& error_message, const bool apply_gravity)
 {
     error_message = "";
     float area = width*height;
@@ -127,9 +125,19 @@ bool Rigidbody::createBoxBody(std::string name, float width, float height, Vecto
     }
 
     restitution = Math2D::clip(restitution, 0.f, 1.f);
-    float mass = area * density;
-    body = new Rigidbody(name, position, density, mass, restitution, area, is_static,0.f, width, height, ShapeType::Box, apply_gravity);
 
+    float mass = 0.f;
+    float inertia = 0.f;
+
+    if (!is_static)
+    {
+        mass = area * density;
+        inertia = (float)1/12 * mass * (height * height + width * width);
+    }
+
+    std::vector<Vector2f> vertices = Rigidbody::createBoxVertices(width, height);
+
+    body = new Rigidbody(density, inertia, mass, restitution, area, is_static,0.f, width, height, vertices, ShapeType::Box, apply_gravity);
     return true;
 }
 
@@ -149,15 +157,14 @@ void Rigidbody::moveTo(const Vector2f& move)
 
 void Rigidbody::rotate(const float amount)
 {
-    this->rotation_ += amount;
+    this->angle_ += amount;
     this->transform_update_required_ = true;
     this->aabb_update_required_ = true;
 }
 
 void Rigidbody::rotateTo(const float rotation)
 {
-    // the negations is due to the fact that the z axis is pointing into the screen
-    this->rotation_ = rotation;
+    this->angle_ = rotation;
     this->transform_update_required_ = true;
     this->aabb_update_required_ = true;
 }
@@ -187,28 +194,13 @@ std::vector<Vector2f> Rigidbody::createBoxVertices(float width, float height)
     return vertices;
 }
 
-std::vector<int> Rigidbody::createBoxTriangleIndices()
-{
-    // we go clock wise starting at the top left corner
-    std::vector<int> triangles(6);
-
-    triangles[0] = 0;
-    triangles[1] = 1;
-    triangles[2] = 2;
-    triangles[3] = 0;
-    triangles[4] = 2;
-    triangles[5] = 3;
-
-    return triangles;
-}
-
 const std::vector<Vector2f>& Rigidbody::getTransformedVertices()
 {
     if (this->transform_update_required_)
     {
         for (int i = 0; i < this->vertices_.size(); ++i)
         {
-            Transform2D transform = Transform2D(this->position_, this->rotation_);
+            Transform2D transform = Transform2D(this->position_, this->angle_);
             Vector2f transformed_vertex_pos = Vector2f::transform(this->vertices_[i], transform);
             this->transformed_vertices_[i] = transformed_vertex_pos;
         }
@@ -230,9 +222,8 @@ void Rigidbody::update(const sf::Time& dt, const Vector2f& gravity, int substeps
 
     this->linear_velocity_ += this->force_ / this->mass * time;
     this->position_ += this->linear_velocity_ * time;
-    this->rotation_ += this->angular_velocity_ * time;
+    this->angle_ += this->angular_velocity_ * time;
     
-    // this->force_ = Vector2f::Zero();
     this->transform_update_required_ = true;
     this->aabb_update_required_ = true;
 }
@@ -246,7 +237,7 @@ void Rigidbody::applyForce(const Vector2f& force)
 Vector2f Rigidbody::getForce() const { return this->force_; }
 Vector2f Rigidbody::getPosition() const { return this->position_; }
 Vector2f Rigidbody::getLinearVelocity() const { return this->linear_velocity_; }
-float Rigidbody::getRotation() const { return this->rotation_; }
+float Rigidbody::getRotation() const { return this->angle_; }
 float Rigidbody::getAngularVelocity() const { return this->angular_velocity_; }
 
 AABB Rigidbody::getAABB()

@@ -69,27 +69,27 @@ void Collision2D::findContactPoint(Rigidbody*& body_a, Rigidbody*& body_b, Vecto
     {
         if (shape_type_b == ShapeType::Box)
         {
-            Collision2D::findContactPoint(body_a->getTransformedVertices(), body_b->getTransformedVertices(), contact_one, contact_two, contact_count);
+            Collision2D::findPolygonsContactPoint(body_a->getTransformedVertices(), body_b->getTransformedVertices(), contact_one, contact_two, contact_count);
         } else if (shape_type_b == ShapeType::Circle)
         {
-            Collision2D::findContactPoint(body_b->getPosition(), body_b->radius, body_a->getTransformedVertices(), body_a->getPosition(), contact_one);
+            Collision2D::findCirclePolygonContactPoint(body_b->getPosition(), body_b->radius, body_a->getTransformedVertices(), body_a->getPosition(), contact_one);
             contact_count = 1;
         }
     } else if (shape_type_a == ShapeType::Circle)
     {
         if (shape_type_b == ShapeType::Box)
         {
-            Collision2D::findContactPoint(body_a->getPosition(), body_a->radius, body_b->getTransformedVertices(), body_b->getPosition(), contact_one);
+            Collision2D::findCirclePolygonContactPoint(body_a->getPosition(), body_a->radius, body_b->getTransformedVertices(), body_b->getPosition(), contact_one);
             contact_count = 1;
         } else if (shape_type_b == ShapeType::Circle)
         {
-            Collision2D::findContactPoint(body_a->getPosition(), body_a->radius, body_b->getPosition(), body_b->radius, contact_one);
+            Collision2D::findCirclesContactPoint(body_a->getPosition(), body_a->radius, body_b->getPosition(), body_b->radius, contact_one);
             contact_count = 1;
         }
     }
 }
 
-void Collision2D::findContactPoint(const Vector2f& circle_center_a, const float radius_a, const Vector2f& circle_center_b, const float radius_b, Vector2f& contact_point)
+void Collision2D::findCirclesContactPoint(const Vector2f& circle_center_a, const float radius_a, const Vector2f& circle_center_b, const float radius_b, Vector2f& contact_point)
 {
     Vector2f v_diff = circle_center_b - circle_center_a;
     v_diff = Math2D::normalize(v_diff);
@@ -97,7 +97,7 @@ void Collision2D::findContactPoint(const Vector2f& circle_center_a, const float 
     contact_point = circle_center_a + v_diff * radius_a;
 }
 
-void Collision2D::findContactPoint(const Vector2f& circle_center, const float radius, const std::vector<Vector2f>& vertices, const Vector2f& polygon_center, Vector2f& contact_point)
+void Collision2D::findCirclePolygonContactPoint(const Vector2f& circle_center, const float radius, const std::vector<Vector2f>& vertices, const Vector2f& polygon_center, Vector2f& contact_point)
 {
     float min_distance = INFINITY;
     contact_point = Vector2f::Zero();
@@ -119,7 +119,7 @@ void Collision2D::findContactPoint(const Vector2f& circle_center, const float ra
     }
 }
 
-void Collision2D::findContactPoint(const std::vector<Vector2f>& vertices_a, const std::vector<Vector2f>& vertices_b, Vector2f& contact_one, Vector2f& contact_two, int& contact_count)
+void Collision2D::findPolygonsContactPoint(const std::vector<Vector2f>& vertices_a, const std::vector<Vector2f>& vertices_b, Vector2f& contact_one, Vector2f& contact_two, int& contact_count)
 {
     contact_one = Vector2f::Zero();
     contact_two = Vector2f::Zero();
