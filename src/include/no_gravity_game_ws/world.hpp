@@ -40,7 +40,8 @@ namespace Physics2D
         void addObject(const std::string& name, Rigidbody* obj);
         bool removeObject(const std::string& name);
         bool collide(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& normal, float& depth);
-        void resolveCollision(const CollisionManifold& collision);
+        void resolveCollisionBasic(const CollisionManifold& collision);
+        void resolveCollisionWithRotation(const CollisionManifold& collision);
 
         void setup();
         void update(const sf::Time& dt, int substeps);
@@ -52,8 +53,8 @@ namespace Physics2D
         int getBodyCount() const;
 
         // public variables
-        Window* window_;
-        std::vector<std::string> list_of_object_names_;
+        Window* window;
+        std::vector<std::string> list_of_object_names;
         bool game_over = false;
         std::vector<Vector2f> contact_points;
         std::vector<Tuple<int, int>> contact_pairs;
@@ -75,6 +76,12 @@ namespace Physics2D
         std::vector<Rigidbody*> rigidbodies_;
         std::vector<sf::Color> outline_color_;
         std::vector<CollisionManifold> contacts_;
+
+        // for collision resolving
+        std::array<Vector2f, 2> contact_list_;
+        std::array<Vector2f, 2> impulse_list_;
+        std::array<Vector2f, 2> ra_list_;
+        std::array<Vector2f, 2> rb_list_;
 
         // private methods
         void separateBodies(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& mtv);

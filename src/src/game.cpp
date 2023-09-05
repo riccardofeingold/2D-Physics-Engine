@@ -8,7 +8,7 @@ Game::Game() :
     // enemy_(sf::Vector2f(40, 40), 0.f),
     // tester_(sf::Vector2f(40, 40), 0.f)
 {
-    this->world_.window_ = &window_;
+    this->world_.window = &window_;
     
     this->start();
 }
@@ -38,7 +38,7 @@ void Game::start()
     this->view.zoom(ZOOM);
     this->view.setCenter(this->view.getSize().x/2, this->view.getSize().y/2);
     const float padding = this->view.getSize().x * 0.05f;
-    this->world_.window_->getWindow().setView(view);
+    this->world_.window->getWindow().setView(view);
 
     std::string e = "Error!";
     for (int i = 0; i < 4; ++i)
@@ -186,8 +186,8 @@ void Game::handleInput()
     // add box
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !this->window_.mouse_button_pressed)
     {
-        float width = std::max((float)std::rand()/RAND_MAX * 3, 1.f);
-        float height = std::max((float)std::rand()/RAND_MAX * 3, 1.f);
+        float width = std::max((float)std::rand()/RAND_MAX * 4, 2.f);
+        float height = std::max((float)std::rand()/RAND_MAX * 4, 2.f);
         Rigidbody* body = nullptr;
         std::string e = "ERROR";
         Vector2f position = Vector2f((float)sf::Mouse::getPosition(this->window_.getWindow()).x * ZOOM, (float)sf::Mouse::getPosition(this->window_.getWindow()).y * ZOOM);
@@ -201,7 +201,7 @@ void Game::handleInput()
     // add circle
     if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && !this->window_.mouse_button_pressed)
     {
-        float radius = std::max((float)std::rand()/RAND_MAX * 3, 1.f);
+        float radius = std::max((float)std::rand()/RAND_MAX * 4, 2.f);
         Rigidbody* body = nullptr;
         std::string e = "ERROR";
         Vector2f position = Vector2f((float)sf::Mouse::getPosition(this->window_.getWindow()).x * ZOOM, (float)sf::Mouse::getPosition(this->window_.getWindow()).y * ZOOM);
