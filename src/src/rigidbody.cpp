@@ -18,6 +18,9 @@ Rigidbody::Rigidbody(float density, float inertia, float mass, float restitution
     this->force_ = Vector2f::Zero();
     this->apply_gravity_ = apply_gravity;
 
+    this->static_friction = 0.6f;
+    this->dynamic_friction = 0.4f;
+
     this->shape_type = shape_type;
     this->density = density;
     this->mass = mass;

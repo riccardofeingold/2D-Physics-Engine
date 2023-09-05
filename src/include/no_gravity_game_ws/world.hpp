@@ -42,6 +42,7 @@ namespace Physics2D
         bool collide(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& normal, float& depth);
         void resolveCollisionBasic(const CollisionManifold& collision);
         void resolveCollisionWithRotation(const CollisionManifold& collision);
+        void resolveCollisionWithRotationAndFriction(const CollisionManifold& collision);
 
         void setup();
         void update(const sf::Time& dt, int substeps);
@@ -82,6 +83,8 @@ namespace Physics2D
         std::array<Vector2f, 2> impulse_list_;
         std::array<Vector2f, 2> ra_list_;
         std::array<Vector2f, 2> rb_list_;
+        std::array<Vector2f, 2> friction_impulse_list_;
+        std::array<float, 2> j_list_;
 
         // private methods
         void separateBodies(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& mtv);

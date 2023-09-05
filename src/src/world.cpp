@@ -123,6 +123,140 @@ void World2D::resolveCollisionWithRotation(const CollisionManifold& collision)
     }
 }
 
+void World2D::resolveCollisionWithRotationAndFriction(const CollisionManifold& collision)
+{
+    Rigidbody* body_a = collision.body_a;
+    Rigidbody* body_b = collision.body_b;
+    Vector2f normal = collision.normal;
+    Vector2f contact_one = collision.contact_one;
+    Vector2f contact_two = collision.contact_two;
+    int contact_count = collision.contact_count;
+
+    float e = std::min(body_a->restitution, body_b->restitution);
+
+    float sf = (body_a->static_friction + body_b->static_friction) * 0.5f;
+    float df = (body_a->dynamic_friction + body_b->dynamic_friction) * 0.5f;
+
+    this->contact_list_[0] = contact_one;
+    this->contact_list_[1] = contact_two;
+
+    for (int i = 0; i < contact_count; ++i)
+    {
+        this->impulse_list_[i] = Vector2f::Zero();
+        this->friction_impulse_list_[i] = Vector2f::Zero();
+        this->j_list_[i] = 0;
+        this->ra_list_[i] = Vector2f::Zero();
+        this->rb_list_[i] = Vector2f::Zero();
+    }
+
+    for (int i = 0; i < contact_count; ++i)
+    {
+        Vector2f ra = this->contact_list_[i] - body_a->getPosition();
+        Vector2f rb = this->contact_list_[i] - body_b->getPosition();
+
+        this->ra_list_[i] = ra;
+        this->rb_list_[i] = rb;
+        
+        Vector2f ra_perp = Vector2f(-ra.y, ra.x);
+        Vector2f rb_perp = Vector2f(-rb.y, rb.x);
+
+        Vector2f angular_linear_velocity_a = ra_perp * body_a->getAngularVelocity();
+        Vector2f angular_linear_velocity_b = rb_perp * body_b->getAngularVelocity();
+
+        Vector2f v_diff = (body_b->getLinearVelocity()  + angular_linear_velocity_b) - (body_a->getLinearVelocity() + angular_linear_velocity_a);
+
+        float contact_dot_vel = Math2D::dot(v_diff, normal);
+        
+        // only apply impulse if the object are moving apart
+        if (contact_dot_vel > 0.f)
+            continue;
+        
+        float angular_den_a = Math2D::dot(ra, normal) * Math2D::dot(ra, normal) * body_a->inv_inertia;
+        float angular_den_b = Math2D::dot(rb, normal) * Math2D::dot(rb, normal) * body_b->inv_inertia;
+        
+        float j = -(1 + e) * contact_dot_vel;
+        j /= body_a->inverse_mass + body_b->inverse_mass + angular_den_a + angular_den_b;
+        j /= (float)contact_count;
+
+        j_list_[i] = j;
+
+        Vector2f impulse = normal * j;
+        this->impulse_list_[i] = impulse;
+    }
+
+    // we do it in a separate for loop to gurantee that the impulse application does not affect the impulse calculationo
+    for (int i = 0; i < contact_count; ++i)
+    {
+        Vector2f impulse = this->impulse_list_[i];
+        Vector2f ra = this->ra_list_[i];
+        Vector2f rb = this->rb_list_[i];
+
+        body_a->setLinearVelocity(body_a->getLinearVelocity() - impulse * body_a->inv_inertia);
+        body_a->setAngularVelocity(body_a->getAngularVelocity() - Math2D::cross(ra, impulse * body_a->inv_inertia));
+        body_b->setLinearVelocity(body_b->getLinearVelocity() + impulse * body_b->inverse_mass);
+        body_b->setAngularVelocity(body_b->getAngularVelocity() + Math2D::cross(rb, impulse * body_b->inv_inertia));
+    }
+
+    // impulse for frictions
+    for (int i = 0; i < contact_count; ++i)
+    {
+        Vector2f ra = this->contact_list_[i] - body_a->getPosition();
+        Vector2f rb = this->contact_list_[i] - body_b->getPosition();
+
+        this->ra_list_[i] = ra;
+        this->rb_list_[i] = rb;
+        
+        Vector2f ra_perp = Vector2f(-ra.y, ra.x);
+        Vector2f rb_perp = Vector2f(-rb.y, rb.x);
+
+        Vector2f angular_linear_velocity_a = ra_perp * body_a->getAngularVelocity();
+        Vector2f angular_linear_velocity_b = rb_perp * body_b->getAngularVelocity();
+
+        Vector2f v_diff = (body_b->getLinearVelocity()  + angular_linear_velocity_b) - (body_a->getLinearVelocity() + angular_linear_velocity_a);
+
+        Vector2f tangent = v_diff - normal * Math2D::dot(v_diff, normal);
+        
+        if (Math2D::nearlyEqual(tangent, Vector2f::Zero()))
+            continue;
+        else
+            tangent = Math2D::normalize(tangent);
+
+
+        float angular_den_a = Math2D::dot(ra, tangent) * Math2D::dot(ra, tangent) * body_a->inv_inertia;
+        float angular_den_b = Math2D::dot(rb, tangent) * Math2D::dot(rb, tangent) * body_b->inv_inertia;
+        
+        float jt = -Math2D::dot(v_diff, tangent);
+        jt /= body_a->inverse_mass + body_b->inverse_mass + angular_den_a + angular_den_b;
+        jt /= (float)contact_count;
+
+        // coloumb's law
+        Vector2f friction_impulse;
+        float j = this->j_list_[i];
+        if (std::abs(jt) <= j * sf)
+        {
+            friction_impulse = normal * jt;
+        } else
+        {
+            friction_impulse = -tangent * j * df;
+        }
+
+        this->friction_impulse_list_[i] = friction_impulse;
+    }
+
+    // we do it in a separate for loop to gurantee that the impulse application does not affect the impulse calculationo
+    for (int i = 0; i < contact_count; ++i)
+    {
+        Vector2f friction_impulse = this->friction_impulse_list_[i];
+        Vector2f ra = this->ra_list_[i];
+        Vector2f rb = this->rb_list_[i];
+
+        body_a->setLinearVelocity(body_a->getLinearVelocity() - friction_impulse * body_a->inv_inertia);
+        body_a->setAngularVelocity(body_a->getAngularVelocity() - Math2D::cross(ra, friction_impulse * body_a->inv_inertia));
+        body_b->setLinearVelocity(body_b->getLinearVelocity() + friction_impulse * body_b->inverse_mass);
+        body_b->setAngularVelocity(body_b->getAngularVelocity() + Math2D::cross(rb, friction_impulse * body_b->inv_inertia));
+    }
+}
+
 bool World2D::getBody(int index, Rigidbody*& body)
 {
     if (index < 0 || index >= this->rigidbodies_.size())
@@ -237,7 +371,8 @@ void World2D::narrowPhase(const int current_step, const int substeps)
 
             CollisionManifold collision = CollisionManifold(body_a, body_b, normal, depth, contact_one, contact_two, contact_count);
             // this->resolveCollisionBasic(collision);
-            this->resolveCollisionWithRotation(collision);
+            // this->resolveCollisionWithRotation(collision);
+            this->resolveCollisionWithRotationAndFriction(collision);
             this->contacts_.push_back(collision);
         }
     }

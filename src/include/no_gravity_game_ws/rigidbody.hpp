@@ -35,6 +35,8 @@ namespace Physics2D
         float radius; // in meters
         float width; // in meters
         float height; // in meters
+        float static_friction;
+        float dynamic_friction;
         
         // getters
         Vector2f getForce() const;
