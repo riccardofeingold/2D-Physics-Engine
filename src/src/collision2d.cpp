@@ -69,7 +69,7 @@ void Collision2D::findContactPoint(Rigidbody*& body_a, Rigidbody*& body_b, Vecto
     {
         if (shape_type_b == ShapeType::Box)
         {
-
+            Collision2D::findContactPoint(body_a->getTransformedVertices(), body_b->getTransformedVertices(), contact_one, contact_two, contact_count);
         } else if (shape_type_b == ShapeType::Circle)
         {
             Collision2D::findContactPoint(body_b->getPosition(), body_b->radius, body_a->getTransformedVertices(), body_a->getPosition(), contact_one);
@@ -116,6 +116,73 @@ void Collision2D::findContactPoint(const Vector2f& circle_center, const float ra
             min_distance = distance_squared;
             contact_point = cp;
         }    
+    }
+}
+
+void Collision2D::findContactPoint(const std::vector<Vector2f>& vertices_a, const std::vector<Vector2f>& vertices_b, Vector2f& contact_one, Vector2f& contact_two, int& contact_count)
+{
+    contact_one = Vector2f::Zero();
+    contact_two = Vector2f::Zero();
+    contact_count = 0;
+
+    float min_distance_squared = INFINITY;
+
+    for (int i = 0; i < vertices_a.size(); ++i)
+    {
+        Vector2f p = vertices_a[i];
+
+        for (int j = 0; j < vertices_b.size(); ++j)
+        {
+            Vector2f va = vertices_b[j];
+            Vector2f vb = vertices_b[(j + 1) % vertices_b.size()];
+
+            float distance_squared;
+            Vector2f cp = Vector2f::Zero();
+            pointSegmentDistance(p, va, vb, distance_squared, cp);
+
+            if (Math2D::nearlyEqual(distance_squared, min_distance_squared))
+            {
+                if (!Math2D::nearlyEqual(cp, contact_one))
+                {
+                    contact_two = cp;
+                    contact_count = 2;
+                }
+            } else if (distance_squared < min_distance_squared)
+            {
+                min_distance_squared = distance_squared;
+                contact_one = cp;
+                contact_count = 1;
+            }
+        }
+    }
+
+    for (int i = 0; i < vertices_b.size(); ++i)
+    {
+        Vector2f p = vertices_b[i];
+
+        for (int j = 0; j < vertices_a.size(); ++j)
+        {
+            Vector2f va = vertices_a[j];
+            Vector2f vb = vertices_a[(j + 1) % vertices_a.size()];
+
+            float distance_squared;
+            Vector2f cp = Vector2f::Zero();
+            pointSegmentDistance(p, va, vb, distance_squared, cp);
+
+            if (Math2D::nearlyEqual(distance_squared, min_distance_squared))
+            {
+                if (!Math2D::nearlyEqual(cp, contact_one))
+                {
+                    contact_two = cp;
+                    contact_count = 2;
+                }
+            } else if (distance_squared < min_distance_squared)
+            {
+                min_distance_squared = distance_squared;
+                contact_one = cp;
+                contact_count = 1;
+            }
+        }
     }
 }
 

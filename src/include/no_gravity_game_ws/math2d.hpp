@@ -6,6 +6,9 @@
 namespace Physics2D
 {
     class Vector2f;
+
+    #define EPSILON 0.0005f;
+
     class Math2D
     {
         public:
@@ -41,6 +44,10 @@ namespace Physics2D
         static float dot(const Vector2f& a, const Vector2f& b);
         /// @brief cross product
         static float cross(const Vector2f& a, const Vector2f& b);
+        /// @brief returns true if x and y are almost the same
+        static bool nearlyEqual(const float x, const float y);
+        /// @brief returns true if vector one is almost equal to the second vector
+        static bool nearlyEqual(const Vector2f& v1, const Vector2f& v2);
     }; 
 } // namespace Physics2D
 

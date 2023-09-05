@@ -97,3 +97,13 @@ float Math2D::cross(const Vector2f& a, const Vector2f& b)
 {
     return a.x * b.y - a.y * b.x;
 }
+
+bool Math2D::nearlyEqual(const float x, const float y)
+{
+    return std::abs(x - y) < EPSILON;
+}
+
+bool Math2D::nearlyEqual(const Vector2f& v1, const Vector2f& v2)
+{
+    return Math2D::nearlyEqual(v1.x, v2.x) && Math2D::nearlyEqual(v1.y, v2.y);
+}

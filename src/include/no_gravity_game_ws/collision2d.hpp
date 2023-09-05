@@ -109,6 +109,14 @@ namespace Physics2D
         /// @param contact_point 
         static void findContactPoint(const Vector2f& circle_center, const float radius, const std::vector<Vector2f>& vertices, const Vector2f& polygon_center, Vector2f& contact_point);
 
+        /// @brief return contact points betweeen two polygons
+        /// @param vertices_a 
+        /// @param vertices_b 
+        /// @param contact_one 
+        /// @param contact_two 
+        /// @param contact_count 
+        static void findContactPoint(const std::vector<Vector2f>& vertices_a, const std::vector<Vector2f>& vertices_b, Vector2f& contact_one, Vector2f& contact_two, int& contact_count);
+
         /// @brief project the "vertices" of a circle
         /// @param center 
         /// @param radius 
