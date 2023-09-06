@@ -20,11 +20,11 @@ Entity2D::Entity2D(const std::string& name, Rigidbody*& body, World2D& world)
     world.addObject(this->name, this->body);
 }
 
-Entity2D::Entity2D(const std::string& name, const float radius, const bool is_static, const Vector2f& position, World2D& world)
+Entity2D::Entity2D(const std::string& name, const float radius, const bool is_static, const bool apply_gravity, const bool angle_fix, const Vector2f& position, World2D& world)
 {
     Rigidbody* body;
     std::string e;
-    if (!Rigidbody::createCircleBody(radius, 1.f, is_static, 1.f, 0.6f, 0.4f, body, e, true))
+    if (!Rigidbody::createCircleBody(radius, 1.f, is_static, 1.f, 0.6f, 0.4f, body, e, apply_gravity, angle_fix))
     {
         std::cout << e << std::endl;
         assert(1 == 0);
@@ -37,11 +37,11 @@ Entity2D::Entity2D(const std::string& name, const float radius, const bool is_st
     world.addObject(this->name, this->body);
 }
 
-Entity2D::Entity2D(const std::string& name, const float width, const float height, const bool is_static, const Vector2f& position, World2D& world)
+Entity2D::Entity2D(const std::string& name, const float width, const float height, const bool is_static, const bool apply_gravity, const bool angle_fix, const Vector2f& position, World2D& world)
 {
     Rigidbody* body;
     std::string e;
-    if (!Rigidbody::createBoxBody(width, height, 1.f, is_static, 1.f, 0.6f, 0.4f, body, e, true))
+    if (!Rigidbody::createBoxBody(width, height, 1.f, is_static, 1.f, 0.6f, 0.4f, body, e, apply_gravity, angle_fix))
     {
         std::cout << e << std::endl;
         assert(1 == 0);

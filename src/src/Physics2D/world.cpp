@@ -206,8 +206,8 @@ void World2D::resolveCollisionWithRotationAndFriction(const CollisionManifold& c
         Vector2f ra_perp = Vector2f(-ra.y, ra.x);
         Vector2f rb_perp = Vector2f(-rb.y, rb.x);
 
-        Vector2f angular_linear_velocity_a = ra_perp * body_a->getAngularVelocity();
-        Vector2f angular_linear_velocity_b = rb_perp * body_b->getAngularVelocity();
+        Vector2f angular_linear_velocity_a = body_a->angle_fix ? Vector2f::Zero() : ra_perp * body_a->getAngularVelocity();
+        Vector2f angular_linear_velocity_b = body_b->angle_fix ? Vector2f::Zero() : rb_perp * body_b->getAngularVelocity();
 
         Vector2f v_diff = (body_b->getLinearVelocity()  + angular_linear_velocity_b) - (body_a->getLinearVelocity() + angular_linear_velocity_a);
 
@@ -217,8 +217,8 @@ void World2D::resolveCollisionWithRotationAndFriction(const CollisionManifold& c
         if (contact_dot_vel > 0.f)
             continue;
         
-        float angular_den_a = Math2D::dot(ra, normal) * Math2D::dot(ra, normal) * body_a->inv_inertia;
-        float angular_den_b = Math2D::dot(rb, normal) * Math2D::dot(rb, normal) * body_b->inv_inertia;
+        float angular_den_a = body_a->angle_fix ? 0.f : Math2D::dot(ra, normal) * Math2D::dot(ra, normal) * body_a->inv_inertia;
+        float angular_den_b = body_b->angle_fix ? 0.f : Math2D::dot(rb, normal) * Math2D::dot(rb, normal) * body_b->inv_inertia;
         
         float j = -(1 + e) * contact_dot_vel;
         j /= body_a->inverse_mass + body_b->inverse_mass + angular_den_a + angular_den_b;
@@ -238,9 +238,11 @@ void World2D::resolveCollisionWithRotationAndFriction(const CollisionManifold& c
         Vector2f rb = this->rb_list_[i];
 
         body_a->setLinearVelocity(body_a->getLinearVelocity() - impulse * body_a->inv_inertia);
-        body_a->setAngularVelocity(body_a->getAngularVelocity() - Math2D::cross(ra, impulse * body_a->inv_inertia));
         body_b->setLinearVelocity(body_b->getLinearVelocity() + impulse * body_b->inverse_mass);
-        body_b->setAngularVelocity(body_b->getAngularVelocity() + Math2D::cross(rb, impulse * body_b->inv_inertia));
+        if (!body_a->angle_fix)
+            body_a->setAngularVelocity(body_a->getAngularVelocity() - Math2D::cross(ra, impulse * body_a->inv_inertia));
+        if (!body_b->angle_fix)
+            body_b->setAngularVelocity(body_b->getAngularVelocity() + Math2D::cross(rb, impulse * body_b->inv_inertia));
     }
 
     // impulse for frictions
@@ -255,8 +257,8 @@ void World2D::resolveCollisionWithRotationAndFriction(const CollisionManifold& c
         Vector2f ra_perp = Vector2f(-ra.y, ra.x);
         Vector2f rb_perp = Vector2f(-rb.y, rb.x);
 
-        Vector2f angular_linear_velocity_a = ra_perp * body_a->getAngularVelocity();
-        Vector2f angular_linear_velocity_b = rb_perp * body_b->getAngularVelocity();
+        Vector2f angular_linear_velocity_a = body_a->angle_fix ? Vector2f::Zero() : ra_perp * body_a->getAngularVelocity();
+        Vector2f angular_linear_velocity_b = body_b->angle_fix ? Vector2f::Zero() : rb_perp * body_b->getAngularVelocity();
 
         Vector2f v_diff = (body_b->getLinearVelocity()  + angular_linear_velocity_b) - (body_a->getLinearVelocity() + angular_linear_velocity_a);
 
@@ -268,8 +270,8 @@ void World2D::resolveCollisionWithRotationAndFriction(const CollisionManifold& c
             tangent = Math2D::normalize(tangent);
 
 
-        float angular_den_a = Math2D::dot(ra, tangent) * Math2D::dot(ra, tangent) * body_a->inv_inertia;
-        float angular_den_b = Math2D::dot(rb, tangent) * Math2D::dot(rb, tangent) * body_b->inv_inertia;
+        float angular_den_a = body_a->angle_fix ? 0.f : Math2D::dot(ra, tangent) * Math2D::dot(ra, tangent) * body_a->inv_inertia;
+        float angular_den_b = body_b->angle_fix ? 0.f : Math2D::dot(rb, tangent) * Math2D::dot(rb, tangent) * body_b->inv_inertia;
         
         float jt = -Math2D::dot(v_diff, tangent);
         jt /= body_a->inverse_mass + body_b->inverse_mass + angular_den_a + angular_den_b;
@@ -297,9 +299,12 @@ void World2D::resolveCollisionWithRotationAndFriction(const CollisionManifold& c
         Vector2f rb = this->rb_list_[i];
 
         body_a->setLinearVelocity(body_a->getLinearVelocity() - friction_impulse * body_a->inv_inertia);
-        body_a->setAngularVelocity(body_a->getAngularVelocity() - Math2D::cross(ra, friction_impulse * body_a->inv_inertia));
         body_b->setLinearVelocity(body_b->getLinearVelocity() + friction_impulse * body_b->inverse_mass);
-        body_b->setAngularVelocity(body_b->getAngularVelocity() + Math2D::cross(rb, friction_impulse * body_b->inv_inertia));
+
+        if (!body_a->angle_fix)
+            body_a->setAngularVelocity(body_a->getAngularVelocity() - Math2D::cross(ra, friction_impulse * body_a->inv_inertia));
+        if (!body_b->angle_fix)
+            body_b->setAngularVelocity(body_b->getAngularVelocity() + Math2D::cross(rb, friction_impulse * body_b->inv_inertia));
     }
 }
 
@@ -416,10 +421,7 @@ void World2D::narrowPhase(const int current_step, const int substeps)
             Collision2D::findContactPoint(body_a, body_b, contact_one, contact_two, contact_count);
 
             CollisionManifold collision = CollisionManifold(body_a, body_b, normal, depth, contact_one, contact_two, contact_count);
-            // this->resolveCollisionBasic(collision);
-            this->resolveCollisionBasicWithFriction(collision);
-            // this->resolveCollisionWithRotation(collision);
-            // this->resolveCollisionWithRotationAndFriction(collision);
+            this->resolveCollisionWithRotationAndFriction(collision);
             this->contacts_.push_back(collision);
         }
     }

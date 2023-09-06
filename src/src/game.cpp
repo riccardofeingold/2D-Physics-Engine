@@ -159,7 +159,7 @@ void Game::handleInput()
         Vector2f position = Vector2f((float)sf::Mouse::getPosition(this->window_.getWindow()).x * ZOOM, (float)sf::Mouse::getPosition(this->window_.getWindow()).y * ZOOM);
         
         std::string name = std::to_string(this->world_.getBodyCount() + 1);
-        this->entities_.push_back(Entity2D(name, width, height, false, position, this->world_));
+        this->entities_.push_back(Entity2D(name, width, height, false, true, false, position, this->world_));
 
         this->window_.mouse_button_pressed = true;
     }
@@ -173,7 +173,7 @@ void Game::handleInput()
         Vector2f position = Vector2f((float)sf::Mouse::getPosition(this->window_.getWindow()).x * ZOOM, (float)sf::Mouse::getPosition(this->window_.getWindow()).y * ZOOM);
 
         std::string name = std::to_string(this->world_.getBodyCount() + 1);
-        this->entities_.push_back(Entity2D(name, radius, false, position, this->world_));
+        this->entities_.push_back(Entity2D(name, radius, false, true, false, position, this->world_));
 
         this->window_.mouse_button_pressed = true;
     }
