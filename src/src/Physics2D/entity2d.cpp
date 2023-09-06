@@ -1,4 +1,4 @@
-#include "../include/no_gravity_game_ws/entity2d.hpp"
+#include "../../include/no_gravity_game_ws/Physics2D/entity2d.hpp"
 
 using namespace Physics2D;
 

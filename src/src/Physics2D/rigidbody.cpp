@@ -1,10 +1,8 @@
-#include "../include/no_gravity_game_ws/rigidbody.hpp"
+#include "../../include/no_gravity_game_ws/Physics2D/rigidbody.hpp"
 
 using namespace Physics2D;
 
-Rigidbody::Rigidbody()
-{
-}
+Rigidbody::Rigidbody() = default;
 
 Rigidbody::~Rigidbody() = default;
 

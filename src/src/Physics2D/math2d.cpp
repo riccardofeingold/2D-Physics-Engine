@@ -1,11 +1,8 @@
-#include "../include/no_gravity_game_ws/math2d.hpp"
+#include "../../include/no_gravity_game_ws/Physics2D/math2d.hpp"
 
 using namespace Physics2D;
 
-Math2D::Math2D()
-{
-
-}
+Math2D::Math2D() = default;
 
 float Math2D::clip(const float value, float min, float max)
 {

@@ -11,18 +11,18 @@ FetchContent_MakeAvailable(SFML)
 add_executable(NoGravityGameWS 
                src/main.cpp 
                src/src/game.cpp 
-               src/src/window.cpp
-               src/src/world.cpp
-               src/src/ray.cpp
-               src/src/vector2d.cpp
-               src/src/vector2dconverter.cpp
-               src/src/rigidbody.cpp
-               src/src/math2d.cpp
-               src/src/collision2d.cpp
-               src/src/transform2d.cpp
-               src/src/aabb.cpp
-               src/src/collisionManifold.cpp
-               src/src/entity2d.cpp
+               src/src/Physics2D/window.cpp
+               src/src/Physics2D/world.cpp
+               src/src/Physics2D/ray.cpp
+               src/src/Physics2D/vector2d.cpp
+               src/src/Physics2D/vector2dconverter.cpp
+               src/src/Physics2D/rigidbody.cpp
+               src/src/Physics2D/math2d.cpp
+               src/src/Physics2D/collision2d.cpp
+               src/src/Physics2D/transform2d.cpp
+               src/src/Physics2D/aabb.cpp
+               src/src/Physics2D/collisionManifold.cpp
+               src/src/Physics2D/entity2d.cpp
 )
 target_include_directories(NoGravityGameWS PUBLIC include/no_gravity_game_ws)
 target_link_libraries(NoGravityGameWS PRIVATE sfml-graphics)

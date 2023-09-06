@@ -18,14 +18,14 @@ namespace Physics2D
         Triangle = 2,
         Polygon = 3
     };
-    
+
     class Rigidbody
     {
         public:
         Rigidbody();
         Rigidbody(float density, float inertia, float mass, float restitution, float area, bool isStatic, float radius, float width, float height, const float static_friction, const float dynamic_friction, std::vector<Vector2f>& vertices, ShapeType shape_type, bool apply_gravity = false);
         ~Rigidbody();
-
+    
         ShapeType shape_type;
         float density; // in kg/m^3
         float mass; // in kg
@@ -135,6 +135,8 @@ namespace Physics2D
         /// @param height 
         /// @return list of vertices
         static std::vector<Vector2f> createBoxVertices(float width, float height);
+
+        // TODO: Possibility to add more convex shapes
     };
 }
 

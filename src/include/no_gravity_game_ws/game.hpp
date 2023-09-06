@@ -1,15 +1,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include <chrono>
-
-#include "window.hpp"
-#include "world.hpp"
-#include "rigidbody.hpp"
-#include "vector2dconverter.hpp"
-#include "collision2d.hpp"
-#include "entity2d.hpp"
-#include <SFML/Graphics.hpp>
+#include "Physics2D/Physics2D.hpp"
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
@@ -90,11 +82,6 @@ class Game
     int total_samples_ = 0;
     std::string time_step_string_ = "";
     std::string body_count_string_ = "";
-    // Player player_;
-    // Goal goal_;
-    // Enemy enemy_;
-    // Enemy tester_;
-    // std::vector<Wall> walls_;
 
     // private methods
     /// @brief keeps the objects inside the screen

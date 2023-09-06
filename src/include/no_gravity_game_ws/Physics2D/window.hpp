@@ -1,7 +1,7 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-#include "colors.hpp"
+#include "../colors.hpp"
 #include <string>
 
 class Window

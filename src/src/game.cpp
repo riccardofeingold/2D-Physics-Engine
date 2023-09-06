@@ -97,7 +97,7 @@ void Game::handleInput()
     // keyboard steering
     Vector2f dv(0.f, 0.f);
     float delta_rotation = 0.f;
-    float angular_speed = M_PI/4;
+    float angular_speed = M_PI;
     float force_magnitude = 100.f;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
@@ -117,8 +117,17 @@ void Game::handleInput()
     {
         Vector2f force_direction = Math2D::normalize(dv);
         Vector2f force = force_direction * force_magnitude;
-        Rigidbody* body = nullptr;
-        assert(this->world_.getBody("player", body));
+        Rigidbody* body;
+        
+        try
+        {
+            this->world_.getBody("player", body);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+        
         body->applyForce(force);
     }
 
@@ -126,8 +135,17 @@ void Game::handleInput()
     {
         int sign = delta_rotation < 0 ? -1 : 1;
         float rotation = sign * angular_speed * this->dt_.asSeconds();
-        Rigidbody* body = nullptr;
-        assert(this->world_.getBody("player", body));
+        Rigidbody* body;
+
+        try
+        {
+            this->world_.getBody("player", body);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+        
         body->rotate(rotation);
     }
 

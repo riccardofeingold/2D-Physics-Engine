@@ -1,4 +1,4 @@
-#include "../include/no_gravity_game_ws/window.hpp"
+#include "../../include/no_gravity_game_ws/Physics2D/window.hpp"
 
 Window::Window()
 {
