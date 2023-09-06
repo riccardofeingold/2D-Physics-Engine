@@ -100,6 +100,22 @@ void Game::handleInput()
     float angular_speed = M_PI;
     float force_magnitude = 100.f;
 
+    // joystick input
+    if (sf::Joystick::isConnected(0))
+    {
+        int throttle = (int)sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
+        int rotation = (int)sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Z);
+        int left_right = (int)sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
+
+        dv.y = 1.f;
+        dv.x = 1.f;
+        delta_rotation = 1.f;
+        dv.y *= throttle;
+        dv.x *= left_right;
+        delta_rotation *= rotation;
+    }
+
+    // keyboard input
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         --dv.y;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
