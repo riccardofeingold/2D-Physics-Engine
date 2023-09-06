@@ -55,6 +55,52 @@ void World2D::resolveCollisionBasic(const CollisionManifold& collision)
     collision.body_b->setLinearVelocity(collision.body_b->getLinearVelocity() + impulse * collision.body_b->inverse_mass);
 }
 
+void World2D::resolveCollisionBasicWithFriction(const CollisionManifold& collision)
+{
+    Vector2f v_diff = collision.body_b->getLinearVelocity() - collision.body_a->getLinearVelocity();
+
+    // only apply impulse if the object are moving apart
+    if (Math2D::dot(v_diff, collision.normal) > 0.f)
+        return;
+
+    float e = std::min(collision.body_a->restitution, collision.body_b->restitution);
+    float j = -(1 + e) * Math2D::dot(v_diff, collision.normal);
+    j /= collision.body_a->inverse_mass + collision.body_b->inverse_mass;
+    j /= (float)collision.contact_count;
+
+    Vector2f impulse = collision.normal * j;
+
+    // friction impulse
+    float sf = (collision.body_a->static_friction + collision.body_b->static_friction) * 0.5f;
+    float df = (collision.body_a->dynamic_friction + collision.body_b->dynamic_friction) * 0.5f;
+
+    Vector2f tangent = v_diff - collision.normal * Math2D::dot(v_diff, collision.normal);
+        
+    if (Math2D::nearlyEqual(tangent, Vector2f::Zero()))
+        tangent = Vector2f::Zero();
+    else
+        tangent = Math2D::normalize(tangent);
+
+    float jt = -Math2D::dot(v_diff, tangent);
+    jt /= collision.body_a->inverse_mass + collision.body_b->inverse_mass;
+    jt /= (float)collision.contact_count;
+
+    Vector2f friction_impulse;
+    if (std::abs(jt) <= j * sf)
+    {
+        friction_impulse = collision.normal * jt;
+    } else
+    {
+        friction_impulse = -tangent * j * df;
+    }
+
+    // apply impulses
+    collision.body_a->setLinearVelocity(collision.body_a->getLinearVelocity() - impulse * collision.body_a->inverse_mass);
+    collision.body_b->setLinearVelocity(collision.body_b->getLinearVelocity() + impulse * collision.body_b->inverse_mass);
+    collision.body_a->setLinearVelocity(collision.body_a->getLinearVelocity() - friction_impulse * collision.body_a->inverse_mass);
+    collision.body_b->setLinearVelocity(collision.body_b->getLinearVelocity() + friction_impulse * collision.body_b->inverse_mass);
+}
+
 void World2D::resolveCollisionWithRotation(const CollisionManifold& collision)
 {
     Rigidbody* body_a = collision.body_a;
@@ -371,8 +417,9 @@ void World2D::narrowPhase(const int current_step, const int substeps)
 
             CollisionManifold collision = CollisionManifold(body_a, body_b, normal, depth, contact_one, contact_two, contact_count);
             // this->resolveCollisionBasic(collision);
+            this->resolveCollisionBasicWithFriction(collision);
             // this->resolveCollisionWithRotation(collision);
-            this->resolveCollisionWithRotationAndFriction(collision);
+            // this->resolveCollisionWithRotationAndFriction(collision);
             this->contacts_.push_back(collision);
         }
     }

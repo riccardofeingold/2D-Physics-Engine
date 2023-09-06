@@ -41,6 +41,7 @@ namespace Physics2D
         bool removeObject(const std::string& name);
         bool collide(Rigidbody*& body_a, Rigidbody*& body_b, Vector2f& normal, float& depth);
         void resolveCollisionBasic(const CollisionManifold& collision);
+        void resolveCollisionBasicWithFriction(const CollisionManifold& collision);
         void resolveCollisionWithRotation(const CollisionManifold& collision);
         void resolveCollisionWithRotationAndFriction(const CollisionManifold& collision);
 
