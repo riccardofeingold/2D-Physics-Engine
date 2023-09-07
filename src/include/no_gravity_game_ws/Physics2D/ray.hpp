@@ -4,20 +4,20 @@
 #include "world.hpp"
 #include <cmath>
 
-// forward declarations
 
-#define THICKNESS 1
+#define THICKNESS 0.1
 #define MAX_DISTANCE 200
 
 namespace Physics2D
 {
     // forward declarations
     class World2D;
+    class Rigidbody;
 
     class Ray
     {
         public:
-        Ray(const Vector2f* start, float angle);
+        Ray(Rigidbody*& body, float angle);
         ~Ray();
 
         void castRay(World2D& w);
@@ -30,12 +30,18 @@ namespace Physics2D
         const float getAngle() const;
 
         private:
+        void checkLeftSide(const Vector2f& player, const Vector2f& tl, const Vector2f& tr, const Vector2f& br, const Vector2f& bl, std::vector<sf::Vector2f>& points);
+        void checkRightSide(const Vector2f& player, const Vector2f& tl, const Vector2f& tr, const Vector2f& br, const Vector2f& bl, std::vector<sf::Vector2f>& points);
+        void checkTopSide(const Vector2f& player, const Vector2f& tl, const Vector2f& tr, const Vector2f& br, const Vector2f& bl, std::vector<sf::Vector2f>& points);
+        void checkBottomSide(const Vector2f& player, const Vector2f& tl, const Vector2f& tr, const Vector2f& br, const Vector2f& bl, std::vector<sf::Vector2f>& points);
+        
         sf::RectangleShape line_;
         sf::Vector2f direction_;
         const Vector2f* start_;
         const float angle_; // degrees
         float distance_;
         sf::Vector2f point_of_contact_;
+        Rigidbody* body_;
     };
 }
 

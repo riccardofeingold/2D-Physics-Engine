@@ -1,5 +1,4 @@
 #include "../include/no_gravity_game_ws/game.hpp"
-#define debugging true
 
 Game::Game() : 
     window_("2D Drone Simulator", sf::Vector2u(SCREEN_WIDTH, SCREEN_HEIGHT), FRAME_RATE)
@@ -47,12 +46,12 @@ void Game::start()
             else
             {
                 body->moveTo(Vector2f(this->view.getSize().x / 2, this->view.getSize().y / 2));
-                // int num_rays = 20;
-                // for (int i = 0; i < num_rays; ++i)
-                // {
-                //     Ray ray = Ray(body->getPosition(), (float)360 / num_rays * i);
-                //     body->rays.push_back(ray);
-                // }
+                int num_rays = 20;
+                for (int i = 0; i < num_rays; ++i)
+                {
+                    Ray ray = Ray(body, (float)360 / num_rays * i);
+                    body->rays.push_back(ray);
+                }
                 this->entities_.push_back(Entity2D("player", body, Colors().PLAYER, this->world_));
             }
             continue;
@@ -301,15 +300,19 @@ void Game::render()
     step_time_text.setPosition(0, 0);
     this->window_.draw(step_time_text);
 
-    /********TESTING**********/
-    #if !debugging
-    for (auto r : this->world_.getObject("player").rays)
+    // draw raycasts
+    Rigidbody* player;
+    
+    if (!this->world_.getBody("player", player))
+        std::cout << "ERROR" << std::endl;
+
+    for (int i = 0; i < player->rays.size(); ++i)
     {
+        Ray r = player->rays[i];
         r.castRay(this->world_);
         r.draw();
         this->window_.draw(r.getLineShape());
     }
-    #endif
 
     this->window_.endDraw();
 }
