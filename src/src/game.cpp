@@ -265,6 +265,20 @@ void Game::update()
 void Game::render()
 {
     this->window_.beginDraw();
+    
+    // draw raycasts
+    Rigidbody* player;
+    
+    if (!this->world_.getBody("player", player))
+        std::cout << "ERROR" << std::endl;
+
+    for (int i = 0; i < player->rays.size(); ++i)
+    {
+        Ray r = player->rays[i];
+        r.castRay(this->world_);
+        r.draw();
+        this->window_.draw(r.getLineShape());
+    }
 
     for (int i = 0; i < this->entities_.size(); ++i)
     {
@@ -300,19 +314,6 @@ void Game::render()
     step_time_text.setPosition(0, 0);
     this->window_.draw(step_time_text);
 
-    // draw raycasts
-    Rigidbody* player;
-    
-    if (!this->world_.getBody("player", player))
-        std::cout << "ERROR" << std::endl;
-
-    for (int i = 0; i < player->rays.size(); ++i)
-    {
-        Ray r = player->rays[i];
-        r.castRay(this->world_);
-        r.draw();
-        this->window_.draw(r.getLineShape());
-    }
 
     this->window_.endDraw();
 }

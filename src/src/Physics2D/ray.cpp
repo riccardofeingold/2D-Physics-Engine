@@ -61,7 +61,10 @@ void Ray::castRay(World2D& w)
         {
             if (b->shape_type == ShapeType::Circle)
             {
-
+                Vector2f point;
+                this->lineCircleIntersection(player, b, point);
+                this->point_of_contact_ = Vector2Converter::toSFVector2f(point);
+                global_points.push_back(this->point_of_contact_);
             } else if (b->shape_type == ShapeType::Box)
             {
                 std::vector<sf::Vector2f> points;
@@ -106,6 +109,51 @@ void Ray::castRay(World2D& w)
             min_d = d;
             this->point_of_contact_ = p;
         }
+    }
+}
+
+void Ray::lineCircleIntersection(const Vector2f& player, Rigidbody* const & body, Vector2f& point)
+{
+    Vector2f diff_pos = body->getPosition() - player;
+    Vector2f direction = Vector2Converter::toPhysics2DVector2f(this->direction_);
+    float dot = Math2D::dot(direction, diff_pos);
+
+    if (dot < 0)
+        return;
+
+    float xpm = player.x - body->getPosition().x;
+    float ypm = player.y - body->getPosition().y;
+    float b = 2 * (direction.x * xpm + direction.y * ypm);
+    float c = xpm * xpm + ypm * ypm - body->radius * body->radius;
+
+    float discriminant = b * b - 4 * c;
+    if (discriminant < 0)
+        return;
+    else if (discriminant == 0)
+    {
+        float lambda = -b / 2;
+        point.x = lambda * direction.x + player.x;
+        point.y = lambda * direction.y + player.y;
+    } else if (discriminant > 0)
+    {
+        float lambda1 = (-b + std::sqrt(discriminant)) / 2;
+        float lambda2 = (-b - std::sqrt(discriminant)) / 2;
+
+        Vector2f point1;
+        Vector2f point2;
+
+        point1.x = lambda1 * direction.x + player.x;
+        point1.y = lambda1 * direction.y + player.y;
+        point2.x = lambda2 * direction.x + player.x;
+        point2.y = lambda2 * direction.y + player.y;
+
+        float d1 = Math2D::distance_squared(point1, player);
+        float d2 = Math2D::distance_squared(point2, player);
+
+        if (d1 < d2)
+            point = point1;
+        else
+            point = point2;
     }
 }
 
