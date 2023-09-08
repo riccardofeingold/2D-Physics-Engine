@@ -244,3 +244,8 @@ void Ray::checkTopSide(const Vector2f& player, const Vector2f& tl, const Vector2
         }
     }
 }
+
+float Ray::getDistance()
+{
+    return Math2D::distance(this->body_->getPosition(), Vector2Converter::toPhysics2DVector2f(this->point_of_contact_));
+}

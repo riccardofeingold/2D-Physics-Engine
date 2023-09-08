@@ -28,6 +28,7 @@ namespace Physics2D
         const sf::RectangleShape& getLineShape() const;
         const float getDistance() const;
         const float getAngle() const;
+        float getDistance();
 
         private:
         void checkLeftSide(const Vector2f& player, const Vector2f& tl, const Vector2f& tr, const Vector2f& br, const Vector2f& bl, std::vector<sf::Vector2f>& points);
@@ -39,7 +40,6 @@ namespace Physics2D
 
         sf::RectangleShape line_;
         sf::Vector2f direction_;
-        const Vector2f* start_;
         const float angle_; // degrees
         float distance_;
         sf::Vector2f point_of_contact_;
