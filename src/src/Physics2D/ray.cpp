@@ -44,12 +44,8 @@ void Ray::draw()
 
 void Ray::castRay(World2D& w)
 {
-    Rigidbody* body = nullptr;
-    Vector2f player;
-    if (w.getBody("player", body))
-    {
-        player = body->getPosition();
-    }
+    Vector2f player = this->body_->getPosition();
+
     std::vector<sf::Vector2f> global_points;
     // wikipedia article about line intersection: https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
     for (int i = 0; i < w.getBodyCount(); ++i)
@@ -57,14 +53,16 @@ void Ray::castRay(World2D& w)
         Rigidbody* b;
         w.getBody(i, b);
 
-        if (body != b)
+        if (this->body_ != b)
         {
             if (b->shape_type == ShapeType::Circle)
             {
                 Vector2f point;
-                this->lineCircleIntersection(player, b, point);
-                this->point_of_contact_ = Vector2Converter::toSFVector2f(point);
-                global_points.push_back(this->point_of_contact_);
+                if (this->lineCircleIntersection(player, b, point))
+                {
+                    this->point_of_contact_ = Vector2Converter::toSFVector2f(point);
+                    global_points.push_back(this->point_of_contact_);
+                }
             } else if (b->shape_type == ShapeType::Box)
             {
                 std::vector<sf::Vector2f> points;
@@ -81,7 +79,7 @@ void Ray::castRay(World2D& w)
 
                 // if nothing has been found set contact point to start
                 if (points.size() == 0)
-                    this->point_of_contact_ = Vector2Converter::toSFVector2f(this->body_->getPosition()) + sf::Vector2f(200, 200);
+                    this->point_of_contact_ = Vector2Converter::toSFVector2f(this->body_->getPosition()) + sf::Vector2f(this->RANGE, this->RANGE);
                 else
                 {
                     float min_d = INFINITY;
@@ -110,16 +108,23 @@ void Ray::castRay(World2D& w)
             this->point_of_contact_ = p;
         }
     }
+
+    // check if object is in range
+    if (Math2D::distance_squared(Vector2Converter::toPhysics2DVector2f(this->point_of_contact_), player) > RANGE * RANGE)
+    {
+        this->point_of_contact_ = Vector2Converter::toSFVector2f(this->body_->getPosition()) + sf::Vector2f(RANGE, RANGE);
+    }
+
 }
 
-void Ray::lineCircleIntersection(const Vector2f& player, Rigidbody* const & body, Vector2f& point)
+bool Ray::lineCircleIntersection(const Vector2f& player, Rigidbody* const & body, Vector2f& point)
 {
     Vector2f diff_pos = body->getPosition() - player;
     Vector2f direction = Vector2Converter::toPhysics2DVector2f(this->direction_);
     float dot = Math2D::dot(direction, diff_pos);
 
     if (dot < 0)
-        return;
+        return false;
 
     float xpm = player.x - body->getPosition().x;
     float ypm = player.y - body->getPosition().y;
@@ -128,7 +133,7 @@ void Ray::lineCircleIntersection(const Vector2f& player, Rigidbody* const & body
 
     float discriminant = b * b - 4 * c;
     if (discriminant < 0)
-        return;
+        return false;
     else if (discriminant == 0)
     {
         float lambda = -b / 2;
@@ -155,6 +160,8 @@ void Ray::lineCircleIntersection(const Vector2f& player, Rigidbody* const & body
         else
             point = point2;
     }
+
+    return true;
 }
 
 void Ray::checkLeftSide(const Vector2f& player, const Vector2f& tl, const Vector2f& tr, const Vector2f& br, const Vector2f& bl, std::vector<sf::Vector2f>& points)
