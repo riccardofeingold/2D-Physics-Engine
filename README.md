@@ -22,3 +22,4 @@ of a Lidar sensor. If you're interested in knowing how I implemented my physics 
   - Allow more customization of the Lidar sensor
 - Joint simulation
 - Soft body physics
+- 2D legged robots (just for fun 😂)
