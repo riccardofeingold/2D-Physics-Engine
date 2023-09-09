@@ -266,6 +266,16 @@ void Game::render()
 {
     this->window_.beginDraw();
 
+    // draw walls
+    for (int i = 0; i < this->entities_.size(); ++i)
+    {
+        Entity2D e = this->entities_[i];
+        if (e.name != "player")
+        {
+            e.draw(this->window_);
+        }
+    }
+
     // draw raycasts
     Rigidbody* player;
     
@@ -278,12 +288,22 @@ void Game::render()
         r.castRay(this->world_);
         r.draw();
         this->window_.draw(r.getLineShape());
+
+        float radius = 0.3f;
+        sf::CircleShape point(radius);
+
+        point.setFillColor(sf::Color::Green);
+        point.setOrigin(radius, radius);
+        point.setPosition(r.getPointOfContact().x, r.getPointOfContact().y);
+
+        this->window_.draw(point);
     }
 
-    for (int i = 0; i < this->entities_.size(); ++i)
-    {
-        this->entities_[i].draw(this->window_);
-    }
+    // draw player
+    Entity2D player_entity = *std::find_if(this->entities_.begin(), this->entities_.end(), [&](Entity2D e) {
+        return e.name == "player";
+    });
+    player_entity.draw(this->window_);
 
     // draw contact points
     if (this->world_.render_collision_points)

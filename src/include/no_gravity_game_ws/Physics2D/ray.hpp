@@ -6,7 +6,6 @@
 
 
 #define THICKNESS 0.1
-#define MAX_DISTANCE 200
 
 namespace Physics2D
 {
@@ -29,6 +28,7 @@ namespace Physics2D
         const float getDistance() const;
         const float getAngle() const;
         float getDistance();
+        sf::Vector2f getPointOfContact();
 
         static constexpr float RANGE = 5.f; // 5 m
 

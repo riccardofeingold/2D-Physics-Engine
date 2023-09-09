@@ -18,6 +18,7 @@ Ray::Ray(Rigidbody*& body, float angle)
 Ray::~Ray() = default;
 
 // getters
+sf::Vector2f Ray::getPointOfContact() { return this->point_of_contact_; }
 const sf::RectangleShape& Ray::getLineShape() const { return this->line_; }
 const float Ray::getDistance() const { return this->distance_; }
 const float Ray::getAngle() const { return this->angle_; }
@@ -34,10 +35,13 @@ void Ray::draw()
     line_.setOrigin(sf::Vector2f(0, line_.getSize().y/2));
     line_.setPosition(Vector2Converter::toSFVector2f(this->body_->getPosition()));
 
-    if (this->distance_ <= MAX_DISTANCE)
+    if (this->distance_ <= RANGE)
         line_.setSize(sf::Vector2f(this->distance_, THICKNESS));
     else
-        line_.setSize(sf::Vector2f(MAX_DISTANCE, THICKNESS));
+    {
+        line_.setSize(sf::Vector2f(RANGE, THICKNESS));
+        this->point_of_contact_ = Vector2Converter::toSFVector2f(this->body_->getPosition());
+    }
         
     line_.rotate(this->angle_);
 }
@@ -77,10 +81,7 @@ void Ray::castRay(World2D& w)
                 this->checkRightSide(player, tl, tr, br, bl, points);
                 this->checkBottomSide(player, tl, tr, br, bl, points);                
 
-                // if nothing has been found set contact point to start
-                if (points.size() == 0)
-                    this->point_of_contact_ = Vector2Converter::toSFVector2f(this->body_->getPosition()) + sf::Vector2f(this->RANGE, this->RANGE);
-                else
+                if (points.size() != 0)
                 {
                     float min_d = INFINITY;
                     for (auto p : points)
@@ -108,13 +109,6 @@ void Ray::castRay(World2D& w)
             this->point_of_contact_ = p;
         }
     }
-
-    // check if object is in range
-    if (Math2D::distance_squared(Vector2Converter::toPhysics2DVector2f(this->point_of_contact_), player) > RANGE * RANGE)
-    {
-        this->point_of_contact_ = Vector2Converter::toSFVector2f(this->body_->getPosition()) + sf::Vector2f(RANGE, RANGE);
-    }
-
 }
 
 bool Ray::lineCircleIntersection(const Vector2f& player, Rigidbody* const & body, Vector2f& point)

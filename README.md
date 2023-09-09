@@ -8,6 +8,7 @@ of a Lidar sensor.
 [![Watch the video](media/Physics2D.png)](media/Physics2D.mp4)
 
 ## 🔨 Upcoming Possible Features
+- Implement a contact point class => currently the drawing of these points happens in the game.cpp file
 - Air drag
 - Collision detection with concave shapes
 - Path finding algorithm: Goal is to enable the developer to add autonomous agents that can find the shortest path to a target
