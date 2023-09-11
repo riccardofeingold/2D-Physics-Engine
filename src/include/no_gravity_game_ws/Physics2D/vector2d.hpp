@@ -14,10 +14,14 @@ namespace Physics2D
         Vector2f();
         Vector2f(float x, float y);
         
+        // used for float equality
         static constexpr float EPSILON = 0.0005f;
-        // variables
+
+        // 2D coordinates
         float x;
         float y;
+
+        // Zero vector
         static Vector2f Zero();
 
         // operations
@@ -32,6 +36,8 @@ namespace Physics2D
         bool operator==(const Vector2f& a);
         std::size_t getHashCode();
         std::string toString();
+
+        // transforms a vector by a given transformation
         static Vector2f transform(Vector2f& a, Transform2D& transform);
     };
 }
