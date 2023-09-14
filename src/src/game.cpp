@@ -289,14 +289,8 @@ void Game::render()
         r.draw();
         this->window_.draw(r.getLineShape());
 
-        float radius = 0.3f;
-        sf::CircleShape point(radius);
-
-        point.setFillColor(sf::Color::Green);
-        point.setOrigin(radius, radius);
-        point.setPosition(r.getPointOfContact().x, r.getPointOfContact().y);
-
-        this->window_.draw(point);
+        Point2D point(0.3f, sf::Color::Green, Vector2Converter::toPhysics2DVector2f(r.getPointOfContact()));
+        point.draw(this->window_);
     }
 
     // draw player
@@ -310,32 +304,26 @@ void Game::render()
     {
         for (int i = 0; i < this->world_.contact_points.size(); ++i)
         {
-            float radius = 0.3f;
-            sf::CircleShape point(radius);
-            point.setFillColor(sf::Color::Red);
-            point.setOrigin(radius, radius);
-            point.setPosition(this->world_.contact_points[i].x, this->world_.contact_points[i].y);
-            this->window_.draw(point);
+            Point2D point(0.3f, sf::Color::Red, this->world_.contact_points[i]);
+            point.draw(this->window_);
         }
     }
 
     // draw text
-    sf::Font font;
-    if (!font.loadFromFile("/Users/riccardofeingold/opt/GameCreations/no_gravity_game_ws/fonts/Roboto-Light.ttf"))
-        std::cout << "Couldn't find font!" << std::endl;
+    Text2D debugging_text(
+        "Step Time: " + this->time_step_string_ + " microseconds\n" + "Body Count: " + this->body_count_string_,
+        Vector2f::Zero(),
+        ZOOM,
+        "/Users/riccardofeingold/opt/GameCreations/no_gravity_game_ws/fonts/Roboto-Light.ttf",
+        20,
+        sf::Color::White,
+        sf::Text::Regular
+    );
 
-    sf::Text step_time_text;
-    step_time_text.setString("Step Time: " + this->time_step_string_ + " microseconds\n" + "Body Count: " + this->body_count_string_);
-    step_time_text.setStyle(sf::Text::Regular);
-    step_time_text.setFillColor(sf::Color::White);
-    step_time_text.setFont(font);
-    step_time_text.setCharacterSize(20);
-    step_time_text.setScale(ZOOM, ZOOM);
-    step_time_text.setPosition(0, 0);
-    this->window_.draw(step_time_text);
-
-
+    debugging_text.draw(this->window_);
+    
     this->window_.endDraw();
+
 }
 
 Window* Game::getWindow()

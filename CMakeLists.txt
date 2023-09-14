@@ -23,6 +23,8 @@ add_executable(NoGravityGameWS
                src/src/Physics2D/aabb.cpp
                src/src/Physics2D/collisionManifold.cpp
                src/src/Physics2D/entity2d.cpp
+               src/src/Physics2D/point2d.cpp
+               src/src/Physics2D/text2d.cpp
 )
 target_include_directories(NoGravityGameWS PUBLIC include/no_gravity_game_ws)
 target_link_libraries(NoGravityGameWS PRIVATE sfml-graphics)

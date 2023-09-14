@@ -10,5 +10,7 @@
 #include "vector2dconverter.hpp"
 #include "collision2d.hpp"
 #include "entity2d.hpp"
+#include "point2d.hpp"
+#include "text2d.hpp"
 
 #endif
