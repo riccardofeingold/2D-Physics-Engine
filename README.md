@@ -10,7 +10,6 @@ of a Lidar sensor. If you're interested in knowing how I implemented my physics 
 [![Watch the video](media/Physics2D.png)](media/Physics2D.mp4)
 
 ## 🔨 Upcoming Possible Features
-- Implement a contact point class => currently the drawing of these points happens in the game.cpp file
 - Air drag
 - Collision detection with concave shapes
 - Path finding algorithm: Goal is to enable the developer to add autonomous agents that can find the shortest path to a target
@@ -25,3 +24,5 @@ of a Lidar sensor. If you're interested in knowing how I implemented my physics 
 - 2D legged robots
 - Wheeled robots
 - Quadcopter
+- ✅ Implement a contact point class => currently the drawing of these points happens in the game.cpp file
+- ✅ Implement a text class that handles the drawing using the SFML library
